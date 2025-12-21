@@ -14,6 +14,12 @@ test('products index returns successful response', function () {
             'status',
             'message',
             'data',
+            'meta' => [
+                'current_page',
+                'last_page',
+                'per_page',
+                'total',
+            ],
         ]);
 });
 
@@ -27,10 +33,16 @@ test('products index returns correct response structure', function () {
             'status' => true,
             'message' => 'Products retrieved successfully',
             'data' => [],
+            'meta' => [
+                'current_page' => 1,
+                'last_page' => 1,
+                'per_page' => 15,
+                'total' => 0,
+            ],
         ]);
 });
 
-test('products index returns all products for a store', function () {
+test('products index returns paginated products for a store', function () {
     $store = Store::factory()->create();
     $user = User::factory()->create();
 
@@ -42,7 +54,8 @@ test('products index returns all products for a store', function () {
     $response = $this->getJson("/api/v1/stores/{$store->id}/products");
 
     $response->assertSuccessful()
-        ->assertJsonCount(5, 'data');
+        ->assertJsonCount(5, 'data')
+        ->assertJsonPath('meta.total', 5);
 });
 
 test('products index returns product with correct data', function () {
@@ -87,6 +100,9 @@ test('products index returns empty data when store has no products', function ()
         ->assertJson([
             'status' => true,
             'data' => [],
+            'meta' => [
+                'total' => 0,
+            ],
         ]);
 });
 
@@ -114,5 +130,40 @@ test('products index only returns products for the specified store', function ()
     $response = $this->getJson("/api/v1/stores/{$store1->id}/products");
 
     $response->assertSuccessful()
-        ->assertJsonCount(3, 'data');
+        ->assertJsonCount(3, 'data')
+        ->assertJsonPath('meta.total', 3);
+});
+
+test('products index respects per_page parameter', function () {
+    $store = Store::factory()->create();
+    $user = User::factory()->create();
+
+    Product::factory()->count(10)->create([
+        'store_id' => $store->id,
+        'user_id' => $user->id,
+    ]);
+
+    $response = $this->getJson("/api/v1/stores/{$store->id}/products?per_page=5");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(5, 'data')
+        ->assertJsonPath('meta.per_page', 5)
+        ->assertJsonPath('meta.total', 10)
+        ->assertJsonPath('meta.last_page', 2);
+});
+
+test('products index returns correct page', function () {
+    $store = Store::factory()->create();
+    $user = User::factory()->create();
+
+    Product::factory()->count(10)->create([
+        'store_id' => $store->id,
+        'user_id' => $user->id,
+    ]);
+
+    $response = $this->getJson("/api/v1/stores/{$store->id}/products?per_page=5&page=2");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(5, 'data')
+        ->assertJsonPath('meta.current_page', 2);
 });

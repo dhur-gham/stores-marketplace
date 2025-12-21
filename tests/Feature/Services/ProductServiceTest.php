@@ -6,15 +6,30 @@ use App\Models\Product;
 use App\Models\Store;
 use App\Models\User;
 use App\Services\ProductService;
+use Illuminate\Pagination\LengthAwarePaginator;
 
-test('get_products_by_store returns empty array when store has no products', function () {
+test('get_products_by_store returns paginator and data keys', function () {
     $store = Store::factory()->create();
 
     $service = new ProductService();
 
     $result = $service->get_products_by_store($store);
 
-    expect($result)->toBeArray()->toBeEmpty();
+    expect($result)->toBeArray()
+        ->toHaveKeys(['paginator', 'data']);
+    expect($result['paginator'])->toBeInstanceOf(LengthAwarePaginator::class);
+    expect($result['data'])->toBeArray();
+});
+
+test('get_products_by_store returns empty data when store has no products', function () {
+    $store = Store::factory()->create();
+
+    $service = new ProductService();
+
+    $result = $service->get_products_by_store($store);
+
+    expect($result['data'])->toBeArray()->toBeEmpty();
+    expect($result['paginator']->total())->toBe(0);
 });
 
 test('get_products_by_store returns all products for a store', function () {
@@ -30,7 +45,8 @@ test('get_products_by_store returns all products for a store', function () {
 
     $result = $service->get_products_by_store($store);
 
-    expect($result)->toBeArray()->toHaveCount(5);
+    expect($result['data'])->toBeArray()->toHaveCount(5);
+    expect($result['paginator']->total())->toBe(5);
 });
 
 test('get_products_by_store returns correct product structure', function () {
@@ -55,8 +71,8 @@ test('get_products_by_store returns correct product structure', function () {
 
     $result = $service->get_products_by_store($store);
 
-    expect($result)->toHaveCount(1);
-    expect($result[0])->toMatchArray([
+    expect($result['data'])->toHaveCount(1);
+    expect($result['data'][0])->toMatchArray([
         'id' => $product->id,
         'name' => 'Test Product',
         'slug' => 'test-product',
@@ -89,7 +105,8 @@ test('get_products_by_store only returns products for the specified store', func
 
     $result = $service->get_products_by_store($store1);
 
-    expect($result)->toHaveCount(3);
+    expect($result['data'])->toHaveCount(3);
+    expect($result['paginator']->total())->toBe(3);
 });
 
 test('get_products_by_store only returns expected keys', function () {
@@ -105,7 +122,7 @@ test('get_products_by_store only returns expected keys', function () {
 
     $result = $service->get_products_by_store($store);
 
-    expect($result[0])->toHaveKeys([
+    expect($result['data'][0])->toHaveKeys([
         'id',
         'name',
         'slug',
@@ -145,8 +162,44 @@ test('get_products_by_store returns products with different statuses', function 
 
     $result = $service->get_products_by_store($store);
 
-    expect($result)->toHaveCount(3);
+    expect($result['data'])->toHaveCount(3);
 
-    $statuses = collect($result)->pluck('status')->toArray();
+    $statuses = collect($result['data'])->pluck('status')->toArray();
     expect($statuses)->toContain('active', 'inactive', 'draft');
+});
+
+test('get_products_by_store respects per_page parameter', function () {
+    $store = Store::factory()->create();
+    $user = User::factory()->create();
+
+    Product::factory()->count(10)->create([
+        'store_id' => $store->id,
+        'user_id' => $user->id,
+    ]);
+
+    $service = new ProductService();
+
+    $result = $service->get_products_by_store($store, per_page: 5);
+
+    expect($result['data'])->toHaveCount(5);
+    expect($result['paginator']->perPage())->toBe(5);
+    expect($result['paginator']->total())->toBe(10);
+    expect($result['paginator']->lastPage())->toBe(2);
+});
+
+test('get_products_by_store uses default per_page of 15', function () {
+    $store = Store::factory()->create();
+    $user = User::factory()->create();
+
+    Product::factory()->count(20)->create([
+        'store_id' => $store->id,
+        'user_id' => $user->id,
+    ]);
+
+    $service = new ProductService();
+
+    $result = $service->get_products_by_store($store);
+
+    expect($result['data'])->toHaveCount(15);
+    expect($result['paginator']->perPage())->toBe(15);
 });
