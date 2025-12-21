@@ -16,8 +16,16 @@ class OrderFactory extends Factory
      */
     public function definition(): array
     {
+        $delivery_price = fake()->randomFloat(2, 5, 50);
+        $items_total = fake()->randomFloat(2, 50, 500);
+        
         return [
-            //
+            'user_id' => \App\Models\User::factory(),
+            'store_id' => \App\Models\Store::factory(),
+            'city_id' => \App\Models\City::factory(),
+            'total' => $items_total + $delivery_price,
+            'delivery_price' => $delivery_price,
+            'status' => fake()->randomElement(['new', 'pending', 'processing', 'completed', 'cancelled', 'refunded']),
         ];
     }
 }

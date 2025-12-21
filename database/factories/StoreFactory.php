@@ -16,8 +16,14 @@ class StoreFactory extends Factory
      */
     public function definition(): array
     {
+        $name = fake()->company();
+        
         return [
-            //
+            'name' => $name,
+            'slug' => \Illuminate\Support\Str::slug($name) . '-' . fake()->unique()->numberBetween(1, 9999),
+            'bio' => fake()->sentence(),
+            'image' => fake()->imageUrl(640, 480, 'business'),
+            'type' => fake()->randomElement(['digital', 'physical']),
         ];
     }
 }
