@@ -5,19 +5,22 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Store;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class StoreService
 {
     /**
-     * Get all stores with their product count.
+     * Get paginated stores with their product count.
      *
-     * @return array<int, array<string, mixed>>
+     * @return array{paginator: LengthAwarePaginator, data: array<int, array<string, mixed>>}
      */
-    public function get_all_stores(): array
+    public function get_all_stores(int $per_page = 15): array
     {
-        return Store::query()
+        $paginator = Store::query()
             ->withCount('products')
-            ->get()
+            ->paginate($per_page);
+
+        $data = $paginator->getCollection()
             ->map(fn (Store $store) => [
                 'id' => $store->id,
                 'name' => $store->name,
@@ -28,6 +31,10 @@ class StoreService
                 'products_count' => $store->products_count,
             ])
             ->toArray();
+
+        return [
+            'paginator' => $paginator,
+            'data' => $data,
+        ];
     }
 }
-

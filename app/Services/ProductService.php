@@ -6,18 +6,20 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\Store;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductService
 {
     /**
-     * Get all products for a given store.
+     * Get paginated products for a given store.
      *
-     * @return array<int, array<string, mixed>>
+     * @return array{paginator: LengthAwarePaginator, data: array<int, array<string, mixed>>}
      */
-    public function get_products_by_store(Store $store): array
+    public function get_products_by_store(Store $store, int $per_page = 15): array
     {
-        return $store->products()
-            ->get()
+        $paginator = $store->products()->paginate($per_page);
+
+        $data = $paginator->getCollection()
             ->map(fn (Product $product) => [
                 'id' => $product->id,
                 'name' => $product->name,
@@ -31,6 +33,10 @@ class ProductService
                 'stock' => $product->stock,
             ])
             ->toArray();
+
+        return [
+            'paginator' => $paginator,
+            'data' => $data,
+        ];
     }
 }
-
