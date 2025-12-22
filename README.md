@@ -140,7 +140,7 @@ Migrations include:
 - `digital` - Digital goods (no delivery needed)
 - `physical` - Physical goods (requires delivery)
 
-## API Endpoints (Planned)
+## API Endpoints
 
 ```
 # Authentication
@@ -208,20 +208,6 @@ Format code:
 vendor/bin/pint
 ```
 
-## Future Enhancements
-
-### Planned Features
-1. **Address Model** - Full delivery addresses (street, building, apartment, phone)
-2. **Product Reviews & Ratings** - Customer feedback system
-3. **Store Categories** - Categorize stores (Electronics, Fashion, Food, etc.)
-4. **Payment Integration** - Payment gateway integration
-5. **Wishlist/Favorites** - User product favorites
-6. **Soft Deletes** - Preserve historical data for orders
-7. **Product Images Gallery** - Multiple images per product
-8. **Inventory Tracking** - Stock alerts and management
-9. **Discount/Coupon System** - Promotional codes
-10. **Order Tracking** - Real-time delivery tracking
-
 ## Admin Panel
 
 Access Filament admin panel at `/admin` after creating a user.
@@ -229,6 +215,3 @@ Access Filament admin panel at `/admin` after creating a user.
 All users can currently access the admin panel. Modify `User::canAccessPanel()` to add restrictions.
 
 
----
-
-**Status**: 🚧 In Development
