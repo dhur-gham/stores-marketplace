@@ -11,7 +11,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 test('get_products_by_store returns paginator and data keys', function () {
     $store = Store::factory()->create();
 
-    $service = new ProductService();
+    $service = new ProductService;
 
     $result = $service->get_products_by_store($store);
 
@@ -24,7 +24,7 @@ test('get_products_by_store returns paginator and data keys', function () {
 test('get_products_by_store returns empty data when store has no products', function () {
     $store = Store::factory()->create();
 
-    $service = new ProductService();
+    $service = new ProductService;
 
     $result = $service->get_products_by_store($store);
 
@@ -41,7 +41,7 @@ test('get_products_by_store returns all products for a store', function () {
         'user_id' => $user->id,
     ]);
 
-    $service = new ProductService();
+    $service = new ProductService;
 
     $result = $service->get_products_by_store($store);
 
@@ -63,11 +63,11 @@ test('get_products_by_store returns correct product structure', function () {
         'sku' => 'SKU-123',
         'status' => ProductStatus::Active,
         'type' => ProductType::Physical,
-        'price' => 99.99,
+        'price' => 99,
         'stock' => 50,
     ]);
 
-    $service = new ProductService();
+    $service = new ProductService;
 
     $result = $service->get_products_by_store($store);
 
@@ -81,7 +81,7 @@ test('get_products_by_store returns correct product structure', function () {
         'sku' => 'SKU-123',
         'status' => 'active',
         'type' => 'physical',
-        'price' => '99.99',
+        'price' => 99,
         'stock' => 50,
     ]);
 });
@@ -101,7 +101,7 @@ test('get_products_by_store only returns products for the specified store', func
         'user_id' => $user->id,
     ]);
 
-    $service = new ProductService();
+    $service = new ProductService;
 
     $result = $service->get_products_by_store($store1);
 
@@ -118,7 +118,7 @@ test('get_products_by_store only returns expected keys', function () {
         'user_id' => $user->id,
     ]);
 
-    $service = new ProductService();
+    $service = new ProductService;
 
     $result = $service->get_products_by_store($store);
 
@@ -158,7 +158,7 @@ test('get_products_by_store returns products with different statuses', function 
         'status' => ProductStatus::Draft,
     ]);
 
-    $service = new ProductService();
+    $service = new ProductService;
 
     $result = $service->get_products_by_store($store);
 
@@ -177,7 +177,7 @@ test('get_products_by_store respects per_page parameter', function () {
         'user_id' => $user->id,
     ]);
 
-    $service = new ProductService();
+    $service = new ProductService;
 
     $result = $service->get_products_by_store($store, per_page: 5);
 
@@ -196,7 +196,7 @@ test('get_products_by_store uses default per_page of 15', function () {
         'user_id' => $user->id,
     ]);
 
-    $service = new ProductService();
+    $service = new ProductService;
 
     $result = $service->get_products_by_store($store);
 

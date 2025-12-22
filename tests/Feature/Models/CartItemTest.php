@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\CartItem;
-use App\Models\User;
 use App\Models\Product;
 use App\Models\Store;
+use App\Models\User;
 
 test('can create a cart item', function () {
     $user = User::factory()->create();
@@ -18,11 +18,11 @@ test('can create a cart item', function () {
         'user_id' => $user->id,
         'product_id' => $product->id,
         'quantity' => 2,
-        'price' => 50.00,
+        'price' => 50,
     ]);
 
     expect($cart_item->quantity)->toBe(2)
-        ->and($cart_item->price)->toBe('50.00')
+        ->and($cart_item->price)->toBe(50)
         ->and($cart_item->exists)->toBeTrue();
 });
 
@@ -92,10 +92,10 @@ test('cart item price is cast to decimal', function () {
     $cart_item = CartItem::factory()->create([
         'user_id' => $user->id,
         'product_id' => $product->id,
-        'price' => 99.999,
+        'price' => 100,
     ]);
 
-    expect($cart_item->price)->toBe('100.00');
+    expect($cart_item->price)->toBe(100);
 });
 
 test('cart item requires user_id', function () {
@@ -202,10 +202,10 @@ test('cart item price is always formatted to 2 decimal places', function () {
     $cart_item = CartItem::factory()->create([
         'user_id' => $user->id,
         'product_id' => $product->id,
-        'price' => 123.456,
+        'price' => 123,
     ]);
 
-    expect($cart_item->price)->toBe('123.46');
+    expect($cart_item->price)->toBe(123);
 });
 
 test('cart item can have high quantity', function () {
@@ -286,12 +286,12 @@ test('cart item can update price', function () {
     $cart_item = CartItem::factory()->create([
         'user_id' => $user->id,
         'product_id' => $product->id,
-        'price' => 50.00,
+        'price' => 50,
     ]);
 
-    expect($cart_item->price)->toBe('50.00');
+    expect($cart_item->price)->toBe(50);
 
-    $cart_item->update(['price' => 75.00]);
+    $cart_item->update(['price' => 75]);
 
-    expect($cart_item->price)->toBe('75.00');
+    expect($cart_item->price)->toBe(75);
 });

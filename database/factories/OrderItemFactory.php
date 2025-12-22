@@ -20,7 +20,7 @@ class OrderItemFactory extends Factory
             'order_id' => \App\Models\Order::factory(),
             'product_id' => \App\Models\Product::factory(),
             'quantity' => fake()->numberBetween(1, 5),
-            'price' => fake()->randomFloat(2, 10, 1000),
+            'price' => fake()->numberBetween(1000, 500000),
         ];
     }
 }

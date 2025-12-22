@@ -43,7 +43,7 @@ class Product extends Model
         return [
             'status' => ProductStatus::class,
             'type' => ProductType::class,
-            'price' => 'decimal:2',
+            'price' => 'integer',
             'stock' => 'integer',
         ];
     }
@@ -80,4 +80,3 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 }
-

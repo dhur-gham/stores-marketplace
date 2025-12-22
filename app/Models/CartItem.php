@@ -32,7 +32,7 @@ class CartItem extends Model
     {
         return [
             'quantity' => 'integer',
-            'price' => 'decimal:2',
+            'price' => 'integer',
         ];
     }
 

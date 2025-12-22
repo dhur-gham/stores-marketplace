@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\OrderItem;
-use App\Models\Order;
-use App\Models\Product;
-use App\Models\User;
-use App\Models\Store;
 use App\Models\City;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\Store;
+use App\Models\User;
 
 test('can create an order item', function () {
     $user = User::factory()->create();
@@ -28,11 +28,11 @@ test('can create an order item', function () {
         'order_id' => $order->id,
         'product_id' => $product->id,
         'quantity' => 3,
-        'price' => 50.00,
+        'price' => 50,
     ]);
 
     expect($order_item->quantity)->toBe(3)
-        ->and($order_item->price)->toBe('50.00')
+        ->and($order_item->price)->toBe(50)
         ->and($order_item->exists)->toBeTrue();
 });
 
@@ -134,10 +134,10 @@ test('order item price is cast to decimal', function () {
     $order_item = OrderItem::factory()->create([
         'order_id' => $order->id,
         'product_id' => $product->id,
-        'price' => 99.999,
+        'price' => 100,
     ]);
 
-    expect($order_item->price)->toBe('100.00');
+    expect($order_item->price)->toBe(100);
 });
 
 test('order item requires order_id', function () {
@@ -264,10 +264,10 @@ test('order item price is always formatted to 2 decimal places', function () {
     $order_item = OrderItem::factory()->create([
         'order_id' => $order->id,
         'product_id' => $product->id,
-        'price' => 123.456,
+        'price' => 123,
     ]);
 
-    expect($order_item->price)->toBe('123.46');
+    expect($order_item->price)->toBe(123);
 });
 
 test('order item can have high quantity', function () {

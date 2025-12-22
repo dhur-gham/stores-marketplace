@@ -17,18 +17,18 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         $name = fake()->words(3, true);
-        
+
         return [
             'store_id' => \App\Models\Store::factory(),
             'user_id' => \App\Models\User::factory(),
             'name' => $name,
-            'slug' => \Illuminate\Support\Str::slug($name) . '-' . fake()->unique()->numberBetween(1, 9999),
+            'slug' => \Illuminate\Support\Str::slug($name).'-'.fake()->unique()->numberBetween(1, 9999),
             'image' => fake()->imageUrl(640, 480, 'products'),
             'description' => fake()->paragraph(),
             'sku' => fake()->unique()->bothify('SKU-####-????'),
             'status' => fake()->randomElement(['active', 'inactive', 'draft']),
             'type' => fake()->randomElement(['digital', 'physical']),
-            'price' => fake()->randomFloat(2, 10, 1000),
+            'price' => fake()->numberBetween(1000, 500000),
             'stock' => fake()->numberBetween(0, 100),
         ];
     }

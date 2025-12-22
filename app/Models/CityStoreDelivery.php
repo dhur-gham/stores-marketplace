@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class OrderItem extends Model
+class CityStoreDelivery extends Model
 {
-    /** @use HasFactory<\Database\Factories\OrderItemFactory> */
-    use HasFactory;
+    /**
+     * The table associated with the model.
+     */
+    protected $table = 'city_store_delivery';
 
     /**
      * The attributes that are mass assignable.
@@ -17,9 +18,8 @@ class OrderItem extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'order_id',
-        'product_id',
-        'quantity',
+        'city_id',
+        'store_id',
         'price',
     ];
 
@@ -31,24 +31,23 @@ class OrderItem extends Model
     protected function casts(): array
     {
         return [
-            'quantity' => 'integer',
             'price' => 'integer',
         ];
     }
 
     /**
-     * Order item belongs to an order.
+     * Get the city for this delivery.
      */
-    public function order(): BelongsTo
+    public function city(): BelongsTo
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(City::class);
     }
 
     /**
-     * Order item belongs to a product.
+     * Get the store for this delivery.
      */
-    public function product(): BelongsTo
+    public function store(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Store::class);
     }
 }

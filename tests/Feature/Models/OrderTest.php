@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\Order;
-use App\Models\User;
-use App\Models\Store;
-use App\Models\City;
-use App\Models\OrderItem;
 use App\Enums\OrderStatus;
+use App\Models\City;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Store;
+use App\Models\User;
 
 test('can create an order', function () {
     $user = User::factory()->create();
@@ -16,13 +16,13 @@ test('can create an order', function () {
         'user_id' => $user->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
-        'total' => 150.50,
-        'delivery_price' => 10.00,
+        'total' => 150000,
+        'delivery_price' => 5000,
         'status' => 'new',
     ]);
 
-    expect($order->total)->toBe('150.50')
-        ->and($order->delivery_price)->toBe('10.00')
+    expect($order->total)->toBe(150000)
+        ->and($order->delivery_price)->toBe(5000)
         ->and($order->status)->toBe(OrderStatus::New)
         ->and($order->exists)->toBeTrue();
 });
@@ -119,10 +119,10 @@ test('order total is cast to decimal', function () {
         'user_id' => $user->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
-        'total' => 123.456,
+        'total' => 123,
     ]);
 
-    expect($order->total)->toBe('123.46');
+    expect($order->total)->toBe(123);
 });
 
 test('order delivery price is cast to decimal', function () {
@@ -134,10 +134,10 @@ test('order delivery price is cast to decimal', function () {
         'user_id' => $user->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
-        'delivery_price' => 15.999,
+        'delivery_price' => 15,
     ]);
 
-    expect($order->delivery_price)->toBe('16.00');
+    expect($order->delivery_price)->toBe(15);
 });
 
 test('order can have all status types', function () {
@@ -201,7 +201,7 @@ test('order can have zero delivery price', function () {
         'total' => 100.00,
     ]);
 
-    expect($order->delivery_price)->toBe('0.00')
+    expect($order->delivery_price)->toBe(0)
         ->and($order->exists)->toBeTrue();
 });
 
@@ -280,8 +280,8 @@ test('order total is always formatted to 2 decimal places', function () {
         'user_id' => $user->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
-        'total' => 99.999,
+        'total' => 99,
     ]);
 
-    expect($order->total)->toBe('100.00');
+    expect($order->total)->toBe(99);
 });

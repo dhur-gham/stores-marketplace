@@ -35,8 +35,8 @@ class Order extends Model
     protected function casts(): array
     {
         return [
-            'total' => 'decimal:2',
-            'delivery_price' => 'decimal:2',
+            'total' => 'integer',
+            'delivery_price' => 'integer',
             'status' => OrderStatus::class,
         ];
     }

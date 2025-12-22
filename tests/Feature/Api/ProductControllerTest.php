@@ -71,7 +71,7 @@ test('products index returns product with correct data', function () {
         'sku' => 'SKU-1234',
         'status' => 'active',
         'type' => 'physical',
-        'price' => 99.99,
+        'price' => 99,
         'stock' => 50,
     ]);
 
@@ -86,7 +86,7 @@ test('products index returns product with correct data', function () {
             'sku' => 'SKU-1234',
             'status' => 'active',
             'type' => 'physical',
-            'price' => '99.99',
+            'price' => 99,
             'stock' => 50,
         ]);
 });

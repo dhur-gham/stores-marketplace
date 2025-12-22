@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\StoreType;
 use App\Models\Store;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Str;
 
 class StoreService
 {
@@ -36,5 +38,72 @@ class StoreService
             'paginator' => $paginator,
             'data' => $data,
         ];
+    }
+
+    /**
+     * Create a new store.
+     *
+     * @param  array{name: string, bio?: string|null, image?: string|null, type: StoreType, user_id?: int|null}  $data
+     */
+    public function create_store(array $data): Store
+    {
+        $data['slug'] = $this->generate_unique_slug($data['name']);
+
+        return Store::query()->create($data);
+    }
+
+    /**
+     * Update an existing store.
+     *
+     * @param  array{name?: string, bio?: string|null, image?: string|null, type?: StoreType}  $data
+     */
+    public function update_store(Store $store, array $data): Store
+    {
+        if (isset($data['name']) && $data['name'] !== $store->name) {
+            $data['slug'] = $this->generate_unique_slug($data['name'], $store->id);
+        }
+
+        $store->update($data);
+
+        return $store->fresh();
+    }
+
+    /**
+     * Delete a store.
+     */
+    public function delete_store(Store $store): bool
+    {
+        return $store->delete();
+    }
+
+    /**
+     * Generate a unique slug for a store.
+     */
+    private function generate_unique_slug(string $name, ?int $exclude_id = null): string
+    {
+        $slug = Str::slug($name);
+        $original_slug = $slug;
+        $counter = 1;
+
+        while ($this->slug_exists($slug, $exclude_id)) {
+            $slug = $original_slug.'-'.$counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Check if a slug already exists.
+     */
+    private function slug_exists(string $slug, ?int $exclude_id = null): bool
+    {
+        $query = Store::query()->where('slug', $slug);
+
+        if ($exclude_id !== null) {
+            $query->where('id', '!=', $exclude_id);
+        }
+
+        return $query->exists();
     }
 }

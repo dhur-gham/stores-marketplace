@@ -1,12 +1,12 @@
 <?php
 
+use App\Enums\ProductStatus;
+use App\Enums\ProductType;
+use App\Models\CartItem;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\User;
-use App\Models\CartItem;
-use App\Models\OrderItem;
-use App\Enums\ProductStatus;
-use App\Enums\ProductType;
 
 test('can create a product', function () {
     $store = Store::factory()->create();
@@ -16,12 +16,12 @@ test('can create a product', function () {
         'store_id' => $store->id,
         'user_id' => $user->id,
         'name' => 'Test Product',
-        'price' => 99.99,
+        'price' => 25000,
         'stock' => 10,
     ]);
 
     expect($product->name)->toBe('Test Product')
-        ->and($product->price)->toBe('99.99')
+        ->and($product->price)->toBe(25000)
         ->and($product->stock)->toBe(10)
         ->and($product->exists)->toBeTrue();
 });
@@ -129,17 +129,18 @@ test('product type is cast to enum', function () {
         ->and($product->type)->toBe(ProductType::Digital);
 });
 
-test('product price is cast to decimal', function () {
+test('product price is cast to integer', function () {
     $store = Store::factory()->create();
     $user = User::factory()->create();
 
     $product = Product::factory()->create([
         'store_id' => $store->id,
         'user_id' => $user->id,
-        'price' => 123.456,
+        'price' => 25000,
     ]);
 
-    expect($product->price)->toBe('123.46');
+    expect($product->price)->toBeInt()
+        ->and($product->price)->toBe(25000);
 });
 
 test('product stock is cast to integer', function () {
@@ -213,17 +214,18 @@ test('product can have multiple types', function () {
         ->and($physicalProduct->type)->toBe(ProductType::Physical);
 });
 
-test('product price is always formatted to 2 decimal places', function () {
+test('product price is stored as integer without decimals', function () {
     $store = Store::factory()->create();
     $user = User::factory()->create();
 
     $product = Product::factory()->create([
         'store_id' => $store->id,
         'user_id' => $user->id,
-        'price' => 99.999,
+        'price' => 50000,
     ]);
 
-    expect($product->price)->toBe('100.00');
+    expect($product->price)->toBeInt()
+        ->and($product->price)->toBe(50000);
 });
 
 test('product requires store_id', function () {

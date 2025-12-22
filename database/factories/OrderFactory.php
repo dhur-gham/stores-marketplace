@@ -16,9 +16,9 @@ class OrderFactory extends Factory
      */
     public function definition(): array
     {
-        $delivery_price = fake()->randomFloat(2, 5, 50);
-        $items_total = fake()->randomFloat(2, 50, 500);
-        
+        $delivery_price = fake()->numberBetween(3000, 15000);
+        $items_total = fake()->numberBetween(10000, 500000);
+
         return [
             'user_id' => \App\Models\User::factory(),
             'store_id' => \App\Models\Store::factory(),
