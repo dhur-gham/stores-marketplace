@@ -56,6 +56,18 @@ class PermissionSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
 
+        // Widget permissions
+        $widget_permissions = [
+            'view_dashboard_stats',
+            'view_orders_chart',
+            'view_orders_by_status_chart',
+            'view_latest_orders',
+        ];
+
+        foreach ($widget_permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+        }
+
         // Create a super-admin role and assign all permissions
         $super_admin_role = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
         $super_admin_role->givePermissionTo(Permission::all());

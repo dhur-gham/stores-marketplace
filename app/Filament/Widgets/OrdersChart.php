@@ -12,6 +12,11 @@ class OrdersChart extends ChartWidget
 
     protected static ?int $sort = 2;
 
+    public static function canView(): bool
+    {
+        return auth()->user()?->hasPermissionTo('view_orders_chart') ?? false;
+    }
+
     protected int|string|array $columnSpan = 'full';
 
     protected ?string $maxHeight = '300px';

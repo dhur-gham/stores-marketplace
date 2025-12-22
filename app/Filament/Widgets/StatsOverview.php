@@ -14,6 +14,11 @@ class StatsOverview extends BaseWidget
 {
     protected static ?int $sort = 1;
 
+    public static function canView(): bool
+    {
+        return auth()->user()?->hasPermissionTo('view_dashboard_stats') ?? false;
+    }
+
     protected function getStats(): array
     {
         $total_revenue = Order::query()

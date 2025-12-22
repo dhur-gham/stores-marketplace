@@ -12,6 +12,11 @@ class LatestOrders extends BaseWidget
 {
     protected static ?int $sort = 4;
 
+    public static function canView(): bool
+    {
+        return auth()->user()?->hasPermissionTo('view_latest_orders') ?? false;
+    }
+
     protected int|string|array $columnSpan = 'full';
 
     protected static ?string $heading = 'Latest Orders';

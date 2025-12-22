@@ -12,6 +12,11 @@ class OrdersByStatusChart extends ChartWidget
 
     protected static ?int $sort = 3;
 
+    public static function canView(): bool
+    {
+        return auth()->user()?->hasPermissionTo('view_orders_by_status_chart') ?? false;
+    }
+
     protected ?string $maxHeight = '300px';
 
     protected function getData(): array

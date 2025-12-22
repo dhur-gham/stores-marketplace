@@ -12,7 +12,7 @@ class ProductPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('view_any_products');
+        return $user->checkPermissionTo('view_any_products');
     }
 
     /**
@@ -20,7 +20,7 @@ class ProductPolicy
      */
     public function view(User $user, Product $product): bool
     {
-        return $user->hasPermissionTo('view_products');
+        return $user->checkPermissionTo('view_products');
     }
 
     /**
@@ -28,7 +28,7 @@ class ProductPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create_products');
+        return $user->checkPermissionTo('create_products');
     }
 
     /**
@@ -36,7 +36,7 @@ class ProductPolicy
      */
     public function update(User $user, Product $product): bool
     {
-        return $user->hasPermissionTo('update_products');
+        return $user->checkPermissionTo('update_products');
     }
 
     /**
@@ -44,7 +44,7 @@ class ProductPolicy
      */
     public function delete(User $user, Product $product): bool
     {
-        return $user->hasPermissionTo('delete_products');
+        return $user->checkPermissionTo('delete_products');
     }
 
     /**
@@ -52,7 +52,7 @@ class ProductPolicy
      */
     public function restore(User $user, Product $product): bool
     {
-        return $user->hasPermissionTo('restore_products');
+        return $user->checkPermissionTo('restore_products');
     }
 
     /**
@@ -60,6 +60,6 @@ class ProductPolicy
      */
     public function forceDelete(User $user, Product $product): bool
     {
-        return $user->hasPermissionTo('force_delete_products');
+        return $user->checkPermissionTo('force_delete_products');
     }
 }
