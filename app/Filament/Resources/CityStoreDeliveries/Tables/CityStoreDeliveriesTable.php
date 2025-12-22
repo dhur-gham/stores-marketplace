@@ -8,7 +8,10 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Support\Enums\FontWeight;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\Layout\Split;
+use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -20,25 +23,42 @@ class CityStoreDeliveriesTable
     {
         return $table
             ->columns([
-                TextColumn::make('store.name')
-                    ->label('Store')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('city.name')
-                    ->label('City')
-                    ->searchable()
-                    ->sortable(),
+                Split::make([
+                    Stack::make([
+                        TextColumn::make('store.name')
+                            ->label('Store')
+                            ->searchable()
+                            ->sortable()
+                            ->weight(FontWeight::Bold),
+                        TextColumn::make('city.name')
+                            ->label('City')
+                            ->searchable()
+                            ->sortable()
+                            ->color('gray'),
+                    ]),
+                    TextColumn::make('price')
+                        ->label('Delivery Price')
+                        ->numeric()
+                        ->suffix(' IQD')
+                        ->sortable()
+                        ->color(fn ($state) => $state == 0 ? 'success' : 'warning')
+                        ->weight(FontWeight::SemiBold),
+                    TextColumn::make('updated_at')
+                        ->label('Last Updated')
+                        ->dateTime()
+                        ->sortable()
+                        ->toggleable()
+                        ->visibleFrom('md'),
+                ])->from('md'),
+
+                // Mobile-only: show price below store/city
                 TextColumn::make('price')
                     ->label('Delivery Price')
                     ->numeric()
                     ->suffix(' IQD')
-                    ->sortable()
-                    ->color(fn ($state) => $state == 0 ? 'success' : 'warning'),
-                TextColumn::make('updated_at')
-                    ->label('Last Updated')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(),
+                    ->color(fn ($state) => $state == 0 ? 'success' : 'warning')
+                    ->weight(FontWeight::SemiBold)
+                    ->hiddenFrom('md'),
             ])
             ->filters([
                 SelectFilter::make('store')

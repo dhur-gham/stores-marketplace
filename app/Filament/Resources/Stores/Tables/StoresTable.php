@@ -7,7 +7,10 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\Layout\Split;
+use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -18,43 +21,68 @@ class StoresTable
     {
         return $table
             ->columns([
-                ImageColumn::make('image')
-                    ->circular()
-                    ->defaultImageUrl(fn () => 'https://ui-avatars.com/api/?name=S&background=random'),
-                TextColumn::make('name')
-                    ->searchable()
-                    ->sortable()
-                    ->weight('bold'),
-                TextColumn::make('slug')
-                    ->searchable()
-                    ->copyable()
-                    ->color('gray')
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('bio')
-                    ->limit(50)
-                    ->searchable()
-                    ->toggleable(),
-                TextColumn::make('type')
-                    ->badge()
-                    ->color(fn (StoreType $state): string => match ($state) {
-                        StoreType::Digital => 'info',
-                        StoreType::Physical => 'success',
-                    })
-                    ->sortable(),
-                TextColumn::make('products_count')
-                    ->label('Products')
-                    ->counts('products')
-                    ->badge()
-                    ->color('gray')
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Split::make([
+                    ImageColumn::make('image')
+                        ->circular()
+                        ->defaultImageUrl(fn () => 'https://ui-avatars.com/api/?name=S&background=random')
+                        ->grow(false),
+                    Stack::make([
+                        TextColumn::make('name')
+                            ->searchable()
+                            ->sortable()
+                            ->weight(FontWeight::Bold),
+                        TextColumn::make('slug')
+                            ->searchable()
+                            ->copyable()
+                            ->color('gray')
+                            ->toggleable(isToggledHiddenByDefault: true),
+                    ]),
+                    Stack::make([
+                        TextColumn::make('type')
+                            ->badge()
+                            ->color(fn (StoreType $state): string => match ($state) {
+                                StoreType::Digital => 'info',
+                                StoreType::Physical => 'success',
+                            })
+                            ->sortable(),
+                        TextColumn::make('products_count')
+                            ->label('Products')
+                            ->counts('products')
+                            ->badge()
+                            ->color('gray')
+                            ->sortable(),
+                    ])->visibleFrom('md'),
+                    TextColumn::make('bio')
+                        ->limit(50)
+                        ->searchable()
+                        ->toggleable()
+                        ->visibleFrom('lg'),
+                    Stack::make([
+                        TextColumn::make('created_at')
+                            ->dateTime()
+                            ->sortable()
+                            ->toggleable(isToggledHiddenByDefault: true),
+                        TextColumn::make('updated_at')
+                            ->dateTime()
+                            ->sortable()
+                            ->toggleable(isToggledHiddenByDefault: true),
+                    ])->visibleFrom('xl'),
+                ])->from('md'),
+
+                // Mobile-only: show type and products below main content
+                Stack::make([
+                    TextColumn::make('type')
+                        ->badge()
+                        ->color(fn (StoreType $state): string => match ($state) {
+                            StoreType::Digital => 'info',
+                            StoreType::Physical => 'success',
+                        }),
+                    TextColumn::make('products_count')
+                        ->label('Products')
+                        ->counts('products')
+                        ->badge()
+                        ->color('gray'),
+                ])->hiddenFrom('md'),
             ])
             ->filters([
                 SelectFilter::make('type')
