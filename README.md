@@ -140,45 +140,6 @@ Migrations include:
 - `digital` - Digital goods (no delivery needed)
 - `physical` - Physical goods (requires delivery)
 
-## API Endpoints
-
-```
-# Authentication
-POST   /api/register
-POST   /api/login
-POST   /api/logout
-
-# Stores
-GET    /api/stores
-POST   /api/stores
-GET    /api/stores/{id}
-PUT    /api/stores/{id}
-DELETE /api/stores/{id}
-
-# Products
-GET    /api/products
-GET    /api/stores/{store}/products
-POST   /api/stores/{store}/products
-GET    /api/products/{id}
-PUT    /api/products/{id}
-DELETE /api/products/{id}
-
-# Cart
-GET    /api/cart
-POST   /api/cart
-PUT    /api/cart/{item}
-DELETE /api/cart/{item}
-
-# Orders
-GET    /api/orders
-POST   /api/orders
-GET    /api/orders/{id}
-PUT    /api/orders/{id}/status
-
-# Cities
-GET    /api/cities
-GET    /api/stores/{store}/delivery-cities
-```
 
 ## Testing
 
@@ -203,15 +164,8 @@ This project follows Laravel conventions:
 - **Enum Keys**: `PascalCase`
 - **Code Formatting**: Laravel Pint
 
-Format code:
-```bash
-vendor/bin/pint
-```
-
-## Admin Panel
-
-Access Filament admin panel at `/admin` after creating a user.
-
-All users can currently access the admin panel. Modify `User::canAccessPanel()` to add restrictions.
 
 
+---
+
+**Status**: 🚧 In Development
