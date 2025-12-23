@@ -1,0 +1,39 @@
+{
+  "common": {
+    "loading": "جاري التحميل...",
+    "back": "رجوع",
+    "no_data": "لا توجد بيانات متاحة"
+  },
+  "header": {
+    "title": "سوق المتاجر"
+  },
+  "home": {
+    "stores": "المتاجر",
+    "latest_products": "أحدث المنتجات"
+  },
+  "store": {
+    "back_to_stores": "العودة إلى المتاجر",
+    "products": "المنتجات",
+    "digital_store": "متجر رقمي",
+    "physical_store": "متجر فعلي",
+    "product": "منتج",
+    "products": "منتجات",
+    "no_products": "لا توجد منتجات متاحة في هذا المتجر بعد.",
+    "loading": "جاري تحميل المتجر..."
+  },
+  "product": {
+    "description": "الوصف",
+    "sku": "رمز المنتج",
+    "low_stock": "اشتريه قبل نفاد الكمية!",
+    "out_of_stock": "نفد المخزون",
+    "add_to_cart": "أضف إلى السلة",
+    "loading": "جاري تحميل المنتج..."
+  },
+  "stores": {
+    "no_stores": "لا توجد متاجر متاحة"
+  },
+  "products": {
+    "no_products": "لا توجد منتجات متاحة"
+  }
+}
+

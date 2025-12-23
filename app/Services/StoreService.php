@@ -12,6 +12,32 @@ use Illuminate\Support\Str;
 class StoreService
 {
     /**
+     * Get a single store by ID or slug.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function get_store_by_id_or_slug(string|int $identifier): ?array
+    {
+        $store = is_numeric($identifier)
+            ? Store::query()->withCount('products')->find($identifier)
+            : Store::query()->withCount('products')->where('slug', $identifier)->first();
+
+        if (! $store) {
+            return null;
+        }
+
+        return [
+            'id' => $store->id,
+            'name' => $store->name,
+            'slug' => $store->slug,
+            'bio' => $store->bio,
+            'image' => $store->image ? asset('storage/'.$store->image) : null,
+            'type' => $store->type->value,
+            'products_count' => $store->products_count,
+        ];
+    }
+
+    /**
      * Get paginated stores with their product count.
      *
      * @return array{paginator: LengthAwarePaginator, data: array<int, array<string, mixed>>}
@@ -28,7 +54,7 @@ class StoreService
                 'name' => $store->name,
                 'slug' => $store->slug,
                 'bio' => $store->bio,
-                'image' => $store->image,
+                'image' => $store->image ? asset('storage/'.$store->image) : null,
                 'type' => $store->type->value,
                 'products_count' => $store->products_count,
             ])

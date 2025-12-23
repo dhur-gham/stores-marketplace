@@ -60,4 +60,79 @@ class ProductController extends BaseController
 
         return $this->paginated_response($result['paginator'], $result['data'], 'Products retrieved successfully');
     }
+
+    /**
+     * Get the latest products from all stores.
+     *
+     * Returns the first 5 latest active products from all stores with their store information.
+     *
+     * @response array{
+     *     status: bool,
+     *     message: string,
+     *     data: array<int, array{
+     *         id: int,
+     *         name: string,
+     *         slug: string,
+     *         image: string|null,
+     *         description: string|null,
+     *         price: int,
+     *         store: array{
+     *             id: int,
+     *             name: string,
+     *             slug: string
+     *         }
+     *     }>
+     * }
+     *
+     * @unauthenticated
+     */
+    public function latest(): JsonResponse
+    {
+        $products = $this->product_service->get_latest_products(5);
+
+        return $this->success_response($products, 'Latest products retrieved successfully');
+    }
+
+    /**
+     * Get a single product by ID or slug.
+     *
+     * Returns detailed information about a specific product including store information.
+     *
+     * @param  string  $identifier  The product ID or slug.
+     *
+     * @response array{
+     *     status: bool,
+     *     message: string,
+     *     data: array{
+     *         id: int,
+     *         name: string,
+     *         slug: string,
+     *         image: string|null,
+     *         description: string|null,
+     *         sku: string|null,
+     *         status: string,
+     *         type: string,
+     *         price: int,
+     *         stock: int,
+     *         store: array{
+     *             id: int,
+     *             name: string,
+     *             slug: string,
+     *             image: string|null
+     *         }
+     *     }
+     * }
+     *
+     * @unauthenticated
+     */
+    public function show(string $identifier): JsonResponse
+    {
+        $product = $this->product_service->get_product_by_id_or_slug($identifier);
+
+        if (! $product) {
+            return $this->error_response('Product not found', 404);
+        }
+
+        return $this->success_response($product, 'Product retrieved successfully');
+    }
 }

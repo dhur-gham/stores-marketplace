@@ -76,6 +76,7 @@ class ProductForm
                         FileUpload::make('image')
                             ->image()
                             ->imageEditor()
+                            ->disk('public')
                             ->directory('products')
                             ->maxSize(2048)
                             ->columnSpanFull(),

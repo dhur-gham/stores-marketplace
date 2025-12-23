@@ -1,0 +1,39 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "back": "Back",
+    "no_data": "No data available"
+  },
+  "header": {
+    "title": "Stores Marketplace"
+  },
+  "home": {
+    "stores": "Stores",
+    "latest_products": "Latest Products"
+  },
+  "store": {
+    "back_to_stores": "Back to Stores",
+    "products": "Products",
+    "digital_store": "Digital Store",
+    "physical_store": "Physical Store",
+    "product": "Product",
+    "products": "Products",
+    "no_products": "No products available in this store yet.",
+    "loading": "Loading store..."
+  },
+  "product": {
+    "description": "Description",
+    "sku": "SKU",
+    "low_stock": "Buy it before it's gone!",
+    "out_of_stock": "Out of Stock",
+    "add_to_cart": "Add to Cart",
+    "loading": "Loading product..."
+  },
+  "stores": {
+    "no_stores": "No stores available"
+  },
+  "products": {
+    "no_products": "No products available"
+  }
+}
+

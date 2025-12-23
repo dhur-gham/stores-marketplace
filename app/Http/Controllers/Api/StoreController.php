@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Store;
 use App\Services\StoreService;
 use Dedoc\Scramble\Attributes\Group;
 use Dedoc\Scramble\Attributes\QueryParameter;
@@ -53,5 +54,39 @@ class StoreController extends BaseController
         $result = $this->store_service->get_all_stores($per_page);
 
         return $this->paginated_response($result['paginator'], $result['data'], 'Stores retrieved successfully');
+    }
+
+    /**
+     * Get a single store by ID or slug.
+     *
+     * Returns detailed information about a specific store including all its basic details.
+     *
+     * @param  string  $identifier  The store ID or slug.
+     *
+     * @response array{
+     *     status: bool,
+     *     message: string,
+     *     data: array{
+     *         id: int,
+     *         name: string,
+     *         slug: string,
+     *         bio: string|null,
+     *         image: string|null,
+     *         type: string,
+     *         products_count: int
+     *     }
+     * }
+     *
+     * @unauthenticated
+     */
+    public function show(string $identifier): JsonResponse
+    {
+        $store_data = $this->store_service->get_store_by_id_or_slug($identifier);
+
+        if (! $store_data) {
+            return $this->error_response('Store not found', 404);
+        }
+
+        return $this->success_response($store_data, 'Store retrieved successfully');
     }
 }

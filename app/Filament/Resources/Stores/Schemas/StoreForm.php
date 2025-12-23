@@ -39,6 +39,7 @@ class StoreForm
                         FileUpload::make('image')
                             ->image()
                             ->imageEditor()
+                            ->disk('public')
                             ->directory('stores')
                             ->maxSize(2048)
                             ->columnSpanFull(),
