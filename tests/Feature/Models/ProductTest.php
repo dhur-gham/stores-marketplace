@@ -3,6 +3,7 @@
 use App\Enums\ProductStatus;
 use App\Enums\ProductType;
 use App\Models\CartItem;
+use App\Models\Customer;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Store;
@@ -80,6 +81,7 @@ test('product has cart items relationship', function () {
 
 test('product has order items relationship', function () {
     $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
 
     $product = Product::factory()->create([
@@ -88,7 +90,7 @@ test('product has order items relationship', function () {
     ]);
 
     $order = \App\Models\Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
     ]);
 

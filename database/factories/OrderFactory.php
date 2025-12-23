@@ -20,7 +20,7 @@ class OrderFactory extends Factory
         $items_total = fake()->numberBetween(10000, 500000);
 
         return [
-            'user_id' => \App\Models\User::factory(),
+            'customer_id' => \App\Models\Customer::factory(),
             'store_id' => \App\Models\Store::factory(),
             'city_id' => \App\Models\City::factory(),
             'total' => $items_total + $delivery_price,

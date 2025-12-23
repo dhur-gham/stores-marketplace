@@ -1,10 +1,9 @@
 <?php
 
-use App\Models\User;
-use App\Models\Store;
-use App\Models\Product;
 use App\Models\CartItem;
-use App\Models\Order;
+use App\Models\Product;
+use App\Models\Store;
+use App\Models\User;
 
 test('can create a user', function () {
     $user = User::factory()->create([
@@ -30,7 +29,7 @@ test('user has stores relationship', function () {
 test('user has products relationship', function () {
     $user = User::factory()->create();
     $store = Store::factory()->create();
-    
+
     $products = Product::factory()->count(2)->create([
         'user_id' => $user->id,
         'store_id' => $store->id,
@@ -55,19 +54,6 @@ test('user has cart items relationship', function () {
 
     expect($user->cart_items)->toHaveCount(1)
         ->and($user->cart_items->first())->toBeInstanceOf(CartItem::class);
-});
-
-test('user has orders relationship', function () {
-    $user = User::factory()->create();
-    $store = Store::factory()->create();
-
-    Order::factory()->count(2)->create([
-        'user_id' => $user->id,
-        'store_id' => $store->id,
-    ]);
-
-    expect($user->orders)->toHaveCount(2)
-        ->and($user->orders->first())->toBeInstanceOf(Order::class);
 });
 
 test('user initials method returns correct initials', function () {

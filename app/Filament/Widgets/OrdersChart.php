@@ -5,12 +5,17 @@ namespace App\Filament\Widgets;
 use App\Models\Order;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class OrdersChart extends ChartWidget
 {
     protected ?string $heading = 'Orders Overview';
 
     protected static ?int $sort = 2;
+
+    private const CACHE_KEY = 'widget_orders_chart';
+
+    private const CACHE_TTL = 1800; // 30 minutes
 
     public static function canView(): bool
     {
@@ -23,7 +28,9 @@ class OrdersChart extends ChartWidget
 
     protected function getData(): array
     {
-        $data = $this->getOrdersPerMonth();
+        $data = Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
+            return $this->getOrdersPerMonth();
+        });
 
         return [
             'datasets' => [

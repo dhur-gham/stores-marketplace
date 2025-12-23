@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\City;
-use App\Models\Store;
+use App\Models\Customer;
 use App\Models\Order;
-use App\Models\User;
+use App\Models\Store;
 
 test('can create a city', function () {
     $city = City::factory()->create([
@@ -39,12 +39,12 @@ test('city stores relationship includes pivot price', function () {
 });
 
 test('city has orders relationship', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create(['name' => 'Erbil']);
 
     Order::factory()->count(3)->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -130,18 +130,18 @@ test('city can detach store', function () {
 });
 
 test('multiple orders can belong to same city', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order1 = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
 
     $order2 = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);

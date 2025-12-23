@@ -2,18 +2,18 @@
 
 use App\Enums\OrderStatus;
 use App\Models\City;
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Store;
-use App\Models\User;
 
 test('can create an order', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
         'total' => 150000,
@@ -27,29 +27,29 @@ test('can create an order', function () {
         ->and($order->exists)->toBeTrue();
 });
 
-test('order belongs to user', function () {
-    $user = User::factory()->create(['name' => 'Order Customer']);
+test('order belongs to customer', function () {
+    $customer = Customer::factory()->create(['name' => 'Order Customer']);
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
 
-    expect($order->user)->toBeInstanceOf(User::class)
-        ->and($order->user->name)->toBe('Order Customer')
-        ->and($order->user_id)->toBe($user->id);
+    expect($order->customer)->toBeInstanceOf(Customer::class)
+        ->and($order->customer->name)->toBe('Order Customer')
+        ->and($order->customer_id)->toBe($customer->id);
 });
 
 test('order belongs to store', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create(['name' => 'Order Store']);
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -60,12 +60,12 @@ test('order belongs to store', function () {
 });
 
 test('order belongs to city', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create(['name' => 'Delivery City']);
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -76,12 +76,12 @@ test('order belongs to city', function () {
 });
 
 test('order has order items relationship', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -95,12 +95,12 @@ test('order has order items relationship', function () {
 });
 
 test('order status is cast to enum', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
         'status' => 'pending',
@@ -111,12 +111,12 @@ test('order status is cast to enum', function () {
 });
 
 test('order total is cast to decimal', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
         'total' => 123,
@@ -126,12 +126,12 @@ test('order total is cast to decimal', function () {
 });
 
 test('order delivery price is cast to decimal', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
         'delivery_price' => 15,
@@ -141,7 +141,7 @@ test('order delivery price is cast to decimal', function () {
 });
 
 test('order can have all status types', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
@@ -156,7 +156,7 @@ test('order can have all status types', function () {
 
     foreach ($statuses as $statusValue => $statusEnum) {
         $order = Order::factory()->create([
-            'user_id' => $user->id,
+            'customer_id' => $customer->id,
             'store_id' => $store->id,
             'city_id' => $city->id,
             'status' => $statusValue,
@@ -166,35 +166,35 @@ test('order can have all status types', function () {
     }
 });
 
-test('order requires user_id', function () {
+test('order requires customer_id', function () {
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     expect(fn () => Order::factory()->create([
-        'user_id' => null,
+        'customer_id' => null,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]))->toThrow(\Illuminate\Database\QueryException::class);
 });
 
 test('order requires store_id', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $city = City::factory()->create();
 
     expect(fn () => Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => null,
         'city_id' => $city->id,
     ]))->toThrow(\Illuminate\Database\QueryException::class);
 });
 
 test('order can have zero delivery price', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
         'delivery_price' => 0,
@@ -205,41 +205,41 @@ test('order can have zero delivery price', function () {
         ->and($order->exists)->toBeTrue();
 });
 
-test('multiple orders can belong to same user', function () {
-    $user = User::factory()->create();
+test('multiple orders can belong to same customer', function () {
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order1 = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
 
     $order2 = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
 
-    expect($order1->user_id)->toBe($user->id)
-        ->and($order2->user_id)->toBe($user->id)
-        ->and($user->orders)->toHaveCount(2);
+    expect($order1->customer_id)->toBe($customer->id)
+        ->and($order2->customer_id)->toBe($customer->id)
+        ->and($customer->orders)->toHaveCount(2);
 });
 
 test('multiple orders can belong to same store', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order1 = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
 
     $order2 = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -250,18 +250,18 @@ test('multiple orders can belong to same store', function () {
 });
 
 test('multiple orders can belong to same city', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order1 = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
 
     $order2 = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -272,12 +272,12 @@ test('multiple orders can belong to same city', function () {
 });
 
 test('order total is always formatted to 2 decimal places', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
         'total' => 99,

@@ -88,4 +88,3 @@ class Store extends Model
         return $this->type === StoreType::Physical;
     }
 }
-

@@ -7,10 +7,15 @@ use App\Models\Order;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Illuminate\Support\Facades\Cache;
 
 class LatestOrders extends BaseWidget
 {
     protected static ?int $sort = 4;
+
+    private const CACHE_KEY = 'widget_latest_orders';
+
+    private const CACHE_TTL = 1800; // 30 minutes
 
     public static function canView(): bool
     {
@@ -23,28 +28,41 @@ class LatestOrders extends BaseWidget
 
     public function table(Table $table): Table
     {
+        $order_ids = Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
+            return Order::query()
+                ->latest()
+                ->limit(10)
+                ->pluck('id')
+                ->toArray();
+        });
+
         return $table
             ->query(
                 Order::query()
-                    ->with(['user', 'store', 'city'])
+                    ->whereIn('id', $order_ids)
+                    ->with(['customer', 'store', 'city'])
                     ->latest()
-                    ->limit(10)
             )
             ->columns([
                 TextColumn::make('id')
                     ->label('Order #')
                     ->sortable(),
 
-                TextColumn::make('user.name')
+                TextColumn::make('customer.name')
                     ->label('Customer')
-                    ->searchable(),
+                    ->searchable()
+                    ->description(fn (Order $record): string => $record->store?->name ?? '')
+                    ->visibleFrom('sm'),
 
                 TextColumn::make('store.name')
                     ->label('Store')
-                    ->searchable(),
+                    ->searchable()
+                    ->visibleFrom('lg'),
 
                 TextColumn::make('city.name')
-                    ->label('City'),
+                    ->label('City')
+                    ->searchable()
+                    ->visibleFrom('xl'),
 
                 TextColumn::make('total')
                     ->label('Total')
@@ -65,7 +83,8 @@ class LatestOrders extends BaseWidget
                 TextColumn::make('created_at')
                     ->label('Date')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->visibleFrom('md'),
             ])
             ->defaultSort('created_at', 'desc')
             ->paginated(false);

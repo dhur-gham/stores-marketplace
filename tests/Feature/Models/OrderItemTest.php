@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\City;
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -9,11 +10,12 @@ use App\Models\User;
 
 test('can create an order item', function () {
     $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -38,11 +40,12 @@ test('can create an order item', function () {
 
 test('order item belongs to order', function () {
     $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -64,11 +67,12 @@ test('order item belongs to order', function () {
 
 test('order item belongs to product', function () {
     $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -91,11 +95,12 @@ test('order item belongs to product', function () {
 
 test('order item quantity is cast to integer', function () {
     $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -117,11 +122,12 @@ test('order item quantity is cast to integer', function () {
 
 test('order item price is cast to decimal', function () {
     $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -156,12 +162,12 @@ test('order item requires order_id', function () {
 });
 
 test('order item requires product_id', function () {
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -174,11 +180,12 @@ test('order item requires product_id', function () {
 
 test('multiple order items can belong to same order', function () {
     $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -210,6 +217,7 @@ test('multiple order items can belong to same order', function () {
 
 test('multiple order items can reference same product', function () {
     $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
@@ -219,13 +227,13 @@ test('multiple order items can reference same product', function () {
     ]);
 
     $order1 = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
 
     $order2 = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -247,11 +255,12 @@ test('multiple order items can reference same product', function () {
 
 test('order item price is always formatted to 2 decimal places', function () {
     $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);
@@ -272,11 +281,12 @@ test('order item price is always formatted to 2 decimal places', function () {
 
 test('order item can have high quantity', function () {
     $user = User::factory()->create();
+    $customer = Customer::factory()->create();
     $store = Store::factory()->create();
     $city = City::factory()->create();
 
     $order = Order::factory()->create([
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
     ]);

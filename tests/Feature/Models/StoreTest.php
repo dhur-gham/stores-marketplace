@@ -1,15 +1,16 @@
 <?php
 
+use App\Enums\StoreType;
+use App\Models\City;
+use App\Models\Customer;
+use App\Models\Order;
+use App\Models\Product;
 use App\Models\Store;
 use App\Models\User;
-use App\Models\Product;
-use App\Models\Order;
-use App\Models\City;
-use App\Enums\StoreType;
 
 test('can create a store', function () {
     $user = User::factory()->create();
-    
+
     $store = Store::factory()->create([
         'name' => 'Tech Store',
         'type' => 'digital',
@@ -45,11 +46,11 @@ test('store has products relationship', function () {
 
 test('store has orders relationship', function () {
     $store = Store::factory()->create();
-    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
 
     Order::factory()->count(2)->create([
         'store_id' => $store->id,
-        'user_id' => $user->id,
+        'customer_id' => $customer->id,
     ]);
 
     expect($store->orders)->toHaveCount(2)

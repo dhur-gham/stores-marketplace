@@ -25,6 +25,7 @@ class PermissionSeeder extends Seeder
             'roles',
             'orders',
             'users',
+            'customers',
         ];
 
         // Standard Filament permissions for each resource

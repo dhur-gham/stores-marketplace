@@ -19,7 +19,7 @@ class Order extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'user_id',
+        'customer_id',
         'store_id',
         'city_id',
         'total',
@@ -42,11 +42,11 @@ class Order extends Model
     }
 
     /**
-     * Order belongs to a user.
+     * Order belongs to a customer.
      */
-    public function user(): BelongsTo
+    public function customer(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Customer::class);
     }
 
     /**
