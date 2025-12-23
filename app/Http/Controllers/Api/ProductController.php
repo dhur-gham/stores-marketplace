@@ -94,6 +94,77 @@ class ProductController extends BaseController
     }
 
     /**
+     * List all products from all stores with filtering and sorting.
+     *
+     * Returns a paginated list of products from all stores with filtering and sorting options.
+     * Products include details like name, price, stock, status, type, and store information.
+     *
+     * @response array{
+     *     status: bool,
+     *     message: string,
+     *     data: array<int, array{
+     *         id: int,
+     *         name: string,
+     *         slug: string,
+     *         image: string|null,
+     *         description: string|null,
+     *         sku: string|null,
+     *         status: string,
+     *         type: string,
+     *         price: int,
+     *         stock: int,
+     *         store: array{
+     *             id: int,
+     *             name: string,
+     *             slug: string,
+     *             image: string|null
+     *         }
+     *     }>,
+     *     meta: array{
+     *         current_page: int,
+     *         last_page: int,
+     *         per_page: int,
+     *         total: int
+     *     }
+     * }
+     *
+     * @unauthenticated
+     */
+    #[QueryParameter('per_page', description: 'Number of products per page.', type: 'int', default: 15, example: 10)]
+    #[QueryParameter('page', description: 'Page number.', type: 'int', default: 1, example: 1)]
+    #[QueryParameter('search', description: 'Search products by name (case-insensitive, partial match).', type: 'string', required: false, example: 'tech')]
+    #[QueryParameter('store_id', description: 'Filter by store ID.', type: 'int', required: false, example: 1)]
+    #[QueryParameter('type', description: 'Filter by type: digital or physical.', type: 'string', required: false, example: 'digital')]
+    #[QueryParameter('price_min', description: 'Minimum price filter.', type: 'int', required: false, example: 100)]
+    #[QueryParameter('price_max', description: 'Maximum price filter.', type: 'int', required: false, example: 1000)]
+    #[QueryParameter('sort_by', description: 'Sort by: name, price, created_at, or store_name.', type: 'string', required: false, example: 'price')]
+    #[QueryParameter('sort_order', description: 'Sort order: asc or desc.', type: 'string', required: false, example: 'desc')]
+    public function all(Request $request): JsonResponse
+    {
+        $per_page = (int) $request->query('per_page', 15);
+        $search = $request->query('search');
+        $store_id = $request->query('store_id') ? (int) $request->query('store_id') : null;
+        $type = $request->query('type');
+        $price_min = $request->query('price_min') ? (int) $request->query('price_min') : null;
+        $price_max = $request->query('price_max') ? (int) $request->query('price_max') : null;
+        $sort_by = $request->query('sort_by');
+        $sort_order = $request->query('sort_order', 'desc');
+
+        $result = $this->product_service->get_all_products(
+            $per_page,
+            $search,
+            $store_id,
+            $type,
+            $price_min,
+            $price_max,
+            $sort_by,
+            $sort_order
+        );
+
+        return $this->paginated_response($result['paginator'], $result['data'], 'Products retrieved successfully');
+    }
+
+    /**
      * Get a single product by ID or slug.
      *
      * Returns detailed information about a specific product including store information.

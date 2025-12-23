@@ -8,13 +8,57 @@ const api = axios.create({
     },
 });
 
-export const fetchStores = async () => {
-    const response = await api.get('/stores');
+// Add token to requests if available
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+// Handle 401 responses
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('auth_token');
+            // Only redirect if not already on login/register page and not during initial auth check
+            const current_path = window.location.pathname;
+            if (!current_path.includes('/login') && !current_path.includes('/register')) {
+                // Use setTimeout to avoid redirect during initial page load
+                setTimeout(() => {
+                    if (window.location.pathname === current_path) {
+                        window.location.href = '/login';
+                    }
+                }, 100);
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
+export const fetchStores = async (search = null, per_page = 15, page = 1) => {
+    const params = {
+        per_page,
+        page,
+    };
+    
+    if (search && search.trim() !== '') {
+        params.search = search.trim();
+    }
+    
+    const response = await api.get('/stores', { params });
     return response.data;
 };
 
 export const fetchStore = async (identifier) => {
     const response = await api.get(`/stores/${identifier}`);
+    return response.data;
+};
+
+export const fetchStoreDeliveryPrices = async (store_id) => {
+    const response = await api.get(`/stores/${store_id}/delivery-prices`);
     return response.data;
 };
 
@@ -30,8 +74,137 @@ export const fetchLatestProducts = async () => {
     return response.data;
 };
 
+export const fetchAllProducts = async ({
+    search = null,
+    store_id = null,
+    type = null,
+    price_min = null,
+    price_max = null,
+    sort_by = null,
+    sort_order = 'desc',
+    per_page = 15,
+    page = 1,
+} = {}) => {
+    const params = {
+        per_page,
+        page,
+    };
+    
+    if (search && search.trim() !== '') {
+        params.search = search.trim();
+    }
+    
+    if (store_id !== null) {
+        params.store_id = store_id;
+    }
+    
+    if (type) {
+        params.type = type;
+    }
+    
+    if (price_min !== null) {
+        params.price_min = price_min;
+    }
+    
+    if (price_max !== null) {
+        params.price_max = price_max;
+    }
+    
+    if (sort_by) {
+        params.sort_by = sort_by;
+        params.sort_order = sort_order;
+    }
+    
+    const response = await api.get('/products', { params });
+    return response.data;
+};
+
 export const fetchProduct = async (identifier) => {
     const response = await api.get(`/products/${identifier}`);
+    return response.data;
+};
+
+// Auth methods
+export const register = async (data) => {
+    const response = await api.post('/auth/register', data);
+    if (response.data.token) {
+        localStorage.setItem('auth_token', response.data.token);
+    }
+    return response.data;
+};
+
+export const login = async (data) => {
+    const response = await api.post('/auth/login', data);
+    if (response.data.token) {
+        localStorage.setItem('auth_token', response.data.token);
+    }
+    return response.data;
+};
+
+export const logout = async () => {
+    await api.post('/auth/logout');
+    localStorage.removeItem('auth_token');
+};
+
+export const getCurrentUser = async () => {
+    const response = await api.get('/auth/user');
+    return response.data;
+};
+
+// Cart methods
+export const getCart = async () => {
+    const response = await api.get('/cart');
+    return response.data;
+};
+
+export const addToCart = async (product_id, quantity = 1) => {
+    const response = await api.post('/cart', {
+        product_id,
+        quantity,
+    });
+    return response.data;
+};
+
+export const updateCartItem = async (cart_item_id, quantity) => {
+    const response = await api.put(`/cart/${cart_item_id}`, {
+        quantity,
+    });
+    return response.data;
+};
+
+export const removeFromCart = async (cart_item_id) => {
+    const response = await api.delete(`/cart/${cart_item_id}`);
+    return response.data;
+};
+
+export const clearCart = async () => {
+    const response = await api.delete('/cart');
+    return response.data;
+};
+
+// Order methods
+export const placeOrder = async (address_data = {}) => {
+    const response = await api.post('/orders', {
+        address_data,
+    });
+    return response.data;
+};
+
+export const getOrders = async (page = 1, per_page = 15) => {
+    const response = await api.get('/orders', {
+        params: { page, per_page },
+    });
+    return response.data;
+};
+
+export const getOrder = async (order_id) => {
+    const response = await api.get(`/orders/${order_id}`);
+    return response.data;
+};
+
+// Cities
+export const fetchCities = async () => {
+    const response = await api.get('/cities');
     return response.data;
 };
 

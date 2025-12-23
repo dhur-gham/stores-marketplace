@@ -1,12 +1,16 @@
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import ProductCard from './ProductCard';
 
-export default function ProductsList({ products, loading }) {
+export default function ProductsList({ products, loading, limit = null, showViewAll = false }) {
     const { t } = useTranslation();
+    
     if (loading) {
+        const skeleton_count = limit || 6;
         return (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4">
-                {[...Array(6)].map((_, i) => (
+                {[...Array(skeleton_count)].map((_, i) => (
                     <div
                         key={i}
                         className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700/50 animate-pulse"
@@ -31,11 +35,27 @@ export default function ProductsList({ products, loading }) {
         );
     }
 
+    const display_products = limit ? products.slice(0, limit) : products;
+
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4">
-            {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-            ))}
+        <div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4">
+                {display_products.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                ))}
+            </div>
+            {showViewAll && (
+                <div className="mt-6 text-center">
+                    <Link
+                        to="/products"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                    >
+                        <Sparkles className="w-5 h-5" />
+                        <span>{t('products.explore_all_products')}</span>
+                        <ArrowRight className="w-5 h-5" />
+                    </Link>
+                </div>
+            )}
         </div>
     );
 }

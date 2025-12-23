@@ -20,6 +20,7 @@ class CustomerFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
+            'password' => bcrypt('password'),
             'phone' => fake()->phoneNumber(),
             'address' => fake()->address(),
             'city_id' => City::factory(),

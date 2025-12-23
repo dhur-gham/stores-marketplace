@@ -120,3 +120,104 @@ test('stores index returns correct page', function () {
         ->assertJsonCount(5, 'data')
         ->assertJsonPath('meta.current_page', 2);
 });
+
+test('stores index accepts search query parameter', function () {
+    Store::factory()->create(['name' => 'Tech Store']);
+    Store::factory()->create(['name' => 'Fashion Store']);
+
+    $response = $this->getJson('/api/v1/stores?search=Tech');
+
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.name', 'Tech Store');
+});
+
+test('stores index search filters results correctly', function () {
+    Store::factory()->create(['name' => 'Tech Store']);
+    Store::factory()->create(['name' => 'Technology Hub']);
+    Store::factory()->create(['name' => 'Fashion Store']);
+
+    $response = $this->getJson('/api/v1/stores?search=Tech');
+
+    $response->assertSuccessful()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonPath('meta.total', 2);
+});
+
+test('stores index search returns correct store structure', function () {
+    $store = Store::factory()->create(['name' => 'Tech Store']);
+
+    $response = $this->getJson('/api/v1/stores?search=Tech');
+
+    $response->assertSuccessful()
+        ->assertJsonFragment([
+            'id' => $store->id,
+            'name' => 'Tech Store',
+            'slug' => $store->slug,
+        ]);
+});
+
+test('stores index search with no matches returns empty data', function () {
+    Store::factory()->create(['name' => 'Tech Store']);
+
+    $response = $this->getJson('/api/v1/stores?search=NonExistent');
+
+    $response->assertSuccessful()
+        ->assertJsonCount(0, 'data')
+        ->assertJsonPath('meta.total', 0);
+});
+
+test('stores index search works with pagination', function () {
+    Store::factory()->create(['name' => 'Tech Store 1']);
+    Store::factory()->create(['name' => 'Tech Store 2']);
+    Store::factory()->create(['name' => 'Tech Store 3']);
+    Store::factory()->create(['name' => 'Fashion Store']);
+
+    $response = $this->getJson('/api/v1/stores?search=Tech&per_page=2');
+
+    $response->assertSuccessful()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonPath('meta.total', 3)
+        ->assertJsonPath('meta.last_page', 2);
+});
+
+test('stores index search parameter is optional', function () {
+    Store::factory()->count(3)->create();
+
+    $response = $this->getJson('/api/v1/stores');
+
+    $response->assertSuccessful()
+        ->assertJsonCount(3, 'data')
+        ->assertJsonPath('meta.total', 3);
+});
+
+test('stores index search is case-insensitive', function () {
+    Store::factory()->create(['name' => 'Tech Store']);
+
+    $response = $this->getJson('/api/v1/stores?search=tech');
+
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.name', 'Tech Store');
+});
+
+test('stores index search with special characters', function () {
+    Store::factory()->create(['name' => "Tech's Store"]);
+    Store::factory()->create(['name' => 'Tech-Store']);
+
+    $response = $this->getJson('/api/v1/stores?search=Tech');
+
+    $response->assertSuccessful()
+        ->assertJsonCount(2, 'data');
+});
+
+test('stores index search with multiple words', function () {
+    Store::factory()->create(['name' => 'Tech Store Hub']);
+    Store::factory()->create(['name' => 'Fashion Store']);
+
+    $response = $this->getJson('/api/v1/stores?search=Tech Store');
+
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.name', 'Tech Store Hub');
+});

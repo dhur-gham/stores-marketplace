@@ -1,8 +1,16 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ShoppingCart, Check } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 
 export default function ProductCard({ product }) {
     const { t } = useTranslation();
+    const { authenticated } = useAuth();
+    const { addToCart } = useCart();
+    const [adding, setAdding] = useState(false);
+    const [added, setAdded] = useState(false);
     
     const formatPrice = (price) => {
         const formatted = new Intl.NumberFormat('en-US', {
@@ -13,6 +21,25 @@ export default function ProductCard({ product }) {
     };
 
     const isLowStock = product.stock !== undefined && product.stock > 0 && product.stock < 5;
+    const isOutOfStock = product.stock === 0 || product.stock === undefined;
+
+    const handleAddToCart = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (isOutOfStock || adding) {
+            return;
+        }
+
+        setAdding(true);
+        const result = await addToCart(product.id, 1);
+        setAdding(false);
+        
+        if (result.success) {
+            setAdded(true);
+            setTimeout(() => setAdded(false), 2000);
+        }
+    };
 
     return (
         <Link
@@ -66,6 +93,25 @@ export default function ProductCard({ product }) {
                     <span className="text-base font-bold text-gray-900 dark:text-white">
                         {formatPrice(product.price)}
                     </span>
+                    {authenticated && !isOutOfStock && (
+                        <button
+                            onClick={handleAddToCart}
+                            disabled={adding || added}
+                            className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                            title={added ? t('cart.item_added') : t('cart.add_to_cart')}
+                        >
+                            {added ? (
+                                <Check className="w-4 h-4" />
+                            ) : (
+                                <ShoppingCart className="w-4 h-4" />
+                            )}
+                        </button>
+                    )}
+                    {isOutOfStock && (
+                        <span className="text-xs text-red-600 dark:text-red-400 font-medium">
+                            {t('cart.out_of_stock')}
+                        </span>
+                    )}
                 </div>
             </div>
         </Link>

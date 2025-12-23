@@ -48,10 +48,12 @@ class StoreController extends BaseController
      * @unauthenticated
      */
     #[QueryParameter('per_page', description: 'Number of stores per page.', type: 'int', default: 15, example: 10)]
+    #[QueryParameter('search', description: 'Search stores by name (case-insensitive, partial match).', type: 'string', required: false, example: 'tech')]
     public function index(Request $request): JsonResponse
     {
         $per_page = (int) $request->query('per_page', 15);
-        $result = $this->store_service->get_all_stores($per_page);
+        $search = $request->query('search');
+        $result = $this->store_service->get_all_stores($per_page, $search);
 
         return $this->paginated_response($result['paginator'], $result['data'], 'Stores retrieved successfully');
     }
@@ -88,5 +90,35 @@ class StoreController extends BaseController
         }
 
         return $this->success_response($store_data, 'Store retrieved successfully');
+    }
+
+    /**
+     * Get delivery prices for a store's cities.
+     *
+     * Returns delivery prices for all cities that the store delivers to.
+     *
+     * @param  int  $store  The store ID.
+     *
+     * @response array{
+     *     status: bool,
+     *     message: string,
+     *     data: array<int, array{city_id: int, price: int}>
+     * }
+     *
+     * @unauthenticated
+     */
+    public function deliveryPrices(int $store): JsonResponse
+    {
+        $store_model = Store::query()->findOrFail($store);
+        
+        $delivery_prices = $store_model->cities()
+            ->get()
+            ->map(fn ($city) => [
+                'city_id' => $city->id,
+                'price' => (int) $city->pivot->price,
+            ])
+            ->toArray();
+
+        return $this->success_response($delivery_prices, 'Delivery prices retrieved successfully');
     }
 }

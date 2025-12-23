@@ -42,11 +42,15 @@ class StoreService
      *
      * @return array{paginator: LengthAwarePaginator, data: array<int, array<string, mixed>>}
      */
-    public function get_all_stores(int $per_page = 15): array
+    public function get_all_stores(int $per_page = 15, ?string $search = null): array
     {
-        $paginator = Store::query()
-            ->withCount('products')
-            ->paginate($per_page);
+        $query = Store::query()->withCount('products');
+
+        if ($search && trim($search) !== '') {
+            $query->where('name', 'like', '%'.trim($search).'%');
+        }
+
+        $paginator = $query->paginate($per_page);
 
         $data = $paginator->getCollection()
             ->map(fn (Store $store) => [

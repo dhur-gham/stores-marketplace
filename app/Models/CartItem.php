@@ -17,7 +17,7 @@ class CartItem extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'user_id',
+        'customer_id',
         'product_id',
         'quantity',
         'price',
@@ -37,11 +37,11 @@ class CartItem extends Model
     }
 
     /**
-     * Cart item belongs to a user.
+     * Cart item belongs to a customer.
      */
-    public function user(): BelongsTo
+    public function customer(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Customer::class);
     }
 
     /**

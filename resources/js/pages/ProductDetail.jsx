@@ -1,16 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ShoppingCart, Plus, Minus, Check } from 'lucide-react';
 import Header from '../components/Header';
 import ArrowIcon from '../components/ArrowIcon';
 import { fetchProduct } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 
 export default function ProductDetail() {
     const { t } = useTranslation();
     const { productId } = useParams();
     const navigate = useNavigate();
+    const { authenticated } = useAuth();
+    const { cart_items, addToCart, updateCartItem } = useCart();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [quantity, setQuantity] = useState(1);
+    const [adding, setAdding] = useState(false);
+    const [added, setAdded] = useState(false);
 
     useEffect(() => {
         const loadProduct = async () => {
@@ -42,6 +50,44 @@ export default function ProductDetail() {
             maximumFractionDigits: 0,
         }).format(price);
         return `${formatted} IQD`;
+    };
+
+    const cart_item = cart_items.find((item) => item.product_id === product?.id);
+    const current_cart_quantity = cart_item?.quantity || 0;
+
+    const handleAddToCart = async () => {
+        if (!authenticated) {
+            navigate('/login');
+            return;
+        }
+
+        if (product.stock === 0 || adding) {
+            return;
+        }
+
+        setAdding(true);
+        
+        if (cart_item) {
+            const new_quantity = cart_item.quantity + quantity;
+            const result = await updateCartItem(cart_item.id, new_quantity);
+            if (result.success) {
+                setAdded(true);
+                setTimeout(() => setAdded(false), 2000);
+            }
+        } else {
+            const result = await addToCart(product.id, quantity);
+            if (result.success) {
+                setAdded(true);
+                setTimeout(() => setAdded(false), 2000);
+            }
+        }
+        
+        setAdding(false);
+    };
+
+    const handleQuantityChange = (delta) => {
+        const new_quantity = Math.max(1, Math.min(product.stock, quantity + delta));
+        setQuantity(new_quantity);
     };
 
     if (loading) {
@@ -153,18 +199,92 @@ export default function ProductDetail() {
                                 </div>
                             )}
 
-                            <div className="mt-8">
-                                <button
-                                    disabled={product.stock === 0}
-                                    className={`w-full py-3 px-6 rounded-lg font-semibold text-white transition-colors ${
-                                        product.stock > 0
-                                            ? 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                                            : 'bg-gray-400 cursor-not-allowed dark:bg-gray-600'
-                                    }`}
-                                >
-                                    {product.stock > 0 ? t('product.add_to_cart') : t('product.out_of_stock')}
-                                </button>
-                            </div>
+                            {authenticated && (
+                                <div className="mt-8 space-y-4">
+                                    {product.stock > 0 && (
+                                        <div className="flex items-center gap-3">
+                                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                {t('cart.quantity')}:
+                                            </label>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => handleQuantityChange(-1)}
+                                                    disabled={quantity <= 1}
+                                                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                                >
+                                                    <Minus className="w-4 h-4" />
+                                                </button>
+                                                <span className="w-12 text-center font-semibold text-gray-900 dark:text-white">
+                                                    {quantity}
+                                                </span>
+                                                <button
+                                                    onClick={() => handleQuantityChange(1)}
+                                                    disabled={quantity >= product.stock}
+                                                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                                >
+                                                    <Plus className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                            {current_cart_quantity > 0 && (
+                                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                    ({t('cart.in_cart')}: {current_cart_quantity})
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+                                    <button
+                                        onClick={handleAddToCart}
+                                        disabled={product.stock === 0 || adding || added}
+                                        className={`w-full py-3 px-6 rounded-lg font-semibold text-white transition-colors flex items-center justify-center gap-2 ${
+                                            product.stock > 0 && !added
+                                                ? 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                                                : added
+                                                ? 'bg-green-600 dark:bg-green-500'
+                                                : 'bg-gray-400 cursor-not-allowed dark:bg-gray-600'
+                                        }`}
+                                    >
+                                        {added ? (
+                                            <>
+                                                <Check className="w-5 h-5" />
+                                                {t('cart.item_added')}
+                                            </>
+                                        ) : adding ? (
+                                            <>
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                {t('cart.adding')}
+                                            </>
+                                        ) : product.stock > 0 ? (
+                                            <>
+                                                <ShoppingCart className="w-5 h-5" />
+                                                {t('cart.add_to_cart')}
+                                            </>
+                                        ) : (
+                                            t('cart.out_of_stock')
+                                        )}
+                                    </button>
+                                </div>
+                            )}
+                            {!authenticated && product.stock > 0 && (
+                                <div className="mt-8">
+                                    <Link
+                                        to="/login"
+                                        className="w-full py-3 px-6 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <ShoppingCart className="w-5 h-5" />
+                                        {t('cart.login_to_add')}
+                                    </Link>
+                                </div>
+                            )}
+                            {product.stock === 0 && (
+                                <div className="mt-8">
+                                    <button
+                                        disabled
+                                        className="w-full py-3 px-6 rounded-lg font-semibold text-white bg-gray-400 cursor-not-allowed dark:bg-gray-600"
+                                    >
+                                        {t('cart.out_of_stock')}
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

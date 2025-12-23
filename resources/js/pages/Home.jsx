@@ -51,14 +51,14 @@ export default function Home() {
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6">
                         {t('home.stores')}
                     </h2>
-                    <StoresList stores={stores} loading={storesLoading} />
+                    <StoresList stores={stores} loading={storesLoading} limit={5} showViewAll={true} />
                 </section>
 
                 <section className="my-12">
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-6">
                         {t('home.latest_products')}
                     </h2>
-                    <ProductsList products={products} loading={productsLoading} />
+                    <ProductsList products={products} loading={productsLoading} limit={5} showViewAll={true} />
                 </section>
             </div>
         </div>
