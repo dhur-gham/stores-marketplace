@@ -19,7 +19,7 @@ class PermissionResource extends Resource
 
     protected static string|null|\BackedEnum $navigationIcon = Heroicon::OutlinedKey;
 
-    protected static string|null|\UnitEnum $navigationGroup = 'User Management';
+    protected static string|null|\UnitEnum $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 2;
 

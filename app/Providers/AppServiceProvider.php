@@ -2,12 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\ApiRequest;
 use App\Models\CityStoreDelivery;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\User;
+use App\Policies\ApiRequestPolicy;
 use App\Policies\CityStoreDeliveryPolicy;
 use App\Policies\CustomerPolicy;
 use App\Policies\OrderPolicy;
@@ -44,5 +46,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Order::class, OrderPolicy::class);
         Gate::policy(Customer::class, CustomerPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(ApiRequest::class, ApiRequestPolicy::class);
     }
 }

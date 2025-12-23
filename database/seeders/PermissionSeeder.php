@@ -26,6 +26,7 @@ class PermissionSeeder extends Seeder
             'orders',
             'users',
             'customers',
+            'api_requests',
         ];
 
         // Standard Filament permissions for each resource
@@ -63,6 +64,7 @@ class PermissionSeeder extends Seeder
             'view_orders_chart',
             'view_orders_by_status_chart',
             'view_latest_orders',
+            'view_api_metrics',
         ];
 
         foreach ($widget_permissions as $permission) {
