@@ -159,6 +159,7 @@ class ProductsTable
                     BulkAction::make('publish')
                         ->label('Publish')
                         ->icon(Heroicon::OutlinedCheckCircle)
+                        ->visible(fn () => auth()->user()?->hasRole('super_admin') ?? false)
                         ->action(function (Collection $records): void {
                             $records->each(function (Product $product) {
                                 $product->update(['status' => ProductStatus::Active]);

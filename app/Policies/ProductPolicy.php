@@ -78,6 +78,14 @@ class ProductPolicy
     }
 
     /**
+     * Determine whether the user can bulk delete models.
+     */
+    public function deleteAny(User $user): bool
+    {
+        return $user->checkPermissionTo('delete_products');
+    }
+
+    /**
      * Determine whether the user can restore the model.
      */
     public function restore(User $user, Product $product): bool
