@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Store extends Model
 {
@@ -25,6 +26,57 @@ class Store extends Model
         'image',
         'type',
     ];
+
+    /**
+     * Boot the model.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function (Store $store): void {
+            if (empty($store->slug) && ! empty($store->name)) {
+                $store->slug = static::generate_unique_slug($store->name);
+            }
+        });
+
+        static::updating(function (Store $store): void {
+            if ($store->isDirty('name')) {
+                $store->slug = static::generate_unique_slug($store->name, $store->id);
+            }
+        });
+    }
+
+    /**
+     * Generate a unique slug from the name.
+     */
+    protected static function generate_unique_slug(string $name, ?int $exclude_id = null): string
+    {
+        $slug = Str::slug($name);
+        $original_slug = $slug;
+        $counter = 1;
+
+        while (static::slug_exists($slug, $exclude_id)) {
+            $slug = $original_slug.'-'.$counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Check if a slug already exists.
+     */
+    protected static function slug_exists(string $slug, ?int $exclude_id = null): bool
+    {
+        $query = static::query()->where('slug', $slug);
+
+        if ($exclude_id !== null) {
+            $query->where('id', '!=', $exclude_id);
+        }
+
+        return $query->exists();
+    }
 
     /**
      * Get the attributes that should be cast.
