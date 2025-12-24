@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Stores\Tables;
 
+use App\Enums\StoreStatus;
 use App\Enums\StoreType;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -38,6 +39,13 @@ class StoresTable
                             ->toggleable(isToggledHiddenByDefault: true),
                     ]),
                     Stack::make([
+                        TextColumn::make('status')
+                            ->badge()
+                            ->color(fn (StoreStatus $state): string => match ($state) {
+                                StoreStatus::Active => 'success',
+                                StoreStatus::Inactive => 'danger',
+                            })
+                            ->sortable(),
                         TextColumn::make('type')
                             ->badge()
                             ->color(fn (StoreType $state): string => match ($state) {
@@ -69,8 +77,14 @@ class StoresTable
                     ])->visibleFrom('xl'),
                 ])->from('md'),
 
-                // Mobile-only: show type and products below main content
+                // Mobile-only: show status, type and products below main content
                 Stack::make([
+                    TextColumn::make('status')
+                        ->badge()
+                        ->color(fn (StoreStatus $state): string => match ($state) {
+                            StoreStatus::Active => 'success',
+                            StoreStatus::Inactive => 'danger',
+                        }),
                     TextColumn::make('type')
                         ->badge()
                         ->color(fn (StoreType $state): string => match ($state) {
@@ -85,6 +99,9 @@ class StoresTable
                 ])->hiddenFrom('md'),
             ])
             ->filters([
+                SelectFilter::make('status')
+                    ->options(StoreStatus::class)
+                    ->native(false),
                 SelectFilter::make('type')
                     ->options(StoreType::class)
                     ->native(false),

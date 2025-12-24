@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\StoreStatus;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\User;
@@ -521,6 +522,34 @@ test('products index works with store slug', function () {
 
 test('products index returns 404 when store slug does not exist', function () {
     $response = $this->getJson('/api/v1/stores/non-existent-store/products');
+
+    $response->assertNotFound();
+});
+
+test('products index returns 404 for inactive store', function () {
+    $store = Store::factory()->create(['status' => StoreStatus::Inactive]);
+    $user = User::factory()->create();
+
+    Product::factory()->count(3)->create([
+        'store_id' => $store->id,
+        'user_id' => $user->id,
+    ]);
+
+    $response = $this->getJson("/api/v1/stores/{$store->id}/products");
+
+    $response->assertNotFound();
+});
+
+test('products index returns 404 for inactive store by slug', function () {
+    $store = Store::factory()->create(['status' => StoreStatus::Inactive]);
+    $user = User::factory()->create();
+
+    Product::factory()->count(3)->create([
+        'store_id' => $store->id,
+        'user_id' => $user->id,
+    ]);
+
+    $response = $this->getJson("/api/v1/stores/{$store->slug}/products");
 
     $response->assertNotFound();
 });

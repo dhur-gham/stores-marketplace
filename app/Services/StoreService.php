@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\StoreStatus;
 use App\Enums\StoreType;
 use App\Models\Store;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -19,8 +20,8 @@ class StoreService
     public function get_store_by_id_or_slug(string|int $identifier): ?array
     {
         $store = is_numeric($identifier)
-            ? Store::query()->withCount('products')->find($identifier)
-            : Store::query()->withCount('products')->where('slug', $identifier)->first();
+            ? Store::query()->withCount('products')->where('status', StoreStatus::Active)->find($identifier)
+            : Store::query()->withCount('products')->where('slug', $identifier)->where('status', StoreStatus::Active)->first();
 
         if (! $store) {
             return null;
@@ -44,7 +45,7 @@ class StoreService
      */
     public function get_all_stores(int $per_page = 15, ?string $search = null): array
     {
-        $query = Store::query()->withCount('products');
+        $query = Store::query()->withCount('products')->where('status', StoreStatus::Active);
 
         if ($search && trim($search) !== '') {
             $query->where('name', 'like', '%'.trim($search).'%');

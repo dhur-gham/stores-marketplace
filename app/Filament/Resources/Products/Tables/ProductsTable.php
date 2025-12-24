@@ -4,17 +4,22 @@ namespace App\Filament\Resources\Products\Tables;
 
 use App\Enums\ProductStatus;
 use App\Enums\ProductType;
+use App\Models\Product;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Notifications\Notification;
 use Filament\Support\Enums\FontWeight;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 
 class ProductsTable
 {
@@ -151,6 +156,23 @@ class ProductsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    BulkAction::make('publish')
+                        ->label('Publish')
+                        ->icon(Heroicon::OutlinedCheckCircle)
+                        ->action(function (Collection $records): void {
+                            $records->each(function (Product $product) {
+                                $product->update(['status' => ProductStatus::Active]);
+                            });
+
+                            Notification::make()
+                                ->title('Products published')
+                                ->body($records->count().' product(s) have been published successfully.')
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion()
+                        ->requiresConfirmation()
+                        ->color('success'),
                     DeleteBulkAction::make(),
                 ]),
             ])

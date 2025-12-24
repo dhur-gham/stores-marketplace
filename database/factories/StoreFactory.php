@@ -24,6 +24,7 @@ class StoreFactory extends Factory
             'bio' => fake()->sentence(),
             'image' => fake()->imageUrl(640, 480, 'business'),
             'type' => fake()->randomElement(['digital', 'physical']),
+            'status' => 'active',
         ];
     }
 }

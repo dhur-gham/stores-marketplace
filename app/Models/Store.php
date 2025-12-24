@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\StoreStatus;
 use App\Enums\StoreType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +26,7 @@ class Store extends Model
         'bio',
         'image',
         'type',
+        'status',
     ];
 
     /**
@@ -87,6 +89,7 @@ class Store extends Model
     {
         return [
             'type' => StoreType::class,
+            'status' => StoreStatus::class,
         ];
     }
 
@@ -138,5 +141,13 @@ class Store extends Model
     public function isPhysical(): bool
     {
         return $this->type === StoreType::Physical;
+    }
+
+    /**
+     * Helper: check if store is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->status === StoreStatus::Active;
     }
 }

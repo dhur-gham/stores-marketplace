@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\StoreStatus;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\User;
@@ -296,6 +297,44 @@ test('stores delivery prices works with store slug', function () {
 
 test('stores delivery prices returns 404 when store does not exist', function () {
     $response = $this->getJson('/api/v1/stores/non-existent-store/delivery-prices');
+
+    $response->assertNotFound();
+});
+
+test('stores index returns only active stores', function () {
+    $active_store = Store::factory()->create(['status' => StoreStatus::Active]);
+    Store::factory()->create(['status' => StoreStatus::Inactive]);
+
+    $response = $this->getJson('/api/v1/stores');
+
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.id', $active_store->id);
+});
+
+test('stores show returns 404 for inactive store', function () {
+    $store = Store::factory()->create(['status' => StoreStatus::Inactive]);
+
+    $response = $this->getJson("/api/v1/stores/{$store->id}");
+
+    $response->assertNotFound();
+});
+
+test('stores show returns 404 for inactive store by slug', function () {
+    $store = Store::factory()->create(['status' => StoreStatus::Inactive]);
+
+    $response = $this->getJson("/api/v1/stores/{$store->slug}");
+
+    $response->assertNotFound();
+});
+
+test('stores delivery prices returns 404 for inactive store', function () {
+    $store = Store::factory()->create(['status' => StoreStatus::Inactive]);
+    $city = \App\Models\City::factory()->create();
+
+    $store->cities()->attach($city->id, ['price' => 500]);
+
+    $response = $this->getJson("/api/v1/stores/{$store->id}/delivery-prices");
 
     $response->assertNotFound();
 });

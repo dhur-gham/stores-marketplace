@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Stores\Schemas;
 
+use App\Enums\StoreStatus;
 use App\Enums\StoreType;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -25,6 +26,12 @@ class StoreForm
                             ->columnSpan(1),
                         Select::make('type')
                             ->options(StoreType::class)
+                            ->required()
+                            ->native(false)
+                            ->columnSpan(1),
+                        Select::make('status')
+                            ->options(StoreStatus::class)
+                            ->default(StoreStatus::Active)
                             ->required()
                             ->native(false)
                             ->columnSpan(1),

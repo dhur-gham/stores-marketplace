@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\StoreStatus;
 use App\Models\Store;
 use App\Services\ProductService;
 use Dedoc\Scramble\Attributes\Group;
@@ -56,8 +57,8 @@ class ProductController extends BaseController
     public function index(Request $request, string $identifier): JsonResponse
     {
         $store = is_numeric($identifier)
-            ? Store::query()->find($identifier)
-            : Store::query()->where('slug', $identifier)->first();
+            ? Store::query()->where('status', StoreStatus::Active)->find($identifier)
+            : Store::query()->where('slug', $identifier)->where('status', StoreStatus::Active)->first();
 
         if (! $store) {
             return $this->error_response('Store not found', 404);
