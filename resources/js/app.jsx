@@ -10,6 +10,8 @@ import ProductDetail from './pages/ProductDetail';
 import Stores from './pages/Stores';
 import Products from './pages/Products';
 import Cart from './pages/Cart';
+import Wishlist from './pages/Wishlist';
+import SharedWishlist from './pages/SharedWishlist';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import Orders from './pages/Orders';
@@ -31,6 +33,8 @@ function AppContent() {
             <Route path="/store/:storeId" element={<StoreDetail />} />
             <Route path="/product/:productId" element={<ProductDetail />} />
             <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+            <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+            <Route path="/wishlist/share/:token" element={<SharedWishlist />} />
             <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
             <Route path="/order-confirmation" element={<ProtectedRoute><OrderConfirmation /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />

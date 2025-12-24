@@ -56,7 +56,8 @@ class ProductController extends BaseController
     public function index(Request $request, Store $store): JsonResponse
     {
         $per_page = (int) $request->query('per_page', 15);
-        $result = $this->product_service->get_products_by_store($store, $per_page);
+        $customer = $request->user();
+        $result = $this->product_service->get_products_by_store($store, $per_page, $customer);
 
         return $this->paginated_response($result['paginator'], $result['data'], 'Products retrieved successfully');
     }
@@ -86,9 +87,10 @@ class ProductController extends BaseController
      *
      * @unauthenticated
      */
-    public function latest(): JsonResponse
+    public function latest(Request $request): JsonResponse
     {
-        $products = $this->product_service->get_latest_products(5);
+        $customer = $request->user();
+        $products = $this->product_service->get_latest_products(5, $customer);
 
         return $this->success_response($products, 'Latest products retrieved successfully');
     }
@@ -150,6 +152,7 @@ class ProductController extends BaseController
         $sort_by = $request->query('sort_by');
         $sort_order = $request->query('sort_order', 'desc');
 
+        $customer = $request->user();
         $result = $this->product_service->get_all_products(
             $per_page,
             $search,
@@ -158,7 +161,8 @@ class ProductController extends BaseController
             $price_min,
             $price_max,
             $sort_by,
-            $sort_order
+            $sort_order,
+            $customer
         );
 
         return $this->paginated_response($result['paginator'], $result['data'], 'Products retrieved successfully');
@@ -196,9 +200,10 @@ class ProductController extends BaseController
      *
      * @unauthenticated
      */
-    public function show(string $identifier): JsonResponse
+    public function show(Request $request, string $identifier): JsonResponse
     {
-        $product = $this->product_service->get_product_by_id_or_slug($identifier);
+        $customer = $request->user();
+        $product = $this->product_service->get_product_by_id_or_slug($identifier, $customer);
 
         if (! $product) {
             return $this->error_response('Product not found', 404);

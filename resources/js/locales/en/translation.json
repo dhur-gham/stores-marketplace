@@ -8,7 +8,9 @@
     "page": "Page",
     "of": "of",
     "clear": "Clear",
-    "search": "Search"
+    "search": "Search",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
   },
   "header": {
     "title": "Stores Marketplace",
@@ -172,6 +174,71 @@
       "address_required": "The address field is required.",
       "city_required": "The city field is required.",
       "city_invalid": "The selected city is invalid."
+    }
+  },
+  "wishlist": {
+    "title": "Wishlist",
+    "empty": "Your wishlist is empty",
+    "empty_description": "Start adding products to your wishlist to see them here",
+    "continue_shopping": "Continue Shopping",
+    "add": "Add to Wishlist",
+    "remove": "Remove from Wishlist",
+    "add_to_cart": "Add to Cart",
+    "confirm_remove": "Are you sure you want to remove this item from your wishlist?",
+    "login_required": "Login Required",
+    "login_required_description": "Please login to view and manage your wishlist",
+    "share": {
+      "title": "Share Wishlist",
+      "share_button": "Share Wishlist",
+      "share_link": "Share Link",
+      "copy_link": "Copy Link",
+      "link_copied": "Link copied to clipboard!",
+      "custom_message": "Custom Message",
+      "custom_message_placeholder": "Write your own message...",
+      "select_message": "Select a Message",
+      "or_write_custom": "Or write your own",
+      "enable_sharing": "Enable Sharing",
+      "disable_sharing": "Disable Sharing",
+      "sharing_enabled": "Sharing is enabled",
+      "sharing_disabled": "Sharing is disabled",
+      "views_count": "Views",
+      "generate_link": "Generate Link",
+      "updating": "Updating...",
+      "generating": "Generating...",
+      "messages": {
+        "message_1": "Share it with people who care for you, and take their money 💸",
+        "message_2": "If you care for me, let me steal your budget with this stuff 🛍️",
+        "message_3": "Drop hints to your loved ones (or just send them this link) 🎁",
+        "message_4": "Help me manifest these items into my life ✨",
+        "message_5": "Treat me like the main character I am 🎬",
+        "message_6": "My wishlist is a vibe, check it out 🎯",
+        "message_7": "This is my shopping list for people who love me 🥰",
+        "message_8": "Send this to someone who owes you a favor 😏",
+        "message_9": "My wishlist is giving main character energy ✨",
+        "message_10": "If you're reading this, you should probably buy me something 🛒",
+        "message_11": "This is not a drill - these are the things I actually want 🚨",
+        "message_12": "Share with your wallet and your heart 💝",
+        "message_13": "My wishlist is a whole mood, don't miss out 🎨",
+        "message_14": "Treat yourself by treating me (it's the same thing) 🎁",
+        "message_15": "This link contains my hopes, dreams, and shopping list 📝",
+        "message_16": "Send this to people who want to make me happy 😊",
+        "message_17": "My wishlist is fire, check it out 🔥",
+        "message_18": "If you love me, prove it with this list 💕",
+        "message_19": "This is my curated collection of things I need (want) 🛍️",
+        "message_20": "Share this with your bank account and watch the magic happen ✨"
+      }
+    },
+    "shared": {
+      "title": "Shared Wishlist",
+      "by": "Wishlist by",
+      "message": "Message",
+      "add_to_cart": "Add to Cart",
+      "login_to_add": "Login to Add to Cart",
+      "not_found": "Wishlist Not Found",
+      "not_found_description": "This wishlist link is invalid or has been disabled",
+      "back_home": "Back to Home",
+      "empty": "This wishlist is empty",
+      "empty_description": "No items in this wishlist yet"
     }
   },
   "order": {

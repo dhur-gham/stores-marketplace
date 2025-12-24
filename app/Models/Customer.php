@@ -75,4 +75,20 @@ class Customer extends Authenticatable
     {
         return $this->hasMany(CartItem::class);
     }
+
+    /**
+     * Get the wishlist items for this customer.
+     */
+    public function wishlist_items(): HasMany
+    {
+        return $this->hasMany(WishlistItem::class);
+    }
+
+    /**
+     * Get the wishlist share for this customer.
+     */
+    public function wishlist_share(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(WishlistShare::class);
+    }
 }

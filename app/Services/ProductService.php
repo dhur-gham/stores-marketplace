@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\ProductStatus;
+use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Store;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -16,23 +17,41 @@ class ProductService
      *
      * @return array{paginator: LengthAwarePaginator, data: array<int, array<string, mixed>>}
      */
-    public function get_products_by_store(Store $store, int $per_page = 15): array
+    public function get_products_by_store(Store $store, int $per_page = 15, ?Customer $customer = null): array
     {
         $paginator = $store->products()->paginate($per_page);
 
+        // Get wishlist product IDs if customer is authenticated
+        $wishlist_product_ids = [];
+        if ($customer) {
+            $wishlist_product_ids = $customer->wishlist_items()
+                ->pluck('product_id')
+                ->toArray();
+        }
+
+        $final_wishlist_product_ids = $wishlist_product_ids;
+
         $data = $paginator->getCollection()
-            ->map(fn (Product $product) => [
-                'id' => $product->id,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'image' => $product->image ? asset('storage/'.$product->image) : null,
-                'description' => $product->description,
-                'sku' => $product->sku,
-                'status' => $product->status->value,
-                'type' => $product->type->value,
-                'price' => $product->price,
-                'stock' => $product->stock,
-            ])
+            ->map(function (Product $product) use ($final_wishlist_product_ids) {
+                $product_data = [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'image' => $product->image ? asset('storage/'.$product->image) : null,
+                    'description' => $product->description,
+                    'sku' => $product->sku,
+                    'status' => $product->status->value,
+                    'type' => $product->type->value,
+                    'price' => $product->price,
+                    'stock' => $product->stock,
+                ];
+
+                if (! empty($final_wishlist_product_ids)) {
+                    $product_data['in_wishlist'] = in_array($product->id, $final_wishlist_product_ids, true);
+                }
+
+                return $product_data;
+            })
             ->toArray();
 
         return [
@@ -46,7 +65,7 @@ class ProductService
      *
      * @return array<string, mixed>|null
      */
-    public function get_product_by_id_or_slug(string|int $identifier): ?array
+    public function get_product_by_id_or_slug(string|int $identifier, ?Customer $customer = null): ?array
     {
         $product = is_numeric($identifier)
             ? Product::query()->with('store')->find($identifier)
@@ -56,7 +75,7 @@ class ProductService
             return null;
         }
 
-        return [
+        $product_data = [
             'id' => $product->id,
             'name' => $product->name,
             'slug' => $product->slug,
@@ -74,6 +93,14 @@ class ProductService
                 'image' => $product->store->image ? asset('storage/'.$product->store->image) : null,
             ],
         ];
+
+        if ($customer) {
+            $product_data['in_wishlist'] = $customer->wishlist_items()
+                ->where('product_id', $product->id)
+                ->exists();
+        }
+
+        return $product_data;
     }
 
     /**
@@ -81,7 +108,7 @@ class ProductService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function get_latest_products(int $limit = 5): array
+    public function get_latest_products(int $limit = 5, ?Customer $customer = null): array
     {
         $products = Product::query()
             ->with('store')
@@ -90,19 +117,37 @@ class ProductService
             ->limit($limit)
             ->get();
 
-        return $products->map(fn (Product $product) => [
-            'id' => $product->id,
-            'name' => $product->name,
-            'slug' => $product->slug,
-            'image' => $product->image ? asset('storage/'.$product->image) : null,
-            'description' => $product->description,
-            'price' => $product->price,
-            'store' => [
-                'id' => $product->store->id,
-                'name' => $product->store->name,
-                'slug' => $product->store->slug,
-            ],
-        ])->toArray();
+        // Get wishlist product IDs if customer is authenticated
+        $wishlist_product_ids = [];
+        if ($customer) {
+            $wishlist_product_ids = $customer->wishlist_items()
+                ->pluck('product_id')
+                ->toArray();
+        }
+
+        $final_wishlist_product_ids = $wishlist_product_ids;
+
+        return $products->map(function (Product $product) use ($final_wishlist_product_ids) {
+            $product_data = [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'image' => $product->image ? asset('storage/'.$product->image) : null,
+                'description' => $product->description,
+                'price' => $product->price,
+                'store' => [
+                    'id' => $product->store->id,
+                    'name' => $product->store->name,
+                    'slug' => $product->store->slug,
+                ],
+            ];
+
+            if (! empty($final_wishlist_product_ids)) {
+                $product_data['in_wishlist'] = in_array($product->id, $final_wishlist_product_ids, true);
+            }
+
+            return $product_data;
+        })->toArray();
     }
 
     /**
@@ -118,7 +163,8 @@ class ProductService
         ?int $price_min = null,
         ?int $price_max = null,
         ?string $sort_by = null,
-        ?string $sort_order = 'desc'
+        ?string $sort_order = 'desc',
+        ?Customer $customer = null
     ): array {
         $query = Product::query()->with('store');
 
@@ -165,25 +211,43 @@ class ProductService
 
         $paginator = $query->paginate($per_page);
 
+        // Get wishlist product IDs if customer is authenticated
+        $wishlist_product_ids = [];
+        if ($customer) {
+            $wishlist_product_ids = $customer->wishlist_items()
+                ->pluck('product_id')
+                ->toArray();
+        }
+
+        $final_wishlist_product_ids = $wishlist_product_ids;
+
         $data = $paginator->getCollection()
-            ->map(fn (Product $product) => [
-                'id' => $product->id,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'image' => $product->image ? asset('storage/'.$product->image) : null,
-                'description' => $product->description,
-                'sku' => $product->sku,
-                'status' => $product->status->value,
-                'type' => $product->type->value,
-                'price' => $product->price,
-                'stock' => $product->stock,
-                'store' => [
-                    'id' => $product->store->id,
-                    'name' => $product->store->name,
-                    'slug' => $product->store->slug,
-                    'image' => $product->store->image ? asset('storage/'.$product->store->image) : null,
-                ],
-            ])
+            ->map(function (Product $product) use ($final_wishlist_product_ids) {
+                $product_data = [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'image' => $product->image ? asset('storage/'.$product->image) : null,
+                    'description' => $product->description,
+                    'sku' => $product->sku,
+                    'status' => $product->status->value,
+                    'type' => $product->type->value,
+                    'price' => $product->price,
+                    'stock' => $product->stock,
+                    'store' => [
+                        'id' => $product->store->id,
+                        'name' => $product->store->name,
+                        'slug' => $product->store->slug,
+                        'image' => $product->store->image ? asset('storage/'.$product->store->image) : null,
+                    ],
+                ];
+
+                if (! empty($final_wishlist_product_ids)) {
+                    $product_data['in_wishlist'] = in_array($product->id, $final_wishlist_product_ids, true);
+                }
+
+                return $product_data;
+            })
             ->toArray();
 
         return [

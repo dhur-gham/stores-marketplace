@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Plus, Minus, Check } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Check, Heart } from 'lucide-react';
 import Header from '../components/Header';
 import ArrowIcon from '../components/ArrowIcon';
 import { fetchProduct } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 
 export default function ProductDetail() {
     const { t } = useTranslation();
@@ -14,11 +15,13 @@ export default function ProductDetail() {
     const navigate = useNavigate();
     const { authenticated } = useAuth();
     const { cart_items, addToCart, updateCartItem } = useCart();
+    const { addToWishlist, removeFromWishlist, isInWishlist, wishlist_items } = useWishlist();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [adding, setAdding] = useState(false);
     const [added, setAdded] = useState(false);
+    const [wishlist_toggling, setWishlistToggling] = useState(false);
 
     useEffect(() => {
         const loadProduct = async () => {
@@ -89,6 +92,30 @@ export default function ProductDetail() {
         const new_quantity = Math.max(1, Math.min(product.stock, quantity + delta));
         setQuantity(new_quantity);
     };
+
+    const handleWishlistToggle = async () => {
+        if (!authenticated || wishlist_toggling || !product) {
+            return;
+        }
+
+        setWishlistToggling(true);
+        // Prefer API data if available, otherwise check context
+        const in_wishlist = product.in_wishlist ?? isInWishlist(product.id);
+        
+        if (in_wishlist) {
+            const wishlist_item = wishlist_items.find((item) => item.product_id === product.id);
+            if (wishlist_item) {
+                await removeFromWishlist(wishlist_item.id);
+            }
+        } else {
+            await addToWishlist(product.id);
+        }
+        
+        setWishlistToggling(false);
+    };
+
+    // Check wishlist status - prefer API data if available, otherwise check context
+    const in_wishlist = authenticated ? (product?.in_wishlist ?? isInWishlist(product?.id)) : false;
 
     if (loading) {
         return (
@@ -232,36 +259,54 @@ export default function ProductDetail() {
                                             )}
                                         </div>
                                     )}
-                                    <button
-                                        onClick={handleAddToCart}
-                                        disabled={product.stock === 0 || adding || added}
-                                        className={`w-full py-3 px-6 rounded-lg font-semibold text-white transition-colors flex items-center justify-center gap-2 ${
-                                            product.stock > 0 && !added
-                                                ? 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                                                : added
-                                                ? 'bg-green-600 dark:bg-green-500'
-                                                : 'bg-gray-400 cursor-not-allowed dark:bg-gray-600'
-                                        }`}
-                                    >
-                                        {added ? (
-                                            <>
-                                                <Check className="w-5 h-5" />
-                                                {t('cart.item_added')}
-                                            </>
-                                        ) : adding ? (
-                                            <>
-                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                                {t('cart.adding')}
-                                            </>
-                                        ) : product.stock > 0 ? (
-                                            <>
-                                                <ShoppingCart className="w-5 h-5" />
-                                                {t('cart.add_to_cart')}
-                                            </>
-                                        ) : (
-                                            t('cart.out_of_stock')
-                                        )}
-                                    </button>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={handleAddToCart}
+                                            disabled={product.stock === 0 || adding || added}
+                                            className={`flex-1 py-3 px-6 rounded-lg font-semibold text-white transition-colors flex items-center justify-center gap-2 ${
+                                                product.stock > 0 && !added
+                                                    ? 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                                                    : added
+                                                    ? 'bg-green-600 dark:bg-green-500'
+                                                    : 'bg-gray-400 cursor-not-allowed dark:bg-gray-600'
+                                            }`}
+                                        >
+                                            {added ? (
+                                                <>
+                                                    <Check className="w-5 h-5" />
+                                                    {t('cart.item_added')}
+                                                </>
+                                            ) : adding ? (
+                                                <>
+                                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                    {t('cart.adding')}
+                                                </>
+                                            ) : product.stock > 0 ? (
+                                                <>
+                                                    <ShoppingCart className="w-5 h-5" />
+                                                    {t('cart.add_to_cart')}
+                                                </>
+                                            ) : (
+                                                t('cart.out_of_stock')
+                                            )}
+                                        </button>
+                                        <button
+                                            onClick={handleWishlistToggle}
+                                            disabled={wishlist_toggling}
+                                            className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 border-2 ${
+                                                in_wishlist
+                                                    ? 'bg-red-50 dark:bg-red-900/20 border-red-500 dark:border-red-400 text-red-600 dark:text-red-400'
+                                                    : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                            title={in_wishlist ? t('wishlist.remove') : t('wishlist.add')}
+                                        >
+                                            <Heart
+                                                className={`w-5 h-5 ${
+                                                    in_wishlist ? 'fill-red-500 text-red-500' : ''
+                                                }`}
+                                            />
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                             {!authenticated && product.stock > 0 && (

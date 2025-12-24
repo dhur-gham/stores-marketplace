@@ -1,12 +1,19 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Plus, Minus, Trash2, X, ArrowLeft } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Trash2, ArrowLeft } from 'lucide-react';
 import Header from '../components/Header';
+import ConfirmationModal from '../components/ConfirmationModal';
 import { useCart } from '../contexts/CartContext';
 
 export default function Cart() {
     const { t } = useTranslation();
     const { cart_items, loading, cart_total, updateCartItem, removeFromCart, clearCart } = useCart();
+    const [confirm_modal, setConfirmModal] = useState({
+        is_open: false,
+        type: null, // 'remove' or 'clear'
+        cart_item_id: null,
+    });
 
     const formatPrice = (price) => {
         const formatted = new Intl.NumberFormat('en-US', {
@@ -23,16 +30,54 @@ export default function Cart() {
         await updateCartItem(cart_item_id, new_quantity);
     };
 
-    const handleRemove = async (cart_item_id) => {
-        if (window.confirm(t('cart.confirm_remove'))) {
-            await removeFromCart(cart_item_id);
-        }
+    const handleRemove = (cart_item_id) => {
+        setConfirmModal({
+            is_open: true,
+            type: 'remove',
+            cart_item_id,
+        });
     };
 
-    const handleClearCart = async () => {
-        if (window.confirm(t('cart.confirm_clear'))) {
+    const handleClearCart = () => {
+        setConfirmModal({
+            is_open: true,
+            type: 'clear',
+            cart_item_id: null,
+        });
+    };
+
+    const handleConfirmAction = async () => {
+        if (confirm_modal.type === 'remove' && confirm_modal.cart_item_id) {
+            await removeFromCart(confirm_modal.cart_item_id);
+        } else if (confirm_modal.type === 'clear') {
             await clearCart();
         }
+        setConfirmModal({
+            is_open: false,
+            type: null,
+            cart_item_id: null,
+        });
+    };
+
+    const getConfirmModalProps = () => {
+        if (confirm_modal.type === 'remove') {
+            return {
+                title: t('cart.remove'),
+                message: t('cart.confirm_remove'),
+                confirm_text: t('cart.remove'),
+            };
+        } else if (confirm_modal.type === 'clear') {
+            return {
+                title: t('cart.clear_cart'),
+                message: t('cart.confirm_clear'),
+                confirm_text: t('cart.clear_cart'),
+            };
+        }
+        return {
+            title: '',
+            message: '',
+            confirm_text: '',
+        };
     };
 
     if (loading) {
@@ -201,6 +246,14 @@ export default function Cart() {
                     </div>
                 </div>
             </div>
+            <ConfirmationModal
+                is_open={confirm_modal.is_open}
+                on_close={() => setConfirmModal({ is_open: false, type: null, cart_item_id: null })}
+                on_confirm={handleConfirmAction}
+                {...getConfirmModalProps()}
+                cancel_text={t('common.cancel')}
+                confirm_variant="danger"
+            />
         </div>
     );
 }

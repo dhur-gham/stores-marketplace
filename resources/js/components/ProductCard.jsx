@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Check } from 'lucide-react';
+import { ShoppingCart, Check, Heart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 
 export default function ProductCard({ product }) {
     const { t } = useTranslation();
     const { authenticated } = useAuth();
     const { addToCart } = useCart();
+    const { addToWishlist, removeFromWishlist, isInWishlist, wishlist_items } = useWishlist();
     const [adding, setAdding] = useState(false);
     const [added, setAdded] = useState(false);
+    const [wishlist_toggling, setWishlistToggling] = useState(false);
     
     const formatPrice = (price) => {
         const formatted = new Intl.NumberFormat('en-US', {
@@ -41,6 +44,32 @@ export default function ProductCard({ product }) {
         }
     };
 
+    const handleWishlistToggle = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!authenticated || wishlist_toggling) {
+            return;
+        }
+
+        setWishlistToggling(true);
+        const in_wishlist = isInWishlist(product.id);
+        
+        if (in_wishlist) {
+            const wishlist_item = wishlist_items.find((item) => item.product_id === product.id);
+            if (wishlist_item) {
+                await removeFromWishlist(wishlist_item.id);
+            }
+        } else {
+            await addToWishlist(product.id);
+        }
+        
+        setWishlistToggling(false);
+    };
+
+    // Check wishlist status - prefer API data if available, otherwise check context
+    const in_wishlist = authenticated ? (product.in_wishlist ?? isInWishlist(product.id)) : false;
+
     return (
         <Link
             to={`/product/${product.id}`}
@@ -69,6 +98,22 @@ export default function ProductCard({ product }) {
                             />
                         </svg>
                     </div>
+                )}
+                {authenticated && (
+                    <button
+                        onClick={handleWishlistToggle}
+                        disabled={wishlist_toggling}
+                        className="absolute top-2 end-2 p-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                        title={in_wishlist ? t('wishlist.remove') : t('wishlist.add')}
+                    >
+                        <Heart
+                            className={`w-4 h-4 ${
+                                in_wishlist
+                                    ? 'fill-red-500 text-red-500'
+                                    : 'text-gray-600 dark:text-gray-400'
+                            }`}
+                        />
+                    </button>
                 )}
                 {isLowStock && (
                     <div className="absolute top-2 start-2">

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\StoreController;
+use App\Http\Controllers\Api\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -18,6 +19,9 @@ Route::prefix('v1')->group(function () {
     Route::get('/products/latest', [ProductController::class, 'latest']);
     Route::get('/products/{identifier}', [ProductController::class, 'show']);
     Route::get('/cities', [CityController::class, 'index']);
+
+    // Public wishlist share route
+    Route::get('/wishlist/share/{token}', [WishlistController::class, 'shared']);
 
     // Auth routes (public)
     Route::post('/auth/register', [AuthController::class, 'register']);
@@ -39,5 +43,17 @@ Route::prefix('v1')->group(function () {
         Route::post('/orders', [OrderController::class, 'store']);
         Route::get('/orders', [OrderController::class, 'index']);
         Route::get('/orders/{order}', [OrderController::class, 'show']);
+
+        // Wishlist routes
+        Route::get('/wishlist', [WishlistController::class, 'index']);
+        Route::post('/wishlist', [WishlistController::class, 'store']);
+        Route::delete('/wishlist/{wishlist_item}', [WishlistController::class, 'destroy']);
+        Route::get('/wishlist/check/{product_id}', [WishlistController::class, 'check']);
+
+        // Wishlist share routes
+        Route::get('/wishlist/share', [WishlistController::class, 'share']);
+        Route::post('/wishlist/share', [WishlistController::class, 'share']);
+        Route::put('/wishlist/share/message', [WishlistController::class, 'updateShareMessage']);
+        Route::put('/wishlist/share/toggle', [WishlistController::class, 'toggleShare']);
     });
 });

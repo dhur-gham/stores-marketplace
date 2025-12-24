@@ -1,15 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { User, LogOut, ChevronDown, Globe, ShoppingCart, Package } from 'lucide-react';
+import { User, LogOut, ChevronDown, Globe, ShoppingCart, Package, Heart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 import { useLanguage } from '../hooks/useLanguage';
 
 export default function Header() {
     const { t, i18n } = useTranslation();
     const { authenticated, customer, logout } = useAuth();
     const { cart_count } = useCart();
+    const { wishlist_count } = useWishlist();
     const { is_rtl } = useLanguage();
     const [dropdown_open, setDropdownOpen] = useState(false);
     const [lang_dropdown_open, setLangDropdownOpen] = useState(false);
@@ -66,6 +68,21 @@ export default function Header() {
                     </h1>
                 </Link>
                 <div className="flex-shrink-0 flex items-center gap-3">
+                    {/* Wishlist Icon - Only show when authenticated */}
+                    {authenticated && (
+                        <Link
+                            to="/wishlist"
+                            className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                            title={t('wishlist.title')}
+                        >
+                            <Heart className="w-5 h-5" />
+                            {wishlist_count > 0 && (
+                                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                                    {wishlist_count > 99 ? '99+' : wishlist_count}
+                                </span>
+                            )}
+                        </Link>
+                    )}
                     {/* Cart Icon - Only show when authenticated */}
                     {authenticated && (
                         <Link

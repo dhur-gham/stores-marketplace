@@ -208,3 +208,58 @@ export const fetchCities = async () => {
     return response.data;
 };
 
+// Wishlist methods
+export const getWishlist = async () => {
+    const response = await api.get('/wishlist');
+    return response.data;
+};
+
+export const addToWishlist = async (product_id) => {
+    const response = await api.post('/wishlist', {
+        product_id,
+    });
+    return response.data;
+};
+
+export const removeFromWishlist = async (wishlist_item_id) => {
+    const response = await api.delete(`/wishlist/${wishlist_item_id}`);
+    return response.data;
+};
+
+export const checkWishlist = async (product_id) => {
+    const response = await api.get(`/wishlist/check/${product_id}`);
+    return response.data;
+};
+
+// Wishlist share methods
+export const getShareLink = async () => {
+    const response = await api.get('/wishlist/share');
+    return response.data;
+};
+
+export const generateShareLink = async (custom_message = null) => {
+    const response = await api.post('/wishlist/share', {
+        custom_message,
+    });
+    return response.data;
+};
+
+export const getSharedWishlist = async (token) => {
+    const response = await api.get(`/wishlist/share/${token}`);
+    return response.data;
+};
+
+export const updateShareMessage = async (message) => {
+    const response = await api.put('/wishlist/share/message', {
+        custom_message: message,
+    });
+    return response.data;
+};
+
+export const toggleShare = async (is_active) => {
+    const response = await api.put('/wishlist/share/toggle', {
+        is_active,
+    });
+    return response.data;
+};
+

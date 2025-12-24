@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as authApi from '../services/api';
 import { CartProvider } from './CartContext';
+import { WishlistProvider } from './WishlistContext';
 
 const AuthContext = createContext(null);
 
@@ -93,7 +94,9 @@ export function AuthProvider({ children }) {
 
     return (
         <AuthContext.Provider value={value}>
-            <CartProvider>{children}</CartProvider>
+            <CartProvider>
+                <WishlistProvider>{children}</WishlistProvider>
+            </CartProvider>
         </AuthContext.Provider>
     );
 }
