@@ -173,7 +173,7 @@ export default function ProductDetail() {
                             <div className="mb-4">
                                 {product.store && (
                                     <Link
-                                        to={`/store/${product.store.id}`}
+                                        to={`/store/${product.store.slug}`}
                                         className="inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
                                     >
                                         {product.store.image && (

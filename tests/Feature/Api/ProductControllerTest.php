@@ -502,3 +502,78 @@ test('products all defaults to active products only', function () {
         ->assertJsonCount(2, 'data')
         ->assertJsonPath('meta.total', 2);
 });
+
+test('products index works with store slug', function () {
+    $store = Store::factory()->create(['slug' => 'my-store']);
+    $user = User::factory()->create();
+
+    Product::factory()->count(3)->create([
+        'store_id' => $store->id,
+        'user_id' => $user->id,
+    ]);
+
+    $response = $this->getJson("/api/v1/stores/{$store->slug}/products");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(3, 'data')
+        ->assertJsonPath('meta.total', 3);
+});
+
+test('products index returns 404 when store slug does not exist', function () {
+    $response = $this->getJson('/api/v1/stores/non-existent-store/products');
+
+    $response->assertNotFound();
+});
+
+test('products latest endpoint returns successful response', function () {
+    $store = Store::factory()->create();
+    $user = User::factory()->create();
+
+    Product::factory()->count(3)->create([
+        'store_id' => $store->id,
+        'user_id' => $user->id,
+        'status' => 'active',
+    ]);
+
+    $response = $this->getJson('/api/v1/products/latest');
+
+    $response->assertSuccessful()
+        ->assertJsonStructure([
+            'status',
+            'message',
+            'data' => [
+                0 => [
+                    'id',
+                    'name',
+                    'slug',
+                    'image',
+                    'description',
+                    'price',
+                    'stock',
+                    'store' => [
+                        'id',
+                        'name',
+                        'slug',
+                    ],
+                ],
+            ],
+        ]);
+});
+
+test('products latest endpoint includes stock field', function () {
+    $store = Store::factory()->create();
+    $user = User::factory()->create();
+
+    $product = Product::factory()->create([
+        'store_id' => $store->id,
+        'user_id' => $user->id,
+        'status' => 'active',
+        'stock' => 100,
+    ]);
+
+    $response = $this->getJson('/api/v1/products/latest');
+
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.stock', 100);
+});

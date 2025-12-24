@@ -25,7 +25,7 @@ class ProductController extends BaseController
      * Returns a paginated list of products belonging to a specific store.
      * Products include details like name, price, stock, status, and type.
      *
-     * @param  Store  $store  The store to retrieve products from.
+     * @param  string  $identifier  The store ID or slug.
      *
      * @response array{
      *     status: bool,
@@ -53,8 +53,16 @@ class ProductController extends BaseController
      * @unauthenticated
      */
     #[QueryParameter('per_page', description: 'Number of products per page.', type: 'int', default: 15, example: 10)]
-    public function index(Request $request, Store $store): JsonResponse
+    public function index(Request $request, string $identifier): JsonResponse
     {
+        $store = is_numeric($identifier)
+            ? Store::query()->find($identifier)
+            : Store::query()->where('slug', $identifier)->first();
+
+        if (! $store) {
+            return $this->error_response('Store not found', 404);
+        }
+
         $per_page = (int) $request->query('per_page', 15);
         $customer = $request->user();
         $result = $this->product_service->get_products_by_store($store, $per_page, $customer);
@@ -77,6 +85,7 @@ class ProductController extends BaseController
      *         image: string|null,
      *         description: string|null,
      *         price: int,
+     *         stock: int,
      *         store: array{
      *             id: int,
      *             name: string,

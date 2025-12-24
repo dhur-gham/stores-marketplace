@@ -8,7 +8,7 @@ import { fetchStore, fetchStoreProducts } from '../services/api';
 
 export default function StoreDetail() {
     const { t } = useTranslation();
-    const { storeId } = useParams();
+    const { storeSlug } = useParams();
     const navigate = useNavigate();
     const [store, setStore] = useState(null);
     const [products, setProducts] = useState([]);
@@ -22,8 +22,8 @@ export default function StoreDetail() {
                 setProductsLoading(true);
 
                 const [storeResponse, productsResponse] = await Promise.all([
-                    fetchStore(storeId),
-                    fetchStoreProducts(storeId, 50),
+                    fetchStore(storeSlug),
+                    fetchStoreProducts(storeSlug, 50),
                 ]);
 
                 if (storeResponse.status && storeResponse.data) {
@@ -45,10 +45,10 @@ export default function StoreDetail() {
             }
         };
 
-        if (storeId) {
+        if (storeSlug) {
             loadStoreData();
         }
-    }, [storeId, navigate]);
+    }, [storeSlug, navigate]);
 
     if (loading) {
         return (

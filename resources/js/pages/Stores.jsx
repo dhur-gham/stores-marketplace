@@ -138,7 +138,7 @@ export default function Stores() {
                                 {stores.map((store) => (
                                     <Link
                                         key={store.id}
-                                        to={`/store/${store.id}`}
+                                        to={`/store/${store.slug}`}
                                         className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700"
                                     >
                                         <div className="flex flex-col items-center text-center">

@@ -221,3 +221,81 @@ test('stores index search with multiple words', function () {
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.name', 'Tech Store Hub');
 });
+
+test('stores show returns store by id', function () {
+    $store = Store::factory()->create([
+        'name' => 'My Store',
+        'slug' => 'my-store',
+    ]);
+
+    $response = $this->getJson("/api/v1/stores/{$store->id}");
+
+    $response->assertSuccessful()
+        ->assertJson([
+            'status' => true,
+            'data' => [
+                'id' => $store->id,
+                'name' => 'My Store',
+                'slug' => 'my-store',
+            ],
+        ]);
+});
+
+test('stores show returns store by slug', function () {
+    $store = Store::factory()->create([
+        'name' => 'My Store',
+        'slug' => 'my-store',
+    ]);
+
+    $response = $this->getJson("/api/v1/stores/{$store->slug}");
+
+    $response->assertSuccessful()
+        ->assertJson([
+            'status' => true,
+            'data' => [
+                'id' => $store->id,
+                'name' => 'My Store',
+                'slug' => 'my-store',
+            ],
+        ]);
+});
+
+test('stores show returns 404 when store does not exist', function () {
+    $response = $this->getJson('/api/v1/stores/non-existent-store');
+
+    $response->assertNotFound();
+});
+
+test('stores delivery prices works with store id', function () {
+    $store = Store::factory()->create();
+    $city = \App\Models\City::factory()->create();
+
+    $store->cities()->attach($city->id, ['price' => 500]);
+
+    $response = $this->getJson("/api/v1/stores/{$store->id}/delivery-prices");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.city_id', $city->id)
+        ->assertJsonPath('data.0.price', 500);
+});
+
+test('stores delivery prices works with store slug', function () {
+    $store = Store::factory()->create(['slug' => 'my-store']);
+    $city = \App\Models\City::factory()->create();
+
+    $store->cities()->attach($city->id, ['price' => 500]);
+
+    $response = $this->getJson("/api/v1/stores/{$store->slug}/delivery-prices");
+
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.city_id', $city->id)
+        ->assertJsonPath('data.0.price', 500);
+});
+
+test('stores delivery prices returns 404 when store does not exist', function () {
+    $response = $this->getJson('/api/v1/stores/non-existent-store/delivery-prices');
+
+    $response->assertNotFound();
+});

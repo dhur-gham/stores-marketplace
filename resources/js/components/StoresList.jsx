@@ -35,7 +35,7 @@ export default function StoresList({ stores, loading, limit = null, showViewAll 
                 {display_stores.map((store) => (
                     <Link
                         key={store.id}
-                        to={`/store/${store.id}`}
+                        to={`/store/${store.slug}`}
                         className="flex-shrink-0 flex flex-col items-center gap-2 group"
                     >
                         <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 group-hover:border-blue-500 dark:group-hover:border-blue-400 transition-all transform group-hover:scale-105">

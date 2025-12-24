@@ -97,7 +97,7 @@ class StoreController extends BaseController
      *
      * Returns delivery prices for all cities that the store delivers to.
      *
-     * @param  int  $store  The store ID.
+     * @param  string  $identifier  The store ID or slug.
      *
      * @response array{
      *     status: bool,
@@ -107,10 +107,16 @@ class StoreController extends BaseController
      *
      * @unauthenticated
      */
-    public function deliveryPrices(int $store): JsonResponse
+    public function deliveryPrices(string $identifier): JsonResponse
     {
-        $store_model = Store::query()->findOrFail($store);
-        
+        $store_data = $this->store_service->get_store_by_id_or_slug($identifier);
+
+        if (! $store_data) {
+            return $this->error_response('Store not found', 404);
+        }
+
+        $store_model = Store::query()->findOrFail($store_data['id']);
+
         $delivery_prices = $store_model->cities()
             ->get()
             ->map(fn ($city) => [

@@ -135,6 +135,7 @@ class ProductService
                 'image' => $product->image ? asset('storage/'.$product->image) : null,
                 'description' => $product->description,
                 'price' => $product->price,
+                'stock' => $product->stock,
                 'store' => [
                     'id' => $product->store->id,
                     'name' => $product->store->name,

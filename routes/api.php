@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     // Public routes
     Route::get('/stores', [StoreController::class, 'index']);
-    Route::get('/stores/{store}/delivery-prices', [StoreController::class, 'deliveryPrices']);
-    Route::get('/stores/{store}/products', [ProductController::class, 'index']);
+    Route::get('/stores/{identifier}/delivery-prices', [StoreController::class, 'deliveryPrices']);
+    Route::get('/stores/{identifier}/products', [ProductController::class, 'index']);
     Route::get('/stores/{identifier}', [StoreController::class, 'show']);
     Route::get('/products', [ProductController::class, 'all']);
     Route::get('/products/latest', [ProductController::class, 'latest']);

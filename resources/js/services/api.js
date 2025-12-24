@@ -57,13 +57,13 @@ export const fetchStore = async (identifier) => {
     return response.data;
 };
 
-export const fetchStoreDeliveryPrices = async (store_id) => {
-    const response = await api.get(`/stores/${store_id}/delivery-prices`);
+export const fetchStoreDeliveryPrices = async (identifier) => {
+    const response = await api.get(`/stores/${identifier}/delivery-prices`);
     return response.data;
 };
 
-export const fetchStoreProducts = async (store_id, per_page = 15) => {
-    const response = await api.get(`/stores/${store_id}/products`, {
+export const fetchStoreProducts = async (identifier, per_page = 15) => {
+    const response = await api.get(`/stores/${identifier}/products`, {
         params: { per_page },
     });
     return response.data;
