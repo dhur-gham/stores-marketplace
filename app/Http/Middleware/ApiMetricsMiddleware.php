@@ -48,6 +48,16 @@ class ApiMetricsMiddleware
         try {
             $duration_ms = (int) round($started_at->diffInMicroseconds($ended_at) / 1000);
 
+            // Get user_id and validate it exists in database
+            $user_id = null;
+            $user = $request->user();
+            if ($user && $user->id) {
+                // Verify user exists in database to avoid foreign key constraint violations
+                if (\App\Models\User::query()->where('id', $user->id)->exists()) {
+                    $user_id = $user->id;
+                }
+            }
+
             ApiRequest::create([
                 'method' => $request->method(),
                 'path' => $request->path(),
@@ -58,7 +68,7 @@ class ApiMetricsMiddleware
                 'duration_ms' => $duration_ms,
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
-                'user_id' => $request->user()?->id,
+                'user_id' => $user_id,
                 'request_size' => strlen($request->getContent()),
                 'response_size' => strlen($response->getContent()),
                 'request_headers' => $this->filterHeaders($request->headers->all()),

@@ -160,7 +160,7 @@ class CartService
      */
     public function get_cart_count(Customer $customer): int
     {
-        return CartItem::query()
+        return (int) CartItem::query()
             ->where('customer_id', $customer->id)
             ->sum('quantity');
     }
