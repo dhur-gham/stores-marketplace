@@ -20,6 +20,16 @@ class ProductsTable
 {
     public static function configure(Table $table): Table
     {
+        $user = auth()->user();
+
+        // Filter products by user's stores if not super_admin
+        if ($user && ! $user->hasRole('super_admin')) {
+            $user_store_ids = $user->stores()->pluck('stores.id')->toArray();
+            $table->modifyQueryUsing(function ($query) use ($user_store_ids) {
+                $query->whereIn('store_id', $user_store_ids);
+            });
+        }
+
         return $table
             ->columns([
                 Split::make([
@@ -123,7 +133,14 @@ class ProductsTable
                     ->options(ProductType::class)
                     ->native(false),
                 SelectFilter::make('store')
-                    ->relationship('store', 'name')
+                    ->relationship('store', 'name', function ($query) {
+                        // Filter stores in the filter dropdown
+                        $user = auth()->user();
+                        if ($user && ! $user->hasRole('super_admin')) {
+                            $user_store_ids = $user->stores()->pluck('stores.id')->toArray();
+                            $query->whereIn('stores.id', $user_store_ids);
+                        }
+                    })
                     ->searchable()
                     ->preload()
                     ->native(false),

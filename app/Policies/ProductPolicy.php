@@ -20,7 +20,17 @@ class ProductPolicy
      */
     public function view(User $user, Product $product): bool
     {
-        return $user->checkPermissionTo('view_products');
+        if (! $user->checkPermissionTo('view_products')) {
+            return false;
+        }
+
+        // Super admins can view all products
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only view products from their stores
+        return $user->stores()->where('stores.id', $product->store_id)->exists();
     }
 
     /**
@@ -36,7 +46,17 @@ class ProductPolicy
      */
     public function update(User $user, Product $product): bool
     {
-        return $user->checkPermissionTo('update_products');
+        if (! $user->checkPermissionTo('update_products')) {
+            return false;
+        }
+
+        // Super admins can update all products
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only update products from their stores
+        return $user->stores()->where('stores.id', $product->store_id)->exists();
     }
 
     /**
@@ -44,7 +64,17 @@ class ProductPolicy
      */
     public function delete(User $user, Product $product): bool
     {
-        return $user->checkPermissionTo('delete_products');
+        if (! $user->checkPermissionTo('delete_products')) {
+            return false;
+        }
+
+        // Super admins can delete all products
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only delete products from their stores
+        return $user->stores()->where('stores.id', $product->store_id)->exists();
     }
 
     /**
