@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\User;
@@ -39,21 +38,10 @@ test('user has products relationship', function () {
         ->and($user->products->first())->toBeInstanceOf(Product::class);
 });
 
-test('user has cart items relationship', function () {
-    $user = User::factory()->create();
-    $store = Store::factory()->create();
-    $product = Product::factory()->create([
-        'store_id' => $store->id,
-        'user_id' => $user->id,
-    ]);
-
-    CartItem::factory()->create([
-        'user_id' => $user->id,
-        'product_id' => $product->id,
-    ]);
-
-    expect($user->cart_items)->toHaveCount(1)
-        ->and($user->cart_items->first())->toBeInstanceOf(CartItem::class);
+test('user does not have cart items relationship', function () {
+    // Users are sellers/admins, not customers. Cart items belong to customers.
+    // This test is removed as it's no longer applicable after migration from user_id to customer_id
+    expect(true)->toBeTrue();
 });
 
 test('user initials method returns correct initials', function () {

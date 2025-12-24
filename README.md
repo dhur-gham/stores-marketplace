@@ -1,6 +1,6 @@
 # Stores API
 
-A Laravel-based multi-store e-commerce API that supports both digital and physical product stores with delivery management, shopping cart, and order processing.
+🏪 Multi-store e-commerce API built with Laravel 12. Supports digital & physical products, shopping carts, city-based delivery, and order management. React frontend with Filament admin panel.
 
 ## Overview
 

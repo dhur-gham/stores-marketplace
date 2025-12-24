@@ -64,15 +64,15 @@ test('product has cart items relationship', function () {
         'user_id' => $user->id,
     ]);
 
-    // Create cart items with different users since there's a unique constraint on (user_id, product_id)
+    // Create cart items with different customers since there's a unique constraint on (customer_id, product_id)
     CartItem::factory()->create([
         'product_id' => $product->id,
-        'user_id' => User::factory()->create()->id,
+        'customer_id' => Customer::factory()->create()->id,
     ]);
 
     CartItem::factory()->create([
         'product_id' => $product->id,
-        'user_id' => User::factory()->create()->id,
+        'customer_id' => Customer::factory()->create()->id,
     ]);
 
     expect($product->cart_items)->toHaveCount(2)

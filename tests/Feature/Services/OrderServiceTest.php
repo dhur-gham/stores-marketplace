@@ -177,6 +177,7 @@ test('place_order calculates delivery price correctly for physical stores', func
     CartItem::factory()->create([
         'customer_id' => $customer->id,
         'product_id' => $product->id,
+        'quantity' => 1,
         'price' => 1000,
     ]);
 
