@@ -2,6 +2,7 @@
 
 use App\Enums\StoreType;
 use App\Models\City;
+use App\Models\CityStoreDelivery;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
@@ -100,4 +101,32 @@ test('store slug must be unique', function () {
 
     expect(fn () => Store::factory()->create(['slug' => 'unique-store']))
         ->toThrow(\Illuminate\Database\QueryException::class);
+});
+
+test('physical store automatically initializes delivery prices for all cities', function () {
+    $cities = City::factory()->count(5)->create();
+
+    $store = Store::factory()->create(['type' => 'physical']);
+
+    $delivery_prices = CityStoreDelivery::query()
+        ->where('store_id', $store->id)
+        ->get();
+
+    expect($delivery_prices)->toHaveCount(5);
+
+    $delivery_prices->each(function ($delivery) {
+        expect($delivery->price)->toBe(0);
+    });
+});
+
+test('digital store does not auto-initialize delivery prices', function () {
+    City::factory()->count(5)->create();
+
+    $store = Store::factory()->create(['type' => 'digital']);
+
+    $delivery_prices = CityStoreDelivery::query()
+        ->where('store_id', $store->id)
+        ->count();
+
+    expect($delivery_prices)->toBe(0);
 });

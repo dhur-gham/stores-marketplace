@@ -17,7 +17,15 @@ class CityStoreDeliveryForm
                     ->description('Set delivery price for a city')
                     ->schema([
                         Select::make('store_id')
-                            ->relationship('store', 'name')
+                            ->relationship('store', 'name', function ($query) {
+                                $user = auth()->user();
+                                if ($user && ! $user->hasRole('super_admin')) {
+                                    $user_store_ids = $user->stores()->pluck('stores.id')->toArray();
+                                    $query->whereIn('stores.id', $user_store_ids);
+                                }
+
+                                return $query;
+                            })
                             ->required()
                             ->searchable()
                             ->preload()

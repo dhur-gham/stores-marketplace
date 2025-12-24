@@ -20,7 +20,17 @@ class CityStoreDeliveryPolicy
      */
     public function view(User $user, CityStoreDelivery $city_store_delivery): bool
     {
-        return $user->checkPermissionTo('view_city_store_deliveries');
+        if (! $user->checkPermissionTo('view_city_store_deliveries')) {
+            return false;
+        }
+
+        // Super admins can view all
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only view deliveries for their stores
+        return $user->stores()->where('stores.id', $city_store_delivery->store_id)->exists();
     }
 
     /**
@@ -36,13 +46,41 @@ class CityStoreDeliveryPolicy
      */
     public function update(User $user, CityStoreDelivery $city_store_delivery): bool
     {
-        return $user->checkPermissionTo('update_city_store_deliveries');
+        if (! $user->checkPermissionTo('update_city_store_deliveries')) {
+            return false;
+        }
+
+        // Super admins can update all
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only update deliveries for their stores
+        return $user->stores()->where('stores.id', $city_store_delivery->store_id)->exists();
     }
 
     /**
      * Determine whether the user can delete the model.
      */
     public function delete(User $user, CityStoreDelivery $city_store_delivery): bool
+    {
+        if (! $user->checkPermissionTo('delete_city_store_deliveries')) {
+            return false;
+        }
+
+        // Super admins can delete all
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only delete deliveries for their stores
+        return $user->stores()->where('stores.id', $city_store_delivery->store_id)->exists();
+    }
+
+    /**
+     * Determine whether the user can bulk delete models.
+     */
+    public function deleteAny(User $user): bool
     {
         return $user->checkPermissionTo('delete_city_store_deliveries');
     }

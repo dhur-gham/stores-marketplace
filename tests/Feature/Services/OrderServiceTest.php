@@ -49,7 +49,7 @@ test('place_order creates orders grouped by store', function () {
     $city = City::factory()->create();
     $store->cities()->attach($city->id, ['price' => 500]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     $orders = $service->place_order($customer, [
         $store->id => [
@@ -97,7 +97,7 @@ test('place_order creates separate orders for different stores', function () {
     $store1->cities()->attach($city1->id, ['price' => 500]);
     $store2->cities()->attach($city2->id, ['price' => 300]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     $orders = $service->place_order($customer, [
         $store1->id => [
@@ -131,7 +131,7 @@ test('place_order validates physical stores require address and city', function 
         'product_id' => $product->id,
     ]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     expect(fn () => $service->place_order($customer, []))
         ->toThrow(\InvalidArgumentException::class, 'Address and city are required');
@@ -153,7 +153,7 @@ test('place_order validates digital stores do not require address', function () 
         'product_id' => $product->id,
     ]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     $orders = $service->place_order($customer);
 
@@ -186,7 +186,7 @@ test('place_order calculates delivery price correctly for physical stores', func
     $store->cities()->detach($city->id);
     $store->cities()->attach($city->id, ['price' => 5000]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     $orders = $service->place_order($customer, [
         $store->id => [
@@ -218,7 +218,7 @@ test('place_order sets delivery price to 0 for digital stores', function () {
         'price' => 1000,
     ]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     $orders = $service->place_order($customer);
 
@@ -245,7 +245,7 @@ test('place_order clears cart after order placement', function () {
     $city = City::factory()->create();
     $store->cities()->attach($city->id, ['price' => 500]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     $service->place_order($customer, [
         $store->id => [
@@ -273,7 +273,7 @@ test('place_order validates products are active', function () {
         'product_id' => $product->id,
     ]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     expect(fn () => $service->place_order($customer))
         ->toThrow(\InvalidArgumentException::class, 'not available');
@@ -296,7 +296,7 @@ test('place_order validates stock availability', function () {
         'quantity' => 10,
     ]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     expect(fn () => $service->place_order($customer))
         ->toThrow(\InvalidArgumentException::class, 'Insufficient stock');
@@ -322,7 +322,7 @@ test('place_order uses transaction rollback on error', function () {
     $city = City::factory()->create();
     $store->cities()->attach($city->id, ['price' => 500]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     try {
         $service->place_order($customer, [
@@ -352,7 +352,7 @@ test('calculate_delivery_price returns correct price from pivot', function () {
         'updated_at' => now(),
     ]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     $price = $service->calculate_delivery_price($store, $city->id);
 
@@ -363,7 +363,7 @@ test('calculate_delivery_price returns 0 for digital stores', function () {
     $store = Store::factory()->create(['type' => StoreType::Digital]);
     $city = City::factory()->create();
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     $price = $service->calculate_delivery_price($store, $city->id);
 
@@ -380,7 +380,7 @@ test('get_customer_orders returns paginated orders', function () {
         'store_id' => $store->id,
     ]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     $result = $service->get_customer_orders($customer, 10, 1);
 
@@ -410,7 +410,7 @@ test('get_order returns order details', function () {
         'price' => 1000,
     ]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     $order_data = $service->get_order($customer, $order->id);
 
@@ -431,7 +431,7 @@ test('get_order only returns customer own orders', function () {
         'store_id' => $store->id,
     ]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     $order_data = $service->get_order($customer2, $order->id);
 
@@ -455,7 +455,7 @@ test('place_order updates product stock', function () {
         'quantity' => 3,
     ]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     $service->place_order($customer);
 
@@ -467,7 +467,7 @@ test('place_order updates product stock', function () {
 test('place_order throws exception for empty cart', function () {
     $customer = Customer::factory()->create();
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     expect(fn () => $service->place_order($customer))
         ->toThrow(\InvalidArgumentException::class, 'Cart is empty');
@@ -492,7 +492,7 @@ test('place_order validates address cannot be empty for physical stores', functi
     $city = City::factory()->create();
     $store->cities()->attach($city->id, ['price' => 500]);
 
-    $service = new OrderService;
+    $service = app(OrderService::class);
 
     expect(fn () => $service->place_order($customer, [
         $store->id => [

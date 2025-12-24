@@ -4,10 +4,12 @@ namespace App\Models;
 
 use App\Enums\StoreStatus;
 use App\Enums\StoreType;
+use App\Services\StoreStatusService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Store extends Model
@@ -42,9 +44,26 @@ class Store extends Model
             }
         });
 
+        static::created(function (Store $store): void {
+            // Auto-initialize delivery prices for all cities when a non-digital store is created
+            if ($store->type !== StoreType::Digital) {
+                $store->initializeDeliveryPrices();
+            }
+        });
+
         static::updating(function (Store $store): void {
             if ($store->isDirty('name')) {
                 $store->slug = static::generate_unique_slug($store->name, $store->id);
+            }
+
+            // When store status changes to inactive, deactivate all products
+            if ($store->isDirty('status') && $store->status === StoreStatus::Inactive) {
+                $original_status = $store->getOriginal('status');
+                // Only deactivate products if the store was previously active (not already inactive)
+                if ($original_status !== StoreStatus::Inactive->value) {
+                    $store_status_service = app(StoreStatusService::class);
+                    $store_status_service->deactivateStoreProducts($store);
+                }
             }
         });
     }
@@ -149,5 +168,48 @@ class Store extends Model
     public function isActive(): bool
     {
         return $this->status === StoreStatus::Active;
+    }
+
+    /**
+     * Initialize delivery prices for all cities.
+     */
+    public function initializeDeliveryPrices(): void
+    {
+        $all_city_ids = City::query()->pluck('id')->toArray();
+
+        if (empty($all_city_ids)) {
+            return;
+        }
+
+        // Check which cities already have delivery prices for this store
+        $existing_city_ids = CityStoreDelivery::query()
+            ->where('store_id', $this->id)
+            ->pluck('city_id')
+            ->toArray();
+
+        // Get cities that need to be added
+        $cities_to_add = array_diff($all_city_ids, $existing_city_ids);
+
+        if (empty($cities_to_add)) {
+            return;
+        }
+
+        // Insert delivery prices for all cities (default price: 0)
+        DB::transaction(function () use ($cities_to_add) {
+            $records = [];
+            $now = now();
+
+            foreach ($cities_to_add as $city_id) {
+                $records[] = [
+                    'store_id' => $this->id,
+                    'city_id' => $city_id,
+                    'price' => 0,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+
+            CityStoreDelivery::query()->insert($records);
+        });
     }
 }

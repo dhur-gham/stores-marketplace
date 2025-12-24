@@ -42,7 +42,16 @@ class InitializeStoreDelivery extends Page implements HasForms
                     ->schema([
                         Select::make('store_id')
                             ->label('Store')
-                            ->options(Store::query()->pluck('name', 'id'))
+                            ->options(function () {
+                                $user = auth()->user();
+                                $query = Store::query();
+                                if ($user && ! $user->hasRole('super_admin')) {
+                                    $user_store_ids = $user->stores()->pluck('stores.id')->toArray();
+                                    $query->whereIn('stores.id', $user_store_ids);
+                                }
+
+                                return $query->pluck('name', 'id');
+                            })
                             ->required()
                             ->searchable()
                             ->native(false)

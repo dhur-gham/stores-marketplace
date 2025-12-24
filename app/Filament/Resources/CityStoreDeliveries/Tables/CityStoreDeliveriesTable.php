@@ -21,6 +21,16 @@ class CityStoreDeliveriesTable
 {
     public static function configure(Table $table): Table
     {
+        $user = auth()->user();
+
+        // Filter by stores that belong to the user if not super_admin
+        if ($user && ! $user->hasRole('super_admin')) {
+            $user_store_ids = $user->stores()->pluck('stores.id')->toArray();
+            $table->modifyQueryUsing(function ($query) use ($user_store_ids) {
+                $query->whereIn('store_id', $user_store_ids);
+            });
+        }
+
         return $table
             ->columns([
                 Split::make([
@@ -62,7 +72,15 @@ class CityStoreDeliveriesTable
             ])
             ->filters([
                 SelectFilter::make('store')
-                    ->relationship('store', 'name')
+                    ->relationship('store', 'name', function ($query) use ($user) {
+                        // Filter stores in the filter dropdown
+                        if ($user && ! $user->hasRole('super_admin')) {
+                            $user_store_ids = $user->stores()->pluck('stores.id')->toArray();
+                            $query->whereIn('stores.id', $user_store_ids);
+                        }
+
+                        return $query;
+                    })
                     ->searchable()
                     ->preload()
                     ->native(false),

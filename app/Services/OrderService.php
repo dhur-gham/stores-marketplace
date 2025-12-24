@@ -11,12 +11,13 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Store;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
+    public function __construct(public TelegramService $telegram_service) {}
+
     /**
      * Place order from cart, grouping items by store (one order per store).
      *
@@ -113,6 +114,13 @@ class OrderService
             }
 
             DB::commit();
+
+            // Send Telegram notifications for all orders (if customer has Telegram activated)
+            if ($customer->hasTelegramActivated()) {
+                foreach ($orders as $order) {
+                    $this->sendOrderNotification($customer, $order);
+                }
+            }
 
             return $orders;
         } catch (\Exception $e) {
@@ -248,5 +256,49 @@ class OrderService
             'updated_at' => $order->updated_at->toISOString(),
         ];
     }
-}
 
+    /**
+     * Send Telegram notification for a new order.
+     */
+    private function sendOrderNotification(Customer $customer, Order $order): void
+    {
+        // Load order relationships
+        $order->load(['store', 'city', 'order_items.product']);
+
+        $title = 'تم إنشاء طلبك بنجاح';
+        $content = "تم إنشاء طلبك رقم #{$order->id} من متجر {$order->store->name}";
+
+        $items_list = '';
+        $items_total = 0;
+
+        foreach ($order->order_items as $item) {
+            $item_subtotal = $item->quantity * $item->price;
+            $items_total += $item_subtotal;
+            $items_list .= "• {$item->product->name} × {$item->quantity} = {$item_subtotal} IQD\n";
+        }
+
+        // Build message manually for better formatting
+        $message = "<b>{$title}</b>\n\n{$content}\n\n";
+        $message .= "<b>المتجر:</b> {$order->store->name}\n";
+
+        if ($order->city) {
+            $message .= "<b>المدينة:</b> {$order->city->name}\n";
+        }
+
+        if ($order->address) {
+            $message .= "<b>العنوان:</b> {$order->address}\n";
+        }
+
+        $message .= "\n<b>المنتجات:</b>\n{$items_list}\n";
+        $message .= "<b>إجمالي المنتجات:</b> {$items_total} IQD\n";
+
+        if ($order->delivery_price > 0) {
+            $message .= "<b>رسوم التوصيل:</b> {$order->delivery_price} IQD\n";
+        }
+
+        $message .= "<b>الإجمالي:</b> <b>{$order->total} IQD</b>\n";
+        $message .= "<b>الحالة:</b> {$order->status->value}";
+
+        $this->telegram_service->sendMessageToCustomer($customer, $message);
+    }
+}
