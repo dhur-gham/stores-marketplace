@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ShoppingBag, Package, Calendar, DollarSign } from 'lucide-react';
 import Header from '../components/Header';
+import TelegramActivation from '../components/TelegramActivation';
 import { getOrders } from '../services/api';
 
 export default function Orders() {
@@ -101,6 +102,11 @@ export default function Orders() {
                             <ShoppingBag className="w-8 h-8" />
                             {t('order.order_history')}
                         </h1>
+                    </div>
+
+                    {/* Telegram Activation */}
+                    <div className="mb-6">
+                        <TelegramActivation />
                     </div>
 
                     {orders.length === 0 ? (

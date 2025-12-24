@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\StoreController;
+use App\Http\Controllers\Api\TelegramController;
+use App\Http\Controllers\Api\TelegramWebhookController;
 use App\Http\Controllers\Api\WishlistController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +24,9 @@ Route::prefix('v1')->group(function () {
 
     // Public wishlist share route
     Route::get('/wishlist/share/{token}', [WishlistController::class, 'shared']);
+
+    // Telegram webhook (public, no auth required)
+    Route::post('/telegram/webhook', [TelegramWebhookController::class, 'handle']);
 
     // Auth routes (public)
     Route::post('/auth/register', [AuthController::class, 'register']);
@@ -55,5 +60,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/wishlist/share', [WishlistController::class, 'share']);
         Route::put('/wishlist/share/message', [WishlistController::class, 'updateShareMessage']);
         Route::put('/wishlist/share/toggle', [WishlistController::class, 'toggleShare']);
+
+        // Telegram routes
+        Route::get('/telegram/activation-link', [TelegramController::class, 'getActivationLink']);
     });
 });

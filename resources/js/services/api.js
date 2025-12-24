@@ -151,6 +151,12 @@ export const getCurrentUser = async () => {
     return response.data;
 };
 
+// Telegram methods
+export const getTelegramActivationLink = async () => {
+    const response = await api.get('/telegram/activation-link');
+    return response.data;
+};
+
 // Cart methods
 export const getCart = async () => {
     const response = await api.get('/cart');

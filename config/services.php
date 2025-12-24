@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'telegram' => [
+        'bot_token' => env('BOT_TOKEN'),
+        'bot_username' => env('TELEGRAM_BOT_USERNAME', 'jzubot'),
+    ],
+
 ];

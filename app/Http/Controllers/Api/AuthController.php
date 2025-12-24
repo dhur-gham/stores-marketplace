@@ -63,6 +63,10 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
 
-        return response()->json($user);
+        $user_data = $user->toArray();
+        $user_data['telegram_activation_link'] = $user->getTelegramDeepLink();
+        $user_data['telegram_activated'] = $user->hasTelegramActivated();
+
+        return response()->json($user_data);
     }
 }

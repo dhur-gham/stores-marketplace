@@ -10,7 +10,8 @@
     "clear": "Clear",
     "search": "Search",
     "cancel": "Cancel",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "optional": "Optional"
   },
   "header": {
     "title": "Stores Marketplace",
@@ -125,6 +126,13 @@
       "registration_failed": "Registration failed",
       "welcome_message": "Join us and start shopping! 🎉"
     }
+  },
+  "telegram": {
+    "activate_notifications": "Activate Telegram Notifications",
+    "activate_description": "Click the button below to activate Telegram notifications. You'll receive updates about your orders and important messages.",
+    "activate_button": "Activate Telegram",
+    "activated": "Telegram Notifications Activated",
+    "activated_description": "You will receive notifications about your orders and important updates via Telegram."
   },
   "cart": {
     "title": "Shopping Cart",

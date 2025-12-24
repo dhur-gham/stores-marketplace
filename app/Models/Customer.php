@@ -27,6 +27,7 @@ class Customer extends Authenticatable
         'address',
         'city_id',
         'notes',
+        'telegram_chat_id',
     ];
 
     /**
@@ -90,5 +91,24 @@ class Customer extends Authenticatable
     public function wishlist_share(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(WishlistShare::class);
+    }
+
+    /**
+     * Check if customer has activated Telegram notifications.
+     */
+    public function hasTelegramActivated(): bool
+    {
+        return ! is_null($this->telegram_chat_id);
+    }
+
+    /**
+     * Get the Telegram deep link for activation.
+     */
+    public function getTelegramDeepLink(): string
+    {
+        $bot_username = config('services.telegram.bot_username', 'jzubot');
+        $customer_id = $this->id;
+
+        return "https://t.me/{$bot_username}?start=cust-{$customer_id}";
     }
 }
