@@ -14,12 +14,17 @@ export default function TelegramActivation() {
             try {
                 setLoading(true);
                 const response = await getTelegramActivationLink();
-                if (response.status && response.data) {
-                    setActivationLink(response.data.activation_link);
-                    setIsActivated(response.data.is_activated);
+                console.log('Telegram activation response:', response);
+                if (response && response.status && response.data) {
+                    setActivationLink(response.data.activation_link || null);
+                    setIsActivated(response.data.is_activated || false);
+                    console.log('Activation link set:', response.data.activation_link);
+                } else {
+                    console.warn('Unexpected response format:', response);
                 }
             } catch (error) {
                 console.error('Error fetching Telegram activation link:', error);
+                console.error('Error details:', error.response?.data || error.message);
             } finally {
                 setLoading(false);
             }
@@ -65,16 +70,21 @@ export default function TelegramActivation() {
                     <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
                         {t('telegram.activate_description')}
                     </p>
-                    {activation_link && (
+                    {activation_link ? (
                         <a
                             href={activation_link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-sm"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg"
                         >
                             <span>{t('telegram.activate_button')}</span>
                             <ExternalLink className="w-4 h-4" />
                         </a>
+                    ) : (
+                        <div className="text-sm text-red-600 dark:text-red-400">
+                            <p>Unable to load activation link. Please refresh the page.</p>
+                            <p className="text-xs mt-1">Check browser console for details.</p>
+                        </div>
                     )}
                 </div>
             </div>
