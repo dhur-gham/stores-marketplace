@@ -41,22 +41,9 @@ export default function TelegramActivation() {
         );
     }
 
+    // Don't show anything if user is already activated
     if (is_activated) {
-        return (
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                <div className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-                    <div>
-                        <p className="font-semibold text-green-900 dark:text-green-100">
-                            {t('telegram.activated')}
-                        </p>
-                        <p className="text-sm text-green-700 dark:text-green-300">
-                            {t('telegram.activated_description')}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        );
+        return null;
     }
 
     return (
