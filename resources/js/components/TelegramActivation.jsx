@@ -63,10 +63,9 @@ export default function TelegramActivation() {
                             <ExternalLink className="w-4 h-4" />
                         </a>
                     ) : (
-                        <div className="text-sm text-red-600 dark:text-red-400">
-                            <p>Unable to load activation link. Please refresh the page.</p>
-                            <p className="text-xs mt-1">Check browser console for details.</p>
-                        </div>
+                        <p className="text-sm text-red-600 dark:text-red-400">
+                            Unable to load activation link. Please refresh the page.
+                        </p>
                     )}
                 </div>
             </div>
