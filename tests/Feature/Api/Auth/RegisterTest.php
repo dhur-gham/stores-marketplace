@@ -8,7 +8,7 @@ test('customer can register with valid data', function () {
         'email' => 'john@example.com',
         'password' => 'password123',
         'password_confirmation' => 'password123',
-        'phone' => '1234567890',
+        'phone' => '07717118278',
     ]);
 
     $response->assertSuccessful()
@@ -67,4 +67,33 @@ test('registration requires password confirmation', function () {
 
     $response->assertUnprocessable()
         ->assertJsonValidationErrors(['password']);
+});
+
+test('registration requires valid Iraqi phone number', function () {
+    $response = $this->postJson('/api/v1/auth/register', [
+        'name' => 'John Doe',
+        'email' => 'john@example.com',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+        'phone' => '1234567890',
+    ]);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['phone']);
+});
+
+test('registration accepts valid Iraqi phone number formats', function () {
+    $formats = ['07717118278', '7718117187', '9647718117187'];
+
+    foreach ($formats as $phone) {
+        $response = $this->postJson('/api/v1/auth/register', [
+            'name' => 'John Doe',
+            'email' => "john{$phone}@example.com",
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'phone' => $phone,
+        ]);
+
+        $response->assertSuccessful();
+    }
 });

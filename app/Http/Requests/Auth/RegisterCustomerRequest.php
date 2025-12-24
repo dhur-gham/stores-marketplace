@@ -26,7 +26,24 @@ class RegisterCustomerRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:customers,email'],
             'password' => ['required', 'confirmed', Password::defaults()],
-            'phone' => ['nullable', 'string', 'max:255'],
+            'phone' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^(9647|07|7)[0-9]{9}$/',
+            ],
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'phone.regex' => 'The phone number must be a valid Iraqi mobile number (e.g., 07717118278, 7718117187, or 9647718117187).',
         ];
     }
 }

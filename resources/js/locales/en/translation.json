@@ -106,21 +106,24 @@
       "submitting": "Logging in...",
       "no_account": "Don't have an account?",
       "register_link": "Register",
-      "invalid_credentials": "Invalid credentials"
+      "invalid_credentials": "Invalid credentials",
+      "welcome_message": "Welcome back! Let's get you shopping 🛍️"
     },
     "register": {
       "title": "Register",
       "name": "Name",
       "email": "Email",
       "phone": "Phone",
-      "phone_optional": "Phone (Optional)",
+      "phone_format_hint": "Format: 07717118278, 7718117187, or 9647718117187",
+      "phone_validation_message": "Please enter a valid Iraqi mobile number",
       "password": "Password",
       "confirm_password": "Confirm Password",
       "submit": "Register",
       "submitting": "Registering...",
       "has_account": "Already have an account?",
       "login_link": "Login",
-      "registration_failed": "Registration failed"
+      "registration_failed": "Registration failed",
+      "welcome_message": "Join us and start shopping! 🎉"
     }
   },
   "cart": {
