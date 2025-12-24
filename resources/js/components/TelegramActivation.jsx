@@ -14,17 +14,12 @@ export default function TelegramActivation() {
             try {
                 setLoading(true);
                 const response = await getTelegramActivationLink();
-                console.log('Telegram activation response:', response);
                 if (response && response.status && response.data) {
                     setActivationLink(response.data.activation_link || null);
                     setIsActivated(response.data.is_activated || false);
-                    console.log('Activation link set:', response.data.activation_link);
-                } else {
-                    console.warn('Unexpected response format:', response);
                 }
             } catch (error) {
-                console.error('Error fetching Telegram activation link:', error);
-                console.error('Error details:', error.response?.data || error.message);
+                // Silently handle errors
             } finally {
                 setLoading(false);
             }
