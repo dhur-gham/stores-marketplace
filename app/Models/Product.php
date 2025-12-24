@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Product extends Model
 {
@@ -32,6 +33,64 @@ class Product extends Model
         'price',
         'stock',
     ];
+
+    /**
+     * Boot the model.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function (Product $product): void {
+            // Auto-set user_id to authenticated user if not set
+            if (empty($product->user_id) && auth()->check()) {
+                $product->user_id = auth()->id();
+            }
+
+            // Auto-generate slug from name if not set
+            if (empty($product->slug) && ! empty($product->name)) {
+                $product->slug = static::generate_unique_slug($product->name);
+            }
+        });
+
+        static::updating(function (Product $product): void {
+            // Auto-regenerate slug when name changes
+            if ($product->isDirty('name')) {
+                $product->slug = static::generate_unique_slug($product->name, $product->id);
+            }
+        });
+    }
+
+    /**
+     * Generate a unique slug from the name.
+     */
+    protected static function generate_unique_slug(string $name, ?int $exclude_id = null): string
+    {
+        $slug = Str::slug($name);
+        $original_slug = $slug;
+        $counter = 1;
+
+        while (static::slug_exists($slug, $exclude_id)) {
+            $slug = $original_slug.'-'.$counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Check if a slug already exists.
+     */
+    protected static function slug_exists(string $slug, ?int $exclude_id = null): bool
+    {
+        $query = static::query()->where('slug', $slug);
+
+        if ($exclude_id !== null) {
+            $query->where('id', '!=', $exclude_id);
+        }
+
+        return $query->exists();
+    }
 
     /**
      * Get the attributes that should be cast.
