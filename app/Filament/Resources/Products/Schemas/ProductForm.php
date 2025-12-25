@@ -19,19 +19,21 @@ class ProductForm
     {
         return $schema
             ->components([
-                Section::make('Basic Information')
-                    ->description('Product details')
+                Section::make(__('products.sections.basic_information'))
+                    ->description(__('products.sections.basic_information'))
                     ->schema([
                         TextInput::make('name')
+                            ->label(__('products.fields.name'))
                             ->required()
                             ->maxLength(255)
                             ->columnSpan(1),
                         TextInput::make('sku')
-                            ->label('SKU')
+                            ->label(__('products.fields.sku'))
                             ->unique(ignoreRecord: true)
                             ->maxLength(100)
                             ->columnSpan(1),
                         Select::make('store_id')
+                            ->label(__('products.fields.store_id'))
                             ->relationship('store', 'name')
                             ->required(fn () => auth()->user()?->hasRole('super_admin') ?? false)
                             ->searchable()
@@ -53,6 +55,7 @@ class ProductForm
                             })
                             ->columnSpan(1),
                         Select::make('type')
+                            ->label(__('products.fields.type'))
                             ->options(ProductType::class)
                             ->default(ProductType::Physical)
                             ->required()
@@ -61,14 +64,16 @@ class ProductForm
                             ->native(false)
                             ->columnSpan(1),
                         Textarea::make('description')
+                            ->label(__('products.fields.description'))
                             ->maxLength(2000)
                             ->rows(4)
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
-                Section::make('Pricing & Stock')
+                Section::make(__('products.sections.pricing_stock'))
                     ->schema([
                         TextInput::make('price')
+                            ->label(__('products.fields.price'))
                             ->required()
                             ->numeric()
                             ->integer()
@@ -76,12 +81,14 @@ class ProductForm
                             ->minValue(0)
                             ->columnSpan(1),
                         TextInput::make('stock')
+                            ->label(__('products.fields.stock'))
                             ->required()
                             ->numeric()
                             ->minValue(0)
                             ->default(0)
                             ->columnSpan(1),
                         Select::make('status')
+                            ->label(__('products.fields.status'))
                             ->options(ProductStatus::class)
                             ->default(ProductStatus::Draft)
                             ->required(fn () => auth()->user()?->hasRole('super_admin') ?? false)
@@ -90,9 +97,10 @@ class ProductForm
                             ->columnSpan(1),
                     ])
                     ->columns(3),
-                Section::make('Media')
+                Section::make(__('products.sections.media'))
                     ->schema([
                         FileUpload::make('image')
+                            ->label(__('products.fields.image'))
                             ->image()
                             ->imageEditor()
                             ->disk('public')

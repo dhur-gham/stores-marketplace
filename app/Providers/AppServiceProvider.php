@@ -18,6 +18,7 @@ use App\Policies\ProductPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\StorePolicy;
 use App\Policies\UserPolicy;
+use BezhanSalleh\LanguageSwitch\LanguageSwitch;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Permission\Models\Permission;
@@ -47,5 +48,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Customer::class, CustomerPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(ApiRequest::class, ApiRequestPolicy::class);
+
+        LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
+            $switch
+                ->locales(['en', 'ar']);
+        });
     }
 }

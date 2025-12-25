@@ -21,15 +21,24 @@ class CityStoreDeliveryResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTruck;
 
-    protected static ?string $navigationLabel = 'Delivery Prices';
-
-    protected static ?string $modelLabel = 'Delivery Price';
-
-    protected static ?string $pluralModelLabel = 'Delivery Prices';
-
     protected static string|UnitEnum|null $navigationGroup = 'Store Management';
 
     protected static ?int $navigationSort = 3;
+
+    public static function getModelLabel(): string
+    {
+        return __('city-store-deliveries.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('city-store-deliveries.plural_label');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('city-store-deliveries.navigation_label');
+    }
 
     public static function form(Schema $schema): Schema
     {

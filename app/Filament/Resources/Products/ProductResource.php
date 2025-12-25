@@ -26,6 +26,21 @@ class ProductResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function getModelLabel(): string
+    {
+        return __('products.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('products.plural_label');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('products.navigation_label');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return ProductForm::configure($schema);
