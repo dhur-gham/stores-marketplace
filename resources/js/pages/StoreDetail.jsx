@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Header from '../components/Header';
+import Footer from '../components/Footer';
 import ProductsList from '../components/ProductsList';
 import ArrowIcon from '../components/ArrowIcon';
 import { fetchStore, fetchStoreProducts } from '../services/api';
@@ -52,16 +53,15 @@ export default function StoreDetail() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-                <div className="container mx-auto px-4 py-8">
-                    <Header />
-                    <div className="flex items-center justify-center min-h-[60vh]">
-                        <div className="text-center">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                            <p className="text-gray-600 dark:text-gray-400">{t('store.loading')}</p>
-                        </div>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+                <Header />
+                <div className="container mx-auto px-4 py-8 flex-1 flex items-center justify-center">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                        <p className="text-gray-600 dark:text-gray-400">{t('store.loading')}</p>
                     </div>
                 </div>
+                <Footer />
             </div>
         );
     }
@@ -71,9 +71,9 @@ export default function StoreDetail() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <div className="container mx-auto px-4 py-8">
-                <Header />
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+            <Header />
+            <div className="container mx-auto px-4 py-8 flex-1">
                 
                 <button
                     onClick={() => navigate('/')}
@@ -148,6 +148,7 @@ export default function StoreDetail() {
                     )}
                 </section>
             </div>
+            <Footer />
         </div>
     );
 }

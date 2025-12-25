@@ -283,6 +283,72 @@
       "cancelled": "Cancelled",
       "refunded": "Refunded"
     }
+  },
+  "footer": {
+    "about_title": "About",
+    "about_description": "A multi-store marketplace platform where store owners can manage their stores and customers can shop from multiple stores.",
+    "learn_more": "Learn More",
+    "quick_links": "Quick Links",
+    "stores": "Stores",
+    "products": "Products",
+    "about": "About",
+    "platform": "Platform",
+    "tagline": "Your one-stop marketplace for all your shopping needs.",
+    "rights_reserved": "All rights reserved."
+  },
+  "about": {
+    "hero": {
+      "title": "Welcome to Stores Marketplace",
+      "subtitle": "A powerful platform connecting store owners with customers in a seamless marketplace experience"
+    },
+    "what_is": {
+      "title": "What is Stores Marketplace?",
+      "description": "Stores Marketplace is a comprehensive multi-store e-commerce platform that brings together multiple stores and their products in one convenient location. Whether you're a store owner looking to expand your online presence or a customer seeking the best products from various vendors, our platform provides all the tools and features you need.",
+      "description2": "Our platform supports both digital and physical stores, allowing store owners to manage their inventory, track orders, set delivery prices, and analyze their business performance. Customers can browse products from multiple stores, compare prices, add items to their cart, and complete purchases all in one place."
+    },
+    "features": {
+      "title": "Platform Features",
+      "store_management": {
+        "title": "Store Management",
+        "description": "Easy-to-use dashboard for store owners to manage their store profile, products, and settings"
+      },
+      "product_catalog": {
+        "title": "Product Catalog",
+        "description": "Comprehensive product management with inventory tracking, pricing, and categorization"
+      },
+      "customer_base": {
+        "title": "Customer Base",
+        "description": "Access to a growing community of customers actively shopping on the platform"
+      },
+      "analytics": {
+        "title": "Analytics & Reports",
+        "description": "Track your sales, orders, and business performance with detailed analytics"
+      },
+      "secure": {
+        "title": "Secure & Reliable",
+        "description": "Built with security and reliability in mind, ensuring safe transactions for all users"
+      },
+      "real_time": {
+        "title": "Real-Time Updates",
+        "description": "Real-time inventory management, order tracking, and stock updates"
+      }
+    },
+    "store_owner": {
+      "title": "What Can Store Owners Do?",
+      "intro": "As a store owner on our platform, you have access to a comprehensive set of tools to manage and grow your business:",
+      "create_store": "Create and customize your store profile",
+      "add_products": "Add and manage your product catalog with images, descriptions, and pricing",
+      "manage_inventory": "Manage inventory with real-time stock tracking",
+      "track_orders": "Track and manage customer orders from start to finish",
+      "view_analytics": "View analytics and reports on your store performance",
+      "set_delivery_prices": "Set delivery prices for different cities (physical stores)"
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "description": "Whether you're a store owner ready to grow your business or a customer looking for great products, our platform has everything you need.",
+      "browse_stores": "Browse Stores",
+      "explore_products": "Explore Products"
+    }
   }
 }
 

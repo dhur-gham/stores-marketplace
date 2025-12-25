@@ -60,22 +60,22 @@ export default function Header() {
     };
 
     return (
-        <header className="w-full py-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-            <div className="container mx-auto px-4 flex items-center justify-between">
-                <Link to="/" className="flex-1 text-center">
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+        <header className="sticky top-0 z-50 w-full py-4 md:py-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
+            <div className="container mx-auto px-3 md:px-4 flex items-center justify-between gap-2">
+                <Link to="/" className="flex-1 text-center min-w-0">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate">
                         {t('header.title')}
                     </h1>
                 </Link>
-                <div className="flex-shrink-0 flex items-center gap-3">
+                <div className="flex-shrink-0 flex items-center gap-1.5 sm:gap-2 md:gap-3">
                     {/* Wishlist Icon - Only show when authenticated */}
                     {authenticated && (
                         <Link
                             to="/wishlist"
-                            className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                            className="relative p-1.5 sm:p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                             title={t('wishlist.title')}
                         >
-                            <Heart className="w-5 h-5" />
+                            <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
                             {wishlist_count > 0 && (
                                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                                     {wishlist_count > 99 ? '99+' : wishlist_count}
@@ -87,10 +87,10 @@ export default function Header() {
                     {authenticated && (
                         <Link
                             to="/cart"
-                            className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                            className="relative p-1.5 sm:p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                             title={t('cart.title')}
                         >
-                            <ShoppingCart className="w-5 h-5" />
+                            <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
                             {cart_count > 0 && (
                                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
                                     {cart_count > 99 ? '99+' : cart_count}
@@ -102,15 +102,15 @@ export default function Header() {
                     <div className="relative" ref={lang_dropdown_ref}>
                         <button
                             onClick={() => setLangDropdownOpen(!lang_dropdown_open)}
-                            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                             aria-label="Language menu"
                         >
-                            <Globe className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-300" />
+                            <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
                                 {languages.find((l) => l.code === i18n.language)?.flag || '🌐'}
                             </span>
                             <ChevronDown
-                                className={`w-3 h-3 text-gray-500 dark:text-gray-400 transition-transform ${
+                                className={`w-2.5 h-2.5 sm:w-3 sm:h-3 text-gray-500 dark:text-gray-400 transition-transform ${
                                     lang_dropdown_open ? 'rotate-180' : ''
                                 }`}
                             />
@@ -143,14 +143,14 @@ export default function Header() {
                         <div className="relative" ref={dropdown_ref}>
                             <button
                                 onClick={() => setDropdownOpen(!dropdown_open)}
-                                className="flex items-center gap-2 p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                                className="flex items-center gap-1 sm:gap-2 p-1 sm:p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                                 aria-label="User menu"
                             >
-                                <div className="w-10 h-10 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-semibold text-sm">
+                                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-semibold text-xs sm:text-sm">
                                     {getInitials(customer?.name)}
                                 </div>
                                 <ChevronDown
-                                    className={`w-4 h-4 text-gray-600 dark:text-gray-300 transition-transform ${
+                                    className={`w-3 h-3 sm:w-4 sm:h-4 text-gray-600 dark:text-gray-300 transition-transform hidden sm:block ${
                                         dropdown_open ? 'rotate-180' : ''
                                     }`}
                                 />
@@ -190,16 +190,16 @@ export default function Header() {
                             )}
                         </div>
                     ) : (
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3">
                             <Link
                                 to="/login"
-                                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                className="px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap"
                             >
                                 {t('header.login')}
                             </Link>
                             <Link
                                 to="/register"
-                                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition-colors"
+                                className="px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-lg transition-colors whitespace-nowrap"
                             >
                                 {t('header.register')}
                             </Link>
