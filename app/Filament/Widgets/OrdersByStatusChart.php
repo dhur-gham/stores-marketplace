@@ -35,11 +35,10 @@ class OrdersByStatusChart extends ChartWidget
 
             $status_colors = [
                 OrderStatus::New->value => 'rgba(59, 130, 246, 0.8)',
-                OrderStatus::Pending->value => 'rgba(245, 158, 11, 0.8)',
                 OrderStatus::Processing->value => 'rgba(139, 92, 246, 0.8)',
-                OrderStatus::Completed->value => 'rgba(34, 197, 94, 0.8)',
+                OrderStatus::Dispatched->value => 'rgba(6, 182, 212, 0.8)',
+                OrderStatus::Complete->value => 'rgba(34, 197, 94, 0.8)',
                 OrderStatus::Cancelled->value => 'rgba(239, 68, 68, 0.8)',
-                OrderStatus::Refunded->value => 'rgba(107, 114, 128, 0.8)',
             ];
 
             foreach (OrderStatus::cases() as $status) {

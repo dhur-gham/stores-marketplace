@@ -91,6 +91,9 @@ class OrderService
                     'status' => OrderStatus::New,
                 ]);
 
+                // Record initial status in history (system change, no user)
+                $order->recordStatusChange(OrderStatus::New);
+
                 // Create order items and update stock
                 foreach ($store_cart_items as $cart_item) {
                     OrderItem::query()->create([

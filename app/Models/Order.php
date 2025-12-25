@@ -73,4 +73,23 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    /**
+     * Get the status history for this order.
+     */
+    public function status_history(): HasMany
+    {
+        return $this->hasMany(OrderStatusHistory::class);
+    }
+
+    /**
+     * Record a status change in history.
+     */
+    public function recordStatusChange(OrderStatus $status, ?User $user = null): void
+    {
+        $this->status_history()->create([
+            'status' => $status,
+            'changed_by_user_id' => $user?->id,
+        ]);
+    }
 }

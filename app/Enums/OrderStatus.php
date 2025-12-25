@@ -5,9 +5,8 @@ namespace App\Enums;
 enum OrderStatus: string
 {
     case New = 'new';
-    case Pending = 'pending';
     case Processing = 'processing';
-    case Completed = 'completed';
+    case Dispatched = 'dispatched';
+    case Complete = 'complete';
     case Cancelled = 'cancelled';
-    case Refunded = 'refunded';
 }

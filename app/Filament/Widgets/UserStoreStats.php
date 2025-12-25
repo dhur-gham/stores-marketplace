@@ -60,7 +60,7 @@ class UserStoreStats extends StatsOverviewWidget
             // Calculate total sales from completed orders
             $total_sales = Order::query()
                 ->whereIn('store_id', $store_ids)
-                ->where('status', OrderStatus::Completed)
+                ->where('status', OrderStatus::Complete)
                 ->sum('total');
 
             return [

@@ -18,31 +18,35 @@ class OrdersTable
 {
     public static function configure(Table $table): Table
     {
+        $table->modifyQueryUsing(function ($query) {
+            $query->with(['customer', 'store', 'city']);
+        });
+
         return $table
             ->columns([
                 Split::make([
                     TextColumn::make('id')
-                        ->label('Order #')
+                        ->label(__('orders.messages.order_number'))
                         ->sortable()
                         ->weight(FontWeight::Bold)
                         ->grow(false),
                     Stack::make([
                         TextColumn::make('customer.name')
-                            ->label('Customer')
+                            ->label(__('orders.fields.customer'))
                             ->searchable()
                             ->weight(FontWeight::SemiBold),
                         TextColumn::make('customer.email')
-                            ->label('Email')
+                            ->label(__('orders.messages.email'))
                             ->searchable()
                             ->color('gray'),
                     ]),
                     Stack::make([
                         TextColumn::make('store.name')
-                            ->label('Store')
+                            ->label(__('orders.fields.store'))
                             ->searchable()
                             ->sortable(),
                         TextColumn::make('city.name')
-                            ->label('City')
+                            ->label(__('orders.fields.city'))
                             ->searchable()
                             ->color('gray'),
                     ])->visibleFrom('lg'),
@@ -55,22 +59,22 @@ class OrdersTable
                             ->money('IQD')
                             ->sortable()
                             ->color('gray')
-                            ->prefix('Delivery: '),
+                            ->prefix(__('orders.messages.delivery').': '),
                     ])->visibleFrom('md'),
                     TextColumn::make('status')
                         ->badge()
+                        ->formatStateUsing(fn (OrderStatus $state): string => __('orders.status.'.$state->value))
                         ->color(fn (OrderStatus $state): string => match ($state) {
                             OrderStatus::New => 'info',
-                            OrderStatus::Pending => 'warning',
                             OrderStatus::Processing => 'primary',
-                            OrderStatus::Completed => 'success',
+                            OrderStatus::Dispatched => 'info',
+                            OrderStatus::Complete => 'success',
                             OrderStatus::Cancelled => 'danger',
-                            OrderStatus::Refunded => 'gray',
                         })
                         ->searchable(),
                     Stack::make([
                         TextColumn::make('created_at')
-                            ->label('Date')
+                            ->label(__('orders.messages.date'))
                             ->dateTime()
                             ->sortable(),
                         TextColumn::make('updated_at')
@@ -88,21 +92,21 @@ class OrdersTable
                             ->weight(FontWeight::Bold),
                         TextColumn::make('status')
                             ->badge()
+                            ->formatStateUsing(fn (OrderStatus $state): string => __('orders.status.'.$state->value))
                             ->color(fn (OrderStatus $state): string => match ($state) {
                                 OrderStatus::New => 'info',
-                                OrderStatus::Pending => 'warning',
                                 OrderStatus::Processing => 'primary',
-                                OrderStatus::Completed => 'success',
+                                OrderStatus::Dispatched => 'info',
+                                OrderStatus::Complete => 'success',
                                 OrderStatus::Cancelled => 'danger',
-                                OrderStatus::Refunded => 'gray',
                             }),
                     ]),
                     Split::make([
                         TextColumn::make('store.name')
-                            ->label('Store')
+                            ->label(__('orders.fields.store'))
                             ->color('gray'),
                         TextColumn::make('created_at')
-                            ->label('Date')
+                            ->label(__('orders.messages.date'))
                             ->date()
                             ->color('gray'),
                     ]),
@@ -110,13 +114,18 @@ class OrdersTable
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->options(OrderStatus::class)
+                    ->label(__('orders.filters.status'))
+                    ->options(
+                        collect(OrderStatus::cases())
+                            ->mapWithKeys(fn ($status) => [$status->value => __('orders.status.'.$status->value)])
+                            ->toArray()
+                    )
                     ->native(false),
                 SelectFilter::make('store_id')
                     ->relationship('store', 'name')
                     ->searchable()
                     ->preload()
-                    ->label('Store')
+                    ->label(__('orders.filters.store'))
                     ->native(false),
             ])
             ->recordActions([

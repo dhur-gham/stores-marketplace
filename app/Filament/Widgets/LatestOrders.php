@@ -73,11 +73,10 @@ class LatestOrders extends BaseWidget
                     ->badge()
                     ->color(fn (OrderStatus $state): string => match ($state) {
                         OrderStatus::New => 'info',
-                        OrderStatus::Pending => 'warning',
                         OrderStatus::Processing => 'primary',
-                        OrderStatus::Completed => 'success',
+                        OrderStatus::Dispatched => 'info',
+                        OrderStatus::Complete => 'success',
                         OrderStatus::Cancelled => 'danger',
-                        OrderStatus::Refunded => 'gray',
                     }),
 
                 TextColumn::make('created_at')

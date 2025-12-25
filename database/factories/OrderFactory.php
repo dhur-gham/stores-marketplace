@@ -25,7 +25,7 @@ class OrderFactory extends Factory
             'city_id' => \App\Models\City::factory(),
             'total' => $items_total + $delivery_price,
             'delivery_price' => $delivery_price,
-            'status' => fake()->randomElement(['new', 'pending', 'processing', 'completed', 'cancelled', 'refunded']),
+            'status' => fake()->randomElement(['new', 'processing', 'dispatched', 'complete', 'cancelled']),
         ];
     }
 }

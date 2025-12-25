@@ -31,19 +31,19 @@ class StatsOverview extends BaseWidget
 
             return [
                 'total_revenue' => Order::query()
-                    ->where('status', OrderStatus::Completed)
+                    ->where('status', OrderStatus::Complete)
                     ->sum('total'),
                 'orders_this_month' => Order::query()
                     ->whereMonth('created_at', now()->month)
                     ->whereYear('created_at', now()->year)
                     ->count(),
                 'revenue_this_month' => Order::query()
-                    ->where('status', OrderStatus::Completed)
+                    ->where('status', OrderStatus::Complete)
                     ->whereMonth('created_at', now()->month)
                     ->whereYear('created_at', now()->year)
                     ->sum('total'),
                 'pending_orders' => Order::query()
-                    ->whereIn('status', [OrderStatus::New, OrderStatus::Pending, OrderStatus::Processing])
+                    ->whereIn('status', [OrderStatus::New, OrderStatus::Processing, OrderStatus::Dispatched])
                     ->count(),
                 'total_products' => Product::count(),
                 'total_stores' => Store::count(),
