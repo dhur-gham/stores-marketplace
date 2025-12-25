@@ -145,29 +145,59 @@ export default function About() {
                     </div>
                 </section>
 
-                {/* CTA Section */}
-                <section className="text-center">
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 md:p-12">
-                        <Globe className="w-16 h-16 md:w-20 md:h-20 text-blue-600 dark:text-blue-400 mx-auto mb-6" />
-                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                            {t('about.cta.title')}
-                        </h2>
-                        <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
-                            {t('about.cta.description')}
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                {/* Merchant CTA Section */}
+                <section className="mb-16">
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl shadow-lg p-8 md:p-12">
+                        <div className="text-center mb-8">
+                            <Store className="w-16 h-16 md:w-20 md:h-20 text-green-600 dark:text-green-400 mx-auto mb-4" />
+                            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                                {t('about.merchant.title')}
+                            </h2>
+                            <p className="text-lg text-gray-600 dark:text-gray-400 mb-6 max-w-3xl mx-auto">
+                                {t('about.merchant.description')}
+                            </p>
                             <a
-                                href="/stores"
-                                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+                                href="https://t.me/me_dhurgham"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white font-medium rounded-lg transition-colors text-base md:text-lg"
                             >
-                                {t('about.cta.browse_stores')}
+                                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                                </svg>
+                                {t('about.merchant.contact_button')}
                             </a>
-                            <a
-                                href="/products"
-                                className="px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-lg transition-colors"
-                            >
-                                {t('about.cta.explore_products')}
-                            </a>
+                        </div>
+                        <div className="mt-8 pt-8 border-t border-green-200 dark:border-green-800">
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 text-center">
+                                {t('about.merchant.benefits_title')}
+                            </h3>
+                            <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
+                                <li className="flex items-start gap-3">
+                                    <svg className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span className="text-gray-700 dark:text-gray-300">{t('about.merchant.benefit1')}</span>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <svg className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span className="text-gray-700 dark:text-gray-300">{t('about.merchant.benefit2')}</span>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <svg className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span className="text-gray-700 dark:text-gray-300">{t('about.merchant.benefit3')}</span>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <svg className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span className="text-gray-700 dark:text-gray-300">{t('about.merchant.benefit4')}</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </section>

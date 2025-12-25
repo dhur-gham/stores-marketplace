@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { User, Mail, Phone, Lock, ArrowRight, Sparkles } from 'lucide-react';
+import { User, Mail, Phone, Lock, ArrowRight, Sparkles, MessageCircle, ExternalLink } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
+import { getTelegramActivationLink } from '../services/api';
 
 export default function Register() {
     const { t } = useTranslation();
@@ -18,6 +19,9 @@ export default function Register() {
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [registration_success, setRegistrationSuccess] = useState(false);
+    const [telegram_link, setTelegramLink] = useState(null);
+    const [telegram_activated, setTelegramActivated] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -40,8 +44,31 @@ export default function Register() {
         setErrors({});
 
         try {
-            await register(form_data);
-            navigate('/');
+            const response = await register(form_data);
+            // Check if customer has telegram data
+            if (response?.customer) {
+                setTelegramActivated(response.customer.telegram_activated || false);
+                setTelegramLink(response.customer.telegram_activation_link || null);
+            }
+            setRegistrationSuccess(true);
+            // Fetch telegram link if available
+            if (response?.customer && !response.customer.telegram_activation_link) {
+                try {
+                    const telegram_response = await getTelegramActivationLink();
+                    if (telegram_response?.data) {
+                        setTelegramLink(telegram_response.data.activation_link || null);
+                        setTelegramActivated(telegram_response.data.is_activated || false);
+                    }
+                } catch (err) {
+                    // Ignore telegram link fetch errors
+                }
+            }
+            // Redirect after 3 seconds if telegram is activated, otherwise wait for user to activate
+            if (response?.customer?.telegram_activated) {
+                setTimeout(() => {
+                    navigate('/');
+                }, 3000);
+            }
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
@@ -234,6 +261,55 @@ export default function Register() {
                                 )}
                             </button>
                         </form>
+
+                        {/* Success Message with Telegram Activation */}
+                        {registration_success && !telegram_activated && (
+                            <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                                <div className="flex items-start gap-3">
+                                    <MessageCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                                    <div className="flex-1">
+                                        <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                                            {t('telegram.activate_notifications')}
+                                        </h3>
+                                        <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+                                            {t('telegram.activate_description')}
+                                        </p>
+                                        {telegram_link ? (
+                                            <a
+                                                href={telegram_link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm"
+                                            >
+                                                <span>{t('telegram.activate_button')}</span>
+                                                <ExternalLink className="w-4 h-4" />
+                                            </a>
+                                        ) : (
+                                            <p className="text-xs text-red-600 dark:text-red-400">
+                                                {t('telegram.loading_link') || 'Loading activation link...'}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Success Message if already activated */}
+                        {registration_success && telegram_activated && (
+                            <div className="mt-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                                <div className="flex items-start gap-3">
+                                    <MessageCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                                    <div className="flex-1">
+                                        <h3 className="font-semibold text-green-900 dark:text-green-100 mb-1">
+                                            {t('telegram.activated')}
+                                        </h3>
+                                        <p className="text-sm text-green-700 dark:text-green-300">
+                                            {t('telegram.activated_description')}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Login Link */}
                         <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">

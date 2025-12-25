@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, ArrowLeft, Package, MapPin } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Package, MapPin, MessageCircle, ExternalLink } from 'lucide-react';
 import Header from '../components/Header';
 import { useCart } from '../contexts/CartContext';
-import { fetchCities, fetchStoreDeliveryPrices } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
+import { fetchCities, fetchStoreDeliveryPrices, getTelegramActivationLink } from '../services/api';
 import { Link } from 'react-router-dom';
 
 export default function Checkout() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { cart_items, loading: cart_loading, placeOrder } = useCart();
+    const { customer } = useAuth();
     const [cities, setCities] = useState([]);
     const [loading_cities, setLoadingCities] = useState(true);
     const [address_data, setAddressData] = useState({});
@@ -18,6 +20,9 @@ export default function Checkout() {
     const [placing, setPlacing] = useState(false);
     const [error, setError] = useState(null);
     const [validation_errors, setValidationErrors] = useState({});
+    const [telegram_link, setTelegramLink] = useState(null);
+    const [telegram_activated, setTelegramActivated] = useState(false);
+    const [loading_telegram, setLoadingTelegram] = useState(true);
 
     // Group cart items by store
     const items_by_store = cart_items.reduce((acc, item) => {
@@ -49,6 +54,27 @@ export default function Checkout() {
         };
         loadCities();
     }, []);
+
+    // Load Telegram activation link
+    useEffect(() => {
+        const loadTelegramLink = async () => {
+            if (customer) {
+                try {
+                    setLoadingTelegram(true);
+                    const response = await getTelegramActivationLink();
+                    if (response?.data) {
+                        setTelegramLink(response.data.activation_link || null);
+                        setTelegramActivated(response.data.is_activated || false);
+                    }
+                } catch (error) {
+                    // Ignore errors
+                } finally {
+                    setLoadingTelegram(false);
+                }
+            }
+        };
+        loadTelegramLink();
+    }, [customer]);
 
     // Load delivery prices for physical stores
     useEffect(() => {
@@ -291,6 +317,38 @@ export default function Checkout() {
                     {error && (
                         <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                             <p className="text-red-600 dark:text-red-400">{error}</p>
+                        </div>
+                    )}
+
+                    {/* Telegram Activation Banner */}
+                    {!loading_telegram && !telegram_activated && (
+                        <div className="mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                            <div className="flex items-start gap-3">
+                                <MessageCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                                <div className="flex-1">
+                                    <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                                        {t('telegram.activate_notifications')}
+                                    </h3>
+                                    <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+                                        {t('telegram.activate_description')} {t('telegram.activate_before_order') || 'Activate now to receive order updates!'}
+                                    </p>
+                                    {telegram_link ? (
+                                        <a
+                                            href={telegram_link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm"
+                                        >
+                                            <span>{t('telegram.activate_button')}</span>
+                                            <ExternalLink className="w-4 h-4" />
+                                        </a>
+                                    ) : (
+                                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                                            {t('telegram.loading_link') || 'Loading activation link...'}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     )}
 

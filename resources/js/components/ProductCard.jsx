@@ -103,7 +103,7 @@ export default function ProductCard({ product }) {
                     <button
                         onClick={handleWishlistToggle}
                         disabled={wishlist_toggling}
-                        className="absolute top-2 end-2 p-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                        className="absolute top-2 end-2 p-2.5 min-w-[44px] min-h-[44px] bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm touch-manipulation"
                         title={in_wishlist ? t('wishlist.remove') : t('wishlist.add')}
                     >
                         <Heart
@@ -142,7 +142,7 @@ export default function ProductCard({ product }) {
                         <button
                             onClick={handleAddToCart}
                             disabled={adding || added}
-                            className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                            className="p-2.5 min-w-[44px] min-h-[44px] rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center touch-manipulation"
                             title={added ? t('cart.item_added') : t('cart.add_to_cart')}
                         >
                             {added ? (

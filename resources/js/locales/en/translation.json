@@ -131,8 +131,10 @@
     "activate_notifications": "Activate Telegram Notifications",
     "activate_description": "Click the button below to activate Telegram notifications. You'll receive updates about your orders and important messages.",
     "activate_button": "Activate Telegram",
+    "activate_before_order": "Activate now to receive order updates!",
     "activated": "Telegram Notifications Activated",
-    "activated_description": "You will receive notifications about your orders and important updates via Telegram."
+    "activated_description": "You will receive notifications about your orders and important updates via Telegram.",
+    "loading_link": "Loading activation link..."
   },
   "cart": {
     "title": "Shopping Cart",
@@ -348,6 +350,16 @@
       "description": "Whether you're a store owner ready to grow your business or a customer looking for great products, our platform has everything you need.",
       "browse_stores": "Browse Stores",
       "explore_products": "Explore Products"
+    },
+    "merchant": {
+      "title": "Want to Host Your Store With Us?",
+      "description": "Are you a merchant looking to expand your online presence? Join our platform and reach thousands of customers. Contact us via Telegram to get started and open your store account today!",
+      "contact_button": "Contact Us on Telegram",
+      "benefits_title": "Why Choose Our Platform?",
+      "benefit1": "Easy store setup and management",
+      "benefit2": "Access to a large customer base",
+      "benefit3": "Real-time inventory and order tracking",
+      "benefit4": "Comprehensive analytics and reporting"
     }
   }
 }
