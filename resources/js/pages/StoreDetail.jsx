@@ -77,10 +77,10 @@ export default function StoreDetail() {
                 
                 <button
                     onClick={() => navigate('/')}
-                    className="mb-6 flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                    className="mb-6 flex items-center gap-2 px-3 py-2 min-h-[44px] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors touch-manipulation rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 -ml-3"
                 >
-                    <ArrowIcon className="w-5 h-5 me-2" />
-                    {t('store.back_to_stores')}
+                    <ArrowIcon className="w-5 h-5 sm:w-4 sm:h-4" />
+                    <span className="text-base sm:text-sm font-medium">{t('store.back_to_stores')}</span>
                 </button>
 
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-8">

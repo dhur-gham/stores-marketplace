@@ -116,10 +116,10 @@ export default function SharedWishlist() {
                     <div className="mb-6">
                         <Link
                             to="/"
-                            className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                            className="inline-flex items-center gap-2 px-3 py-2 min-h-[44px] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors touch-manipulation rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 -ml-3"
                         >
-                            <ArrowLeft className="w-4 h-4" />
-                            <span>{t('common.back')}</span>
+                            <ArrowLeft className="w-5 h-5 sm:w-4 sm:h-4" />
+                            <span className="text-base sm:text-sm font-medium">{t('common.back')}</span>
                         </Link>
                     </div>
 
