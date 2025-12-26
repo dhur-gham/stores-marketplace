@@ -16,8 +16,8 @@ test('can create a city', function () {
 
 test('city has stores relationship', function () {
     $city = City::factory()->create(['name' => 'Basra']);
-    $store1 = Store::factory()->create();
-    $store2 = Store::factory()->create();
+    $store1 = Store::factory()->create(['type' => 'digital']);
+    $store2 = Store::factory()->create(['type' => 'digital']);
 
     // Attach stores to city with delivery prices
     $city->stores()->attach($store1->id, ['price' => 5.00]);
@@ -29,7 +29,7 @@ test('city has stores relationship', function () {
 
 test('city stores relationship includes pivot price', function () {
     $city = City::factory()->create();
-    $store = Store::factory()->create();
+    $store = Store::factory()->create(['type' => 'digital']);
 
     $city->stores()->attach($store->id, ['price' => 15.5]);
 
@@ -61,9 +61,9 @@ test('city name is required', function () {
 
 test('multiple stores can deliver to same city', function () {
     $city = City::factory()->create();
-    $store1 = Store::factory()->create();
-    $store2 = Store::factory()->create();
-    $store3 = Store::factory()->create();
+    $store1 = Store::factory()->create(['type' => 'digital']);
+    $store2 = Store::factory()->create(['type' => 'digital']);
+    $store3 = Store::factory()->create(['type' => 'digital']);
 
     $city->stores()->attach($store1->id, ['price' => 5.00]);
     $city->stores()->attach($store2->id, ['price' => 7.50]);
@@ -73,7 +73,7 @@ test('multiple stores can deliver to same city', function () {
 });
 
 test('same store can deliver to multiple cities', function () {
-    $store = Store::factory()->create();
+    $store = Store::factory()->create(['type' => 'digital']);
     $city1 = City::factory()->create(['name' => 'City One']);
     $city2 = City::factory()->create(['name' => 'City Two']);
     $city3 = City::factory()->create(['name' => 'City Three']);
@@ -87,8 +87,8 @@ test('same store can deliver to multiple cities', function () {
 
 test('city can have different delivery prices for different stores', function () {
     $city = City::factory()->create();
-    $store1 = Store::factory()->create();
-    $store2 = Store::factory()->create();
+    $store1 = Store::factory()->create(['type' => 'digital']);
+    $store2 = Store::factory()->create(['type' => 'digital']);
 
     $city->stores()->attach($store1->id, ['price' => 5]);
     $city->stores()->attach($store2->id, ['price' => 15]);
@@ -101,7 +101,7 @@ test('city can have different delivery prices for different stores', function ()
 
 test('city can update delivery price for a store', function () {
     $city = City::factory()->create();
-    $store = Store::factory()->create();
+    $store = Store::factory()->create(['type' => 'digital']);
 
     $city->stores()->attach($store->id, ['price' => 10]);
 
@@ -116,7 +116,7 @@ test('city can update delivery price for a store', function () {
 
 test('city can detach store', function () {
     $city = City::factory()->create();
-    $store = Store::factory()->create();
+    $store = Store::factory()->create(['type' => 'digital']);
 
     $city->stores()->attach($store->id, ['price' => 10.00]);
 
@@ -153,7 +153,7 @@ test('multiple orders can belong to same city', function () {
 
 test('city can have zero delivery price for a store', function () {
     $city = City::factory()->create();
-    $store = Store::factory()->create();
+    $store = Store::factory()->create(['type' => 'digital']);
 
     $city->stores()->attach($store->id, ['price' => 0]);
 
@@ -162,7 +162,7 @@ test('city can have zero delivery price for a store', function () {
 
 test('city pivot timestamps are recorded', function () {
     $city = City::factory()->create();
-    $store = Store::factory()->create();
+    $store = Store::factory()->create(['type' => 'digital']);
 
     $city->stores()->attach($store->id, ['price' => 10.00]);
 

@@ -103,11 +103,11 @@ test('order status is cast to enum', function () {
         'customer_id' => $customer->id,
         'store_id' => $store->id,
         'city_id' => $city->id,
-        'status' => 'pending',
+        'status' => 'processing',
     ]);
 
     expect($order->status)->toBeInstanceOf(OrderStatus::class)
-        ->and($order->status)->toBe(OrderStatus::Pending);
+        ->and($order->status)->toBe(OrderStatus::Processing);
 });
 
 test('order total is cast to decimal', function () {
@@ -147,11 +147,10 @@ test('order can have all status types', function () {
 
     $statuses = [
         'new' => OrderStatus::New,
-        'pending' => OrderStatus::Pending,
         'processing' => OrderStatus::Processing,
-        'completed' => OrderStatus::Completed,
+        'dispatched' => OrderStatus::Dispatched,
+        'complete' => OrderStatus::Complete,
         'cancelled' => OrderStatus::Cancelled,
-        'refunded' => OrderStatus::Refunded,
     ];
 
     foreach ($statuses as $statusValue => $statusEnum) {
