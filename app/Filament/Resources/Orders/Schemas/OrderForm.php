@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Orders\Schemas;
 
 use App\Enums\OrderStatus;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -14,39 +15,41 @@ class OrderForm
     {
         return $schema
             ->components([
-                Section::make('Order Details')
+                Section::make('Order Information')
                     ->schema([
-                        Select::make('customer_id')
-                            ->relationship('customer', 'name')
-                            ->required()
-                            ->searchable()
-                            ->preload(),
-                        Select::make('store_id')
-                            ->relationship('store', 'name')
-                            ->required()
-                            ->searchable()
-                            ->preload(),
-                        Select::make('city_id')
-                            ->relationship('city', 'name')
-                            ->searchable()
-                            ->preload(),
-                        TextInput::make('total')
-                            ->required()
-                            ->numeric()
-                            ->default(0)
-                            ->prefix('$'),
-                        TextInput::make('delivery_price')
-                            ->required()
-                            ->numeric()
-                            ->default(0)
-                            ->prefix('$'),
                         Select::make('status')
+                            ->label('Status')
                             ->options(OrderStatus::class)
-                            ->default('new')
-                            ->required(),
+                            ->required()
+                            ->native(false)
+                            ->columnSpan(1),
+                        TextInput::make('total')
+                            ->label('Total')
+                            ->numeric()
+                            ->suffix('IQD')
+                            ->disabled()
+                            ->columnSpan(1),
+                        TextInput::make('delivery_price')
+                            ->label('Delivery Price')
+                            ->numeric()
+                            ->suffix('IQD')
+                            ->columnSpan(1),
                     ])
-                    ->columnSpanFull()
-                    ->columns(2),
+                    ->columns(3),
+                Section::make('Notes & Communication')
+                    ->schema([
+                        Textarea::make('internal_notes')
+                            ->label('Internal Notes')
+                            ->helperText('Private notes visible only to store owners')
+                            ->rows(4)
+                            ->columnSpanFull(),
+                        Textarea::make('customer_message')
+                            ->label('Customer Message')
+                            ->helperText('Message to send to customer via Telegram')
+                            ->rows(4)
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible(),
             ]);
     }
 }

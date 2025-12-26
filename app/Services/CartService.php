@@ -33,6 +33,7 @@ class CartService
                 'slug' => $item->product->slug,
                 'image' => $item->product->image ? asset('storage/'.$item->product->image) : null,
                 'price' => $item->product->price,
+                'discounted_price' => $item->product->discounted_price,
                 'stock' => $item->product->stock,
                 'store' => [
                     'id' => $item->product->store->id,
@@ -76,14 +77,15 @@ class CartService
                 throw new \InvalidArgumentException('Insufficient stock available');
             }
             $cart_item->quantity = $new_quantity;
+            $cart_item->price = $product->getFinalPrice(); // Update price in case discount changed
             $cart_item->save();
         } else {
-            // Create new cart item with price snapshot
+            // Create new cart item with final price (discounted if available)
             $cart_item = CartItem::query()->create([
                 'customer_id' => $customer->id,
                 'product_id' => $product_id,
                 'quantity' => $quantity,
-                'price' => $product->price,
+                'price' => $product->getFinalPrice(),
             ]);
         }
 

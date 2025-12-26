@@ -102,3 +102,4 @@ class UserPolicy
         return $user->checkPermissionTo('reorder_users');
     }
 }
+

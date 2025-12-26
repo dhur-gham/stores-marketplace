@@ -109,4 +109,25 @@ class TelegramService
 
         return $message;
     }
+
+    /**
+     * Send a message to a store owner.
+     *
+     * @param  \App\Models\User  $user  The user (store owner) to send message to
+     * @param  string  $message  The message text
+     * @param  string|null  $parse_mode  Parse mode
+     * @return array<string, mixed>|null
+     */
+    public function sendMessageToStoreOwner(\App\Models\User $user, string $message, ?string $parse_mode = 'HTML'): ?array
+    {
+        if (! $user->hasTelegramActivated()) {
+            Log::warning('Attempted to send Telegram message to store owner without chat_id', [
+                'user_id' => $user->id,
+            ]);
+
+            return null;
+        }
+
+        return $this->sendMessage($user->telegram_chat_id, $message, $parse_mode);
+    }
 }

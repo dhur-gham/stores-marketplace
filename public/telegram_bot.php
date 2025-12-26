@@ -34,6 +34,7 @@ $app = require_once $laravel_root.'/bootstrap/app.php';
 $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use App\Models\Customer;
+use App\Models\User;
 use App\Services\TelegramService;
 
 // Get bot token from config
@@ -77,8 +78,8 @@ if (isset($message['text']) && str_starts_with($message['text'], '/start')) {
     $start_param = substr($text, 6); // Remove "/start" (6 characters)
     $start_param = ltrim($start_param, ' '); // Remove leading space if exists
 
-    if (empty($start_param) || ! str_starts_with($start_param, 'cust-')) {
-        // No customer ID provided, send generic welcome message
+    if (empty($start_param)) {
+        // No ID provided, send generic welcome message
         $welcome_message = "👋 Welcome!\n\n";
         $welcome_message .= 'To activate Telegram notifications, please use the activation link from your account settings.';
 
@@ -89,61 +90,111 @@ if (isset($message['text']) && str_starts_with($message['text'], '/start')) {
         exit;
     }
 
-    // Extract customer ID from "cust-123" -> 123
-    $customer_id = (int) str_replace('cust-', '', $start_param);
+    // Handle customer activation: cust-123
+    if (str_starts_with($start_param, 'cust-')) {
+        $customer_id = (int) str_replace('cust-', '', $start_param);
 
-    if ($customer_id <= 0) {
-        // Invalid customer ID
-        $error_message = "❌ Sorry, we couldn't activate your Telegram notifications.\n\n";
-        $error_message .= "Please make sure you're using the correct activation link from your account.";
-
-        $telegram_service->sendMessage($chat_id, $error_message);
-
-        http_response_code(200);
-        echo json_encode(['ok' => true]);
-        exit;
-    }
-
-    // Find customer
-    try {
-        $customer = Customer::find($customer_id);
-
-        if (! $customer) {
-            // Customer not found
+        if ($customer_id <= 0) {
             $error_message = "❌ Sorry, we couldn't activate your Telegram notifications.\n\n";
             $error_message .= "Please make sure you're using the correct activation link from your account.";
 
             $telegram_service->sendMessage($chat_id, $error_message);
-
             http_response_code(200);
             echo json_encode(['ok' => true]);
             exit;
         }
 
-        // Update customer with chat_id
-        $customer->telegram_chat_id = $chat_id;
-        $customer->save();
+        try {
+            $customer = Customer::find($customer_id);
 
-        // Send confirmation message
-        $confirmation_message = "✅ <b>Telegram Notifications Activated!</b>\n\n";
-        $confirmation_message .= "Hello {$customer->name},\n\n";
-        $confirmation_message .= "Your Telegram account has been successfully linked to your store account.\n";
-        $confirmation_message .= 'You will now receive notifications about your orders and important updates.';
+            if (! $customer) {
+                $error_message = "❌ Sorry, we couldn't activate your Telegram notifications.\n\n";
+                $error_message .= "Please make sure you're using the correct activation link from your account.";
 
-        $telegram_service->sendMessage($chat_id, $confirmation_message);
+                $telegram_service->sendMessage($chat_id, $error_message);
+                http_response_code(200);
+                echo json_encode(['ok' => true]);
+                exit;
+            }
 
-    } catch (\Exception $e) {
-        // Log error and send generic error message
-        \Illuminate\Support\Facades\Log::error('Telegram webhook error', [
-            'error' => $e->getMessage(),
-            'customer_id' => $customer_id,
-            'chat_id' => $chat_id,
-        ]);
+            $customer->telegram_chat_id = $chat_id;
+            $customer->save();
 
-        $error_message = "❌ Sorry, an error occurred while activating your Telegram notifications.\n\n";
-        $error_message .= 'Please try again later or contact support.';
+            $confirmation_message = "✅ <b>Telegram Notifications Activated!</b>\n\n";
+            $confirmation_message .= "Hello {$customer->name},\n\n";
+            $confirmation_message .= "Your Telegram account has been successfully linked to your store account.\n";
+            $confirmation_message .= 'You will now receive notifications about your orders and important updates.';
 
-        $telegram_service->sendMessage($chat_id, $error_message);
+            $telegram_service->sendMessage($chat_id, $confirmation_message);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Telegram webhook error (customer)', [
+                'error' => $e->getMessage(),
+                'customer_id' => $customer_id,
+                'chat_id' => $chat_id,
+            ]);
+
+            $error_message = "❌ Sorry, an error occurred while activating your Telegram notifications.\n\n";
+            $error_message .= 'Please try again later or contact support.';
+
+            $telegram_service->sendMessage($chat_id, $error_message);
+        }
+    }
+    // Handle store owner activation: user-123
+    elseif (str_starts_with($start_param, 'user-')) {
+        $user_id = (int) str_replace('user-', '', $start_param);
+
+        if ($user_id <= 0) {
+            $error_message = "❌ Sorry, we couldn't activate your Telegram notifications.\n\n";
+            $error_message .= "Please make sure you're using the correct activation link from your account.";
+
+            $telegram_service->sendMessage($chat_id, $error_message);
+            http_response_code(200);
+            echo json_encode(['ok' => true]);
+            exit;
+        }
+
+        try {
+            $user = User::find($user_id);
+
+            if (! $user) {
+                $error_message = "❌ Sorry, we couldn't activate your Telegram notifications.\n\n";
+                $error_message .= "Please make sure you're using the correct activation link from your account.";
+
+                $telegram_service->sendMessage($chat_id, $error_message);
+                http_response_code(200);
+                echo json_encode(['ok' => true]);
+                exit;
+            }
+
+            $user->telegram_chat_id = $chat_id;
+            $user->save();
+
+            $confirmation_message = "✅ <b>Telegram Notifications Activated!</b>\n\n";
+            $confirmation_message .= "Hello {$user->name},\n\n";
+            $confirmation_message .= "Your Telegram account has been successfully linked to your store owner account.\n";
+            $confirmation_message .= 'You will now receive notifications about new orders, low stock alerts, and important updates.';
+
+            $telegram_service->sendMessage($chat_id, $confirmation_message);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Telegram webhook error (user)', [
+                'error' => $e->getMessage(),
+                'user_id' => $user_id,
+                'chat_id' => $chat_id,
+            ]);
+
+            $error_message = "❌ Sorry, an error occurred while activating your Telegram notifications.\n\n";
+            $error_message .= 'Please try again later or contact support.';
+
+            $telegram_service->sendMessage($chat_id, $error_message);
+        }
+    } else {
+        // Unknown parameter format
+        $welcome_message = "👋 Welcome!\n\n";
+        $welcome_message .= 'To activate Telegram notifications, please use the activation link from your account settings.';
+
+        $telegram_service->sendMessage($chat_id, $welcome_message);
     }
 }
 

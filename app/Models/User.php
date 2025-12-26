@@ -26,6 +26,7 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
+        'telegram_chat_id',
     ];
 
     /**
@@ -85,5 +86,32 @@ class User extends Authenticatable implements FilamentUser
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    /**
+     * Get the discount plans created by this user.
+     */
+    public function discount_plans(): HasMany
+    {
+        return $this->hasMany(DiscountPlan::class, 'created_by_user_id');
+    }
+
+    /**
+     * Check if user has activated Telegram notifications.
+     */
+    public function hasTelegramActivated(): bool
+    {
+        return ! is_null($this->telegram_chat_id);
+    }
+
+    /**
+     * Get the Telegram deep link for activation.
+     */
+    public function getTelegramDeepLink(): string
+    {
+        $bot_username = config('services.telegram.bot_username', 'jzubot');
+        $user_id = $this->id;
+
+        return "https://t.me/{$bot_username}?start=user-{$user_id}";
     }
 }

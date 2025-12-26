@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Enums\ProductStatus;
 use App\Enums\ProductType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
@@ -32,6 +34,11 @@ class Product extends Model
         'type',
         'price',
         'stock',
+        'plan_id',
+        'discounted_price',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
     ];
 
     /**
@@ -104,6 +111,7 @@ class Product extends Model
             'type' => ProductType::class,
             'price' => 'integer',
             'stock' => 'integer',
+            'discounted_price' => 'integer',
         ];
     }
 
@@ -145,5 +153,82 @@ class Product extends Model
     public function wishlist_items(): HasMany
     {
         return $this->hasMany(WishlistItem::class);
+    }
+
+    /**
+     * Get the product images for this product.
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
+    }
+
+    /**
+     * Product belongs to a discount plan.
+     */
+    public function plan(): BelongsTo
+    {
+        return $this->belongsTo(DiscountPlan::class, 'plan_id');
+    }
+
+    /**
+     * Product belongs to many discount plans (many-to-many).
+     */
+    public function discount_plans(): BelongsToMany
+    {
+        return $this->belongsToMany(DiscountPlan::class, 'discount_plan_products', 'product_id', 'plan_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Alias for discount_plans() to support camelCase access.
+     */
+    public function discountPlans(): BelongsToMany
+    {
+        return $this->discount_plans();
+    }
+
+    /**
+     * Get the final price (discounted_price if available, otherwise regular price).
+     */
+    public function getFinalPrice(): int
+    {
+        return $this->discounted_price ?? $this->price;
+    }
+
+    /**
+     * Check if product is on discount.
+     */
+    public function isOnDiscount(): bool
+    {
+        return ! is_null($this->discounted_price) && $this->discounted_price < $this->price;
+    }
+
+    /**
+     * Check if product is low stock for a given store.
+     */
+    public function isLowStock(?Store $store = null): bool
+    {
+        if (! $store) {
+            $store = $this->store;
+        }
+
+        $threshold = $store->low_stock_threshold ?? 10;
+
+        return $this->stock <= $threshold;
+    }
+
+    /**
+     * Scope to exclude products that are already in a specific discount plan.
+     *
+     * @param  Builder  $query
+     * @param  int  $plan_id
+     * @return Builder
+     */
+    public function scopeWhereNotInPlan(Builder $query, int $plan_id): Builder
+    {
+        return $query->whereDoesntHave('discount_plans', function ($q) use ($plan_id) {
+            $q->where('discount_plans.id', $plan_id);
+        });
     }
 }

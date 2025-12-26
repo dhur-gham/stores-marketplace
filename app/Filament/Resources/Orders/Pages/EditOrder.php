@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Filament\Resources\Orders\OrderResource;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Services\CustomerMessageService;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
@@ -62,6 +63,31 @@ class EditOrder extends EditRecord
                 ->requiresConfirmation()
                 ->action(fn () => $this->updateStatus(OrderStatus::Cancelled)),
             DeleteAction::make(),
+            Action::make('send_customer_message')
+                ->label('Send Message to Customer')
+                ->icon('heroicon-o-paper-airplane')
+                ->color('info')
+                ->requiresConfirmation()
+                ->modalHeading('Send Message to Customer')
+                ->modalDescription('Send the customer message field content to the customer via Telegram.')
+                ->disabled(fn () => empty($this->data['customer_message'] ?? '') || ! $this->record->customer->hasTelegramActivated())
+                ->action(function () {
+                    $message_service = app(CustomerMessageService::class);
+                    $success = $message_service->sendOrderMessage($this->record, $this->data['customer_message'] ?? '');
+
+                    if ($success) {
+                        Notification::make()
+                            ->title('Message sent successfully')
+                            ->success()
+                            ->send();
+                    } else {
+                        Notification::make()
+                            ->title('Failed to send message')
+                            ->body('Customer may not have Telegram activated.')
+                            ->danger()
+                            ->send();
+                    }
+                }),
         ];
     }
 
@@ -155,8 +181,14 @@ class EditOrder extends EditRecord
     public function updateStatus(OrderStatus $status): void
     {
         if ($this->record->status !== $status) {
+            $old_status = $this->record->status;
             $this->record->recordStatusChange($status, auth()->user());
             $this->record->update(['status' => $status]);
+            $this->record->refresh();
+
+            // Notify store owners about status change
+            $store_owner_notification_service = app(\App\Services\StoreOwnerNotificationService::class);
+            $store_owner_notification_service->notifyOrderStatusChange($this->record, $old_status, $status);
 
             $status_label = __('orders.status.'.$status->value);
 

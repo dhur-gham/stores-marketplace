@@ -103,3 +103,4 @@ class CustomerPolicy
         return $user->checkPermissionTo('reorder_customers');
     }
 }
+

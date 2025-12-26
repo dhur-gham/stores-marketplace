@@ -29,6 +29,17 @@ class Store extends Model
         'image',
         'type',
         'status',
+        'low_stock_threshold',
+        'business_hours',
+        'phone',
+        'email',
+        'address',
+        'facebook_url',
+        'instagram_url',
+        'twitter_url',
+        'return_policy',
+        'shipping_policy',
+        'privacy_policy',
     ];
 
     /**
@@ -144,6 +155,26 @@ class Store extends Model
         return $this->belongsToMany(City::class, 'city_store_delivery')
             ->withPivot('price')
             ->withTimestamps();
+    }
+
+    /**
+     * Get the discount plans for this store.
+     */
+    public function discount_plans(): HasMany
+    {
+        return $this->hasMany(DiscountPlan::class);
+    }
+
+    /**
+     * Get products with low stock for this store.
+     */
+    public function getLowStockProducts()
+    {
+        $threshold = $this->low_stock_threshold ?? 10;
+
+        return $this->products()
+            ->where('stock', '<=', $threshold)
+            ->get();
     }
 
     /**

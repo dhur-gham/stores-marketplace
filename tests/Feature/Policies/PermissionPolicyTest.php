@@ -73,3 +73,4 @@ test('user without delete_permissions cannot delete a permission', function () {
 
     expect($this->policy->delete($user, $this->permission))->toBeFalse();
 });
+

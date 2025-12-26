@@ -51,6 +51,60 @@ class StoreForm
                             ->maxSize(2048)
                             ->columnSpanFull(),
                     ]),
+                Section::make('Business Information')
+                    ->schema([
+                        Textarea::make('business_hours')
+                            ->label('Business Hours')
+                            ->rows(4)
+                            ->columnSpanFull(),
+                        TextInput::make('phone')
+                            ->label('Phone')
+                            ->tel()
+                            ->maxLength(255),
+                        TextInput::make('email')
+                            ->label('Email')
+                            ->email()
+                            ->maxLength(255),
+                        Textarea::make('address')
+                            ->label('Address')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2)
+                    ->collapsible(),
+                Section::make('Social Media')
+                    ->schema([
+                        TextInput::make('facebook_url')
+                            ->label('Facebook URL')
+                            ->url()
+                            ->maxLength(255),
+                        TextInput::make('instagram_url')
+                            ->label('Instagram URL')
+                            ->url()
+                            ->maxLength(255),
+                        TextInput::make('twitter_url')
+                            ->label('Twitter URL')
+                            ->url()
+                            ->maxLength(255),
+                    ])
+                    ->columns(3)
+                    ->collapsible(),
+                Section::make('Policies')
+                    ->schema([
+                        Textarea::make('return_policy')
+                            ->label('Return Policy')
+                            ->rows(4)
+                            ->columnSpanFull(),
+                        Textarea::make('shipping_policy')
+                            ->label('Shipping Policy')
+                            ->rows(4)
+                            ->columnSpanFull(),
+                        Textarea::make('privacy_policy')
+                            ->label('Privacy Policy')
+                            ->rows(4)
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible(),
             ]);
     }
 }

@@ -9,3 +9,4 @@ class CreateRole extends CreateRecord
 {
     protected static string $resource = RoleResource::class;
 }
+

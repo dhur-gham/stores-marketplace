@@ -96,6 +96,7 @@ class OrderService
 
                 // Create order items and update stock
                 foreach ($store_cart_items as $cart_item) {
+                    // Use cart item price (already includes discount if available when added to cart)
                     OrderItem::query()->create([
                         'order_id' => $order->id,
                         'product_id' => $cart_item->product_id,
@@ -118,11 +119,17 @@ class OrderService
 
             DB::commit();
 
-            // Send Telegram notifications for all orders (if customer has Telegram activated)
-            if ($customer->hasTelegramActivated()) {
-                foreach ($orders as $order) {
+            // Send Telegram notifications for all orders
+            $store_owner_notification_service = app(\App\Services\StoreOwnerNotificationService::class);
+
+            foreach ($orders as $order) {
+                // Notify customer if Telegram activated
+                if ($customer->hasTelegramActivated()) {
                     $this->sendOrderNotification($customer, $order);
                 }
+
+                // Notify store owners
+                $store_owner_notification_service->notifyNewOrder($order);
             }
 
             return $orders;

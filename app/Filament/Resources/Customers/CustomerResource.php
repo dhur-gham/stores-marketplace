@@ -58,3 +58,4 @@ class CustomerResource extends Resource
         return ['name', 'email', 'phone'];
     }
 }
+

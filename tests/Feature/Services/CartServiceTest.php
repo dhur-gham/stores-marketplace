@@ -437,3 +437,4 @@ test('customer can only modify their own cart items', function () {
     expect(fn () => $service->remove_from_cart($customer2, $cart_item->id))
         ->toThrow(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
 });
+

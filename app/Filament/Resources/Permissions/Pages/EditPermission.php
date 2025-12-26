@@ -17,3 +17,4 @@ class EditPermission extends EditRecord
         ];
     }
 }
+

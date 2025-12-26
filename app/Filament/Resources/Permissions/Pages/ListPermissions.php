@@ -17,3 +17,4 @@ class ListPermissions extends ListRecords
         ];
     }
 }
+

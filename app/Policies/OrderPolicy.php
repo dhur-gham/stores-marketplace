@@ -103,3 +103,4 @@ class OrderPolicy
         return $user->checkPermissionTo('reorder_orders');
     }
 }
+

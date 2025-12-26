@@ -26,6 +26,8 @@ class Order extends Model
         'total',
         'delivery_price',
         'status',
+        'internal_notes',
+        'customer_message',
     ];
 
     /**

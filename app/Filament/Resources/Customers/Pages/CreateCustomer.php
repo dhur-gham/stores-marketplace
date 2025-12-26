@@ -9,3 +9,4 @@ class CreateCustomer extends CreateRecord
 {
     protected static string $resource = CustomerResource::class;
 }
+

@@ -11,3 +11,4 @@ abstract class BaseController extends Controller
 {
     use ApiResponse;
 }
+

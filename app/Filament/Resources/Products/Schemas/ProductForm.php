@@ -108,6 +108,29 @@ class ProductForm
                             ->maxSize(2048)
                             ->columnSpanFull(),
                     ]),
+                Section::make('SEO Settings')
+                    ->schema([
+                        TextInput::make('slug')
+                            ->label('URL Slug')
+                            ->unique(ignoreRecord: true)
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+                        TextInput::make('meta_title')
+                            ->label('Meta Title')
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+                        Textarea::make('meta_description')
+                            ->label('Meta Description')
+                            ->rows(3)
+                            ->maxLength(500)
+                            ->columnSpanFull(),
+                        Textarea::make('meta_keywords')
+                            ->label('Meta Keywords')
+                            ->rows(2)
+                            ->helperText('Comma-separated keywords')
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible(),
             ]);
     }
 }

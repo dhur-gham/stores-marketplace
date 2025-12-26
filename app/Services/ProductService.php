@@ -43,6 +43,9 @@ class ProductService
                     'status' => $product->status->value,
                     'type' => $product->type->value,
                     'price' => $product->price,
+                    'discounted_price' => $product->discounted_price,
+                    'final_price' => $product->getFinalPrice(),
+                    'is_on_discount' => $product->isOnDiscount(),
                     'stock' => $product->stock,
                 ];
 
@@ -85,6 +88,9 @@ class ProductService
             'status' => $product->status->value,
             'type' => $product->type->value,
             'price' => $product->price,
+            'discounted_price' => $product->discounted_price,
+            'final_price' => $product->getFinalPrice(),
+            'is_on_discount' => $product->isOnDiscount(),
             'stock' => $product->stock,
             'store' => [
                 'id' => $product->store->id,
@@ -135,6 +141,9 @@ class ProductService
                 'image' => $product->image ? asset('storage/'.$product->image) : null,
                 'description' => $product->description,
                 'price' => $product->price,
+                'discounted_price' => $product->discounted_price,
+                'final_price' => $product->getFinalPrice(),
+                'is_on_discount' => $product->isOnDiscount(),
                 'stock' => $product->stock,
                 'store' => [
                     'id' => $product->store->id,
@@ -234,6 +243,9 @@ class ProductService
                     'status' => $product->status->value,
                     'type' => $product->type->value,
                     'price' => $product->price,
+                    'discounted_price' => $product->discounted_price,
+                    'final_price' => $product->getFinalPrice(),
+                    'is_on_discount' => $product->isOnDiscount(),
                     'stock' => $product->stock,
                     'store' => [
                         'id' => $product->store->id,
