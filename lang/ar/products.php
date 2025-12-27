@@ -29,6 +29,11 @@ return [
         'pricing_stock' => 'التسعير والمخزون',
         'media' => 'الوسائط',
     ],
+    'status' => [
+        'active' => 'نشط',
+        'inactive' => 'غير نشط',
+        'draft' => 'مسودة',
+    ],
     'actions' => [
         'publish' => 'نشر',
     ],
@@ -37,5 +42,3 @@ return [
         'products_published_body' => 'تم نشر :count منتج بنجاح.',
     ],
 ];
-
-

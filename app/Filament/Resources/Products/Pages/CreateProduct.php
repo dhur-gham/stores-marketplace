@@ -17,9 +17,23 @@ class CreateProduct extends CreateRecord
     {
         $user = auth()->user();
 
-        // Set status to Draft for non-super_admin users
+        // Set default status for non-super_admin users if not set
         if (! $user?->hasRole('super_admin')) {
-            $data['status'] = ProductStatus::Draft;
+            // If status is not set or is Draft, default to Inactive
+            if (! isset($data['status']) || $data['status'] === ProductStatus::Draft->value) {
+                $data['status'] = ProductStatus::Inactive;
+            }
+
+            // Ensure store owners can only set Active or Inactive (not Draft)
+            if (isset($data['status'])) {
+                $status = $data['status'] instanceof ProductStatus
+                    ? $data['status']
+                    : ProductStatus::from($data['status']);
+
+                if ($status === ProductStatus::Draft) {
+                    $data['status'] = ProductStatus::Inactive;
+                }
+            }
 
             // Set store_id to user's first store if not set (since store field is hidden)
             if (! isset($data['store_id'])) {

@@ -29,6 +29,11 @@ return [
         'pricing_stock' => 'Pricing & Stock',
         'media' => 'Media',
     ],
+    'status' => [
+        'active' => 'Active',
+        'inactive' => 'Inactive',
+        'draft' => 'Draft',
+    ],
     'actions' => [
         'publish' => 'Publish',
     ],
@@ -37,5 +42,3 @@ return [
         'products_published_body' => ':count product(s) have been published successfully.',
     ],
 ];
-
-

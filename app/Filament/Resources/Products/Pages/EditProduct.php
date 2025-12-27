@@ -75,10 +75,18 @@ class EditProduct extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        // Prevent non-super_admin users from changing status
-        if (! auth()->user()?->hasRole('super_admin')) {
-            // Keep the existing status, don't allow changes
-            unset($data['status']);
+        $user = auth()->user();
+
+        // Store owners can only set status to Active or Inactive (not Draft)
+        if (! $user?->hasRole('super_admin') && isset($data['status'])) {
+            $status = $data['status'] instanceof ProductStatus
+                ? $data['status']
+                : ProductStatus::from($data['status']);
+
+            // If store owner tries to set Draft, prevent it and keep current status
+            if ($status === ProductStatus::Draft) {
+                unset($data['status']);
+            }
         }
 
         // Update type based on store type if store_id changed

@@ -169,11 +169,22 @@ class ProductForm
                             ->columnSpan(1),
                         Select::make('status')
                             ->label(__('products.fields.status'))
-                            ->options(ProductStatus::class)
+                            ->options(function () {
+                                $user = auth()->user();
+                                if ($user?->hasRole('super_admin')) {
+                                    // Super admin can see all statuses
+                                    return ProductStatus::class;
+                                }
+
+                                // Store owners can only choose Active or Inactive
+                                return [
+                                    ProductStatus::Active->value => __('products.status.active'),
+                                    ProductStatus::Inactive->value => __('products.status.inactive'),
+                                ];
+                            })
                             ->default(ProductStatus::Draft)
-                            ->required(fn () => auth()->user()?->hasRole('super_admin') ?? false)
+                            ->required()
                             ->native(false)
-                            ->visible(fn () => auth()->user()?->hasRole('super_admin') ?? false)
                             ->columnSpan(1),
                     ])
                     ->columns(3),
