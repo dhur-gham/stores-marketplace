@@ -22,12 +22,12 @@ class TelegramService
     /**
      * Send a message to a Telegram chat.
      *
-     * @param  int  $chat_id  The Telegram chat ID
+     * @param  int|string  $chat_id  The Telegram chat ID
      * @param  string  $message  The message text
      * @param  string|null  $parse_mode  Parse mode: 'HTML', 'Markdown', or 'MarkdownV2'
      * @return array<string, mixed>|null
      */
-    public function sendMessage(int $chat_id, string $message, ?string $parse_mode = 'HTML'): ?array
+    public function sendMessage(int|string $chat_id, string $message, ?string $parse_mode = 'HTML'): ?array
     {
         if (empty($this->bot_token)) {
             Log::error('Telegram bot token is not configured');
