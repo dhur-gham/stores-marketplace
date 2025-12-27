@@ -14,7 +14,7 @@ class TelegramActivationWidget extends Widget
     {
         $user = auth()->user();
 
-        return $user && ! $user->hasRole('super_admin') && ! $user->hasTelegramActivated();
+        return $user && ! $user->hasTelegramActivated();
     }
 
     public function getViewData(): array
