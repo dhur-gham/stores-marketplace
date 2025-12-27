@@ -90,7 +90,17 @@ class CityStoreDeliveryPolicy
      */
     public function restore(User $user, CityStoreDelivery $city_store_delivery): bool
     {
-        return $user->checkPermissionTo('restore_city_store_deliveries');
+        if (! $user->checkPermissionTo('restore_city_store_deliveries')) {
+            return false;
+        }
+
+        // Super admins can restore all
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only restore deliveries for their stores
+        return $user->stores()->where('stores.id', $city_store_delivery->store_id)->exists();
     }
 
     /**
@@ -98,6 +108,16 @@ class CityStoreDeliveryPolicy
      */
     public function forceDelete(User $user, CityStoreDelivery $city_store_delivery): bool
     {
-        return $user->checkPermissionTo('force_delete_city_store_deliveries');
+        if (! $user->checkPermissionTo('force_delete_city_store_deliveries')) {
+            return false;
+        }
+
+        // Super admins can force delete all
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only force delete deliveries for their stores
+        return $user->stores()->where('stores.id', $city_store_delivery->store_id)->exists();
     }
 }

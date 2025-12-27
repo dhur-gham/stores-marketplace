@@ -5,6 +5,7 @@ namespace App\Filament\Resources\DiscountPlans\Tables;
 use App\Enums\DiscountPlanStatus;
 use App\Enums\DiscountType;
 use App\Helpers\TimezoneHelper;
+use App\Services\DiscountService;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -12,6 +13,7 @@ use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 
 class DiscountPlansTable
 {
@@ -105,7 +107,14 @@ class DiscountPlansTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->before(function (Collection $records) {
+                            // Remove discounts from products before deleting plans
+                            $discount_service = app(DiscountService::class);
+                            foreach ($records as $plan) {
+                                $discount_service->removePlanDiscounts($plan);
+                            }
+                        }),
                 ]),
             ]);
     }

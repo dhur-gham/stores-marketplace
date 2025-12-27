@@ -18,8 +18,21 @@ class OrdersTable
 {
     public static function configure(Table $table): Table
     {
-        $table->modifyQueryUsing(function ($query) {
+        $user = auth()->user();
+
+        $table->modifyQueryUsing(function ($query) use ($user) {
             $query->with(['customer', 'store', 'city']);
+
+            // Filter by user's stores if not super_admin
+            if ($user && ! $user->hasRole('super_admin')) {
+                $store_ids = $user->stores()->pluck('stores.id')->toArray();
+                if (! empty($store_ids)) {
+                    $query->whereIn('store_id', $store_ids);
+                } else {
+                    // User has no stores, return empty result
+                    $query->whereRaw('1 = 0');
+                }
+            }
         });
 
         return $table

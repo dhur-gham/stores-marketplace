@@ -90,7 +90,17 @@ class ProductPolicy
      */
     public function restore(User $user, Product $product): bool
     {
-        return $user->checkPermissionTo('restore_products');
+        if (! $user->checkPermissionTo('restore_products')) {
+            return false;
+        }
+
+        // Super admins can restore all products
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only restore products from their stores
+        return $user->stores()->where('stores.id', $product->store_id)->exists();
     }
 
     /**
@@ -98,6 +108,16 @@ class ProductPolicy
      */
     public function forceDelete(User $user, Product $product): bool
     {
-        return $user->checkPermissionTo('force_delete_products');
+        if (! $user->checkPermissionTo('force_delete_products')) {
+            return false;
+        }
+
+        // Super admins can force delete all products
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only force delete products from their stores
+        return $user->stores()->where('stores.id', $product->store_id)->exists();
     }
 }

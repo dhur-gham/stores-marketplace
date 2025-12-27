@@ -20,7 +20,17 @@ class OrderPolicy
      */
     public function view(User $user, Order $order): bool
     {
-        return $user->checkPermissionTo('view_orders');
+        if (! $user->checkPermissionTo('view_orders')) {
+            return false;
+        }
+
+        // Super admins can view all orders
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only view orders from their stores
+        return $user->stores()->where('stores.id', $order->store_id)->exists();
     }
 
     /**
@@ -36,7 +46,17 @@ class OrderPolicy
      */
     public function update(User $user, Order $order): bool
     {
-        return $user->checkPermissionTo('update_orders');
+        if (! $user->checkPermissionTo('update_orders')) {
+            return false;
+        }
+
+        // Super admins can update all orders
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only update orders from their stores
+        return $user->stores()->where('stores.id', $order->store_id)->exists();
     }
 
     /**
@@ -44,7 +64,17 @@ class OrderPolicy
      */
     public function delete(User $user, Order $order): bool
     {
-        return $user->checkPermissionTo('delete_orders');
+        if (! $user->checkPermissionTo('delete_orders')) {
+            return false;
+        }
+
+        // Super admins can delete all orders
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only delete orders from their stores
+        return $user->stores()->where('stores.id', $order->store_id)->exists();
     }
 
     /**
@@ -60,7 +90,17 @@ class OrderPolicy
      */
     public function restore(User $user, Order $order): bool
     {
-        return $user->checkPermissionTo('restore_orders');
+        if (! $user->checkPermissionTo('restore_orders')) {
+            return false;
+        }
+
+        // Super admins can restore all orders
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only restore orders from their stores
+        return $user->stores()->where('stores.id', $order->store_id)->exists();
     }
 
     /**
@@ -76,7 +116,17 @@ class OrderPolicy
      */
     public function forceDelete(User $user, Order $order): bool
     {
-        return $user->checkPermissionTo('force_delete_orders');
+        if (! $user->checkPermissionTo('force_delete_orders')) {
+            return false;
+        }
+
+        // Super admins can force delete all orders
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only force delete orders from their stores
+        return $user->stores()->where('stores.id', $order->store_id)->exists();
     }
 
     /**
@@ -92,7 +142,17 @@ class OrderPolicy
      */
     public function replicate(User $user, Order $order): bool
     {
-        return $user->checkPermissionTo('replicate_orders');
+        if (! $user->checkPermissionTo('replicate_orders')) {
+            return false;
+        }
+
+        // Super admins can replicate all orders
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only replicate orders from their stores
+        return $user->stores()->where('stores.id', $order->store_id)->exists();
     }
 
     /**
@@ -103,4 +163,3 @@ class OrderPolicy
         return $user->checkPermissionTo('reorder_orders');
     }
 }
-

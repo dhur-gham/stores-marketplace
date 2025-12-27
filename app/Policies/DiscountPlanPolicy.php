@@ -90,7 +90,17 @@ class DiscountPlanPolicy
      */
     public function restore(User $user, DiscountPlan $discount_plan): bool
     {
-        return $user->checkPermissionTo('restore_discount_plans');
+        if (! $user->checkPermissionTo('restore_discount_plans')) {
+            return false;
+        }
+
+        // Super admins can restore all discount plans
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only restore discount plans from their stores
+        return $user->stores()->where('stores.id', $discount_plan->store_id)->exists();
     }
 
     /**
@@ -98,6 +108,16 @@ class DiscountPlanPolicy
      */
     public function forceDelete(User $user, DiscountPlan $discount_plan): bool
     {
-        return $user->checkPermissionTo('force_delete_discount_plans');
+        if (! $user->checkPermissionTo('force_delete_discount_plans')) {
+            return false;
+        }
+
+        // Super admins can force delete all discount plans
+        if ($user->hasRole('super_admin')) {
+            return true;
+        }
+
+        // Other users can only force delete discount plans from their stores
+        return $user->stores()->where('stores.id', $discount_plan->store_id)->exists();
     }
 }

@@ -172,6 +172,26 @@ class DiscountService
     }
 
     /**
+     * Remove discounts from products when a discount plan is deleted.
+     * This should be called before the plan is deleted.
+     */
+    public function removePlanDiscounts(DiscountPlan $plan): void
+    {
+        DB::transaction(function () use ($plan) {
+            // Get all products with this plan
+            $products = Product::where('plan_id', $plan->id)->get();
+
+            foreach ($products as $product) {
+                $product->plan_id = null;
+                $product->discounted_price = null;
+                $product->save();
+            }
+
+            Log::info("Discount plan {$plan->id} deleted, removed discounts from {$products->count()} products");
+        });
+    }
+
+    /**
      * Convert UTC datetime to Baghdad for display.
      */
     public function convertUtcToBaghdad(\Carbon\Carbon $datetime): \Carbon\Carbon

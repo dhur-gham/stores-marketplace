@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\DiscountPlanStatus;
 use App\Enums\DiscountType;
+use App\Services\DiscountService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -94,5 +95,17 @@ class DiscountPlan extends Model
     public function isExpired(): bool
     {
         return $this->status === DiscountPlanStatus::Expired || $this->end_date < now();
+    }
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        // Remove discounts from products when a plan is deleted
+        static::deleting(function (DiscountPlan $plan) {
+            $discount_service = app(DiscountService::class);
+            $discount_service->removePlanDiscounts($plan);
+        });
     }
 }

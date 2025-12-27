@@ -20,6 +20,16 @@ class StoresTable
 {
     public static function configure(Table $table): Table
     {
+        $user = auth()->user();
+
+        // Filter stores by user's access if not super_admin
+        if ($user && ! $user->hasRole('super_admin')) {
+            $user_store_ids = $user->stores()->pluck('stores.id')->toArray();
+            $table->modifyQueryUsing(function ($query) use ($user_store_ids) {
+                $query->whereIn('stores.id', $user_store_ids);
+            });
+        }
+
         return $table
             ->columns([
                 Split::make([

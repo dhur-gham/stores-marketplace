@@ -14,7 +14,12 @@ class EditDiscountPlan extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->before(function () {
+                    // Remove discounts from products before deleting the plan
+                    $discount_service = app(DiscountService::class);
+                    $discount_service->removePlanDiscounts($this->record);
+                }),
         ];
     }
 
