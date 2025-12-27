@@ -141,6 +141,26 @@ class PayTabsService
             }
 
             // Error response
+            $error_message = $result['message'] ?? 'Payment processing failed';
+
+            // Handle PCI DSS compliance error
+            if (stripos($error_message, 'PCI DSS') !== false || stripos($error_message, 'SAQ') !== false) {
+                Log::error('PayTabs PCI DSS compliance error', [
+                    'order_id' => $order->id,
+                    'response' => $result,
+                    'status' => $response->status(),
+                    'note' => 'PayTabs account/profile may need to be configured for SAQ A-EP compliance. Contact PayTabs support to enable managed form integration.',
+                ]);
+
+                return [
+                    'success' => false,
+                    'error' => 'Payment gateway configuration error. Your PayTabs account needs to be configured for SAQ A-EP compliance. Please contact PayTabs support.',
+                    'error_code' => $result['code'] ?? 'PCI_DSS_ERROR',
+                    'pci_error' => true,
+                    'response' => $result,
+                ];
+            }
+
             Log::warning('PayTabs payment failed', [
                 'order_id' => $order->id,
                 'response' => $result,
@@ -149,7 +169,7 @@ class PayTabsService
 
             return [
                 'success' => false,
-                'error' => $result['message'] ?? 'Payment processing failed',
+                'error' => $error_message,
                 'error_code' => $result['code'] ?? null,
                 'response' => $result,
             ];

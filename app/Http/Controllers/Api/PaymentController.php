@@ -78,10 +78,14 @@ class PaymentController extends BaseController
                 'payment_metadata' => $payment_result ?? null,
             ]);
 
-            return $this->error_response(
-                $payment_result['error'] ?? 'Payment processing failed',
-                422
-            );
+            $error_message = $payment_result['error'] ?? 'Payment processing failed';
+
+            // Provide more helpful error for PCI DSS issues
+            if (isset($payment_result['pci_error']) && $payment_result['pci_error']) {
+                $error_message = 'Payment gateway configuration error. Please contact support.';
+            }
+
+            return $this->error_response($error_message, 422);
         }
 
         // Update order with payment information
