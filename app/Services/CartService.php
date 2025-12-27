@@ -72,12 +72,13 @@ class CartService
 
         if ($cart_item) {
             // Update quantity, but check total doesn't exceed stock
+            // Keep the original price snapshot - don't update price when adding more quantity
             $new_quantity = $cart_item->quantity + $quantity;
             if ($product->stock < $new_quantity) {
                 throw new \InvalidArgumentException('Insufficient stock available');
             }
             $cart_item->quantity = $new_quantity;
-            $cart_item->price = $product->getFinalPrice(); // Update price in case discount changed
+            // Price is a snapshot - don't update it when updating quantity
             $cart_item->save();
         } else {
             // Create new cart item with final price (discounted if available)
