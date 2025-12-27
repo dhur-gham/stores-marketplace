@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('customer_id')->constrained()->cascadeOnDelete();
             $table->string('label')->comment('Home, Work, etc.');
-            $table->foreignId('city_id')->constrained()->nullOnDelete();
+            $table->foreignId('city_id')->constrained()->restrictOnDelete();
             $table->text('address');
             $table->boolean('is_default')->default(false);
             $table->timestamps();
