@@ -31,6 +31,8 @@ class UserStoreStats extends StatsOverviewWidget
         foreach ($user_ids as $user_id) {
             Cache::forget('widget_user_store_stats_'.$user_id);
             Cache::forget('widget_user_store_stats_updated_at_'.$user_id);
+            // Also clear order status stats cache
+            \App\Filament\Widgets\UserOrderStatusStats::clearCacheForUser($user_id);
             // Set new timestamp for immediate display
             Cache::put('widget_user_store_stats_updated_at_'.$user_id, now(), self::CACHE_TTL);
         }
@@ -43,6 +45,8 @@ class UserStoreStats extends StatsOverviewWidget
     {
         Cache::forget('widget_user_store_stats_'.$user_id);
         Cache::forget('widget_user_store_stats_updated_at_'.$user_id);
+        // Also clear order status stats cache
+        \App\Filament\Widgets\UserOrderStatusStats::clearCacheForUser($user_id);
         // Set new timestamp for immediate display
         Cache::put('widget_user_store_stats_updated_at_'.$user_id, now(), self::CACHE_TTL);
     }
@@ -100,9 +104,16 @@ class UserStoreStats extends StatsOverviewWidget
                 ->pluck('id')
                 ->toArray();
 
-            // Calculate total items (sum of quantities from order_items)
+            // Get completed order IDs (exclude cancelled orders)
+            $completed_order_ids = Order::query()
+                ->whereIn('store_id', $store_ids)
+                ->where('status', OrderStatus::Complete)
+                ->pluck('id')
+                ->toArray();
+
+            // Calculate total items sold (only from completed orders, exclude cancelled)
             $total_items = OrderItem::query()
-                ->whereIn('order_id', $order_ids)
+                ->whereIn('order_id', $completed_order_ids)
                 ->sum('quantity');
 
             // Calculate total sales from completed orders

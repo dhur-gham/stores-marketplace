@@ -80,8 +80,8 @@ if (isset($message['text']) && str_starts_with($message['text'], '/start')) {
 
     if (empty($start_param)) {
         // No ID provided, send generic welcome message
-        $welcome_message = "👋 Welcome!\n\n";
-        $welcome_message .= 'To activate Telegram notifications, please use the activation link from your account settings.';
+        $welcome_message = "👋 مرحباً!\n\n";
+        $welcome_message .= 'لتفعيل إشعارات تيليجرام، يرجى استخدام رابط التفعيل من إعدادات حسابك.';
 
         $telegram_service->sendMessage($chat_id, $welcome_message);
 
@@ -95,8 +95,8 @@ if (isset($message['text']) && str_starts_with($message['text'], '/start')) {
         $customer_id = (int) str_replace('cust-', '', $start_param);
 
         if ($customer_id <= 0) {
-            $error_message = "❌ Sorry, we couldn't activate your Telegram notifications.\n\n";
-            $error_message .= "Please make sure you're using the correct activation link from your account.";
+            $error_message = "❌ عذراً، لم نتمكن من تفعيل إشعارات تيليجرام.\n\n";
+            $error_message .= 'يرجى التأكد من استخدام رابط التفعيل الصحيح من حسابك.';
 
             $telegram_service->sendMessage($chat_id, $error_message);
             http_response_code(200);
@@ -108,8 +108,45 @@ if (isset($message['text']) && str_starts_with($message['text'], '/start')) {
             $customer = Customer::find($customer_id);
 
             if (! $customer) {
-                $error_message = "❌ Sorry, we couldn't activate your Telegram notifications.\n\n";
-                $error_message .= "Please make sure you're using the correct activation link from your account.";
+                $error_message = "❌ عذراً، لم نتمكن من تفعيل إشعارات تيليجرام.\n\n";
+                $error_message .= 'يرجى التأكد من استخدام رابط التفعيل الصحيح من حسابك.';
+
+                $telegram_service->sendMessage($chat_id, $error_message);
+                http_response_code(200);
+                echo json_encode(['ok' => true]);
+                exit;
+            }
+
+            // Check if customer is already linked
+            if ($customer->hasTelegramActivated()) {
+                if ($customer->telegram_chat_id == $chat_id) {
+                    // Same chat ID, already activated
+                    $already_activated_message = "✅ <b>إشعارات تيليجرام مفعّلة بالفعل!</b>\n\n";
+                    $already_activated_message .= "مرحباً {$customer->name},\n\n";
+                    $already_activated_message .= "حسابك على تيليجرام مرتبط بالفعل بحساب المتجر.\n";
+                    $already_activated_message .= 'ستستمر في تلقي إشعارات حول طلباتك والتحديثات المهمة.';
+
+                    $telegram_service->sendMessage($chat_id, $already_activated_message);
+                } else {
+                    // Different chat ID, invalid action
+                    $error_message = "❌ <b>إجراء غير صالح</b>\n\n";
+                    $error_message .= "هذا الحساب مرتبط بالفعل بحساب تيليجرام آخر.\n\n";
+                    $error_message .= 'إذا كنت تريد ربط حساب تيليجرام مختلف، يرجى الاتصال بالدعم.';
+
+                    $telegram_service->sendMessage($chat_id, $error_message);
+                }
+
+                http_response_code(200);
+                echo json_encode(['ok' => true]);
+                exit;
+            }
+
+            // Check if this chat_id is already linked to another customer
+            $existing_customer = Customer::where('telegram_chat_id', $chat_id)->where('id', '!=', $customer_id)->first();
+            if ($existing_customer) {
+                $error_message = "❌ <b>إجراء غير صالح</b>\n\n";
+                $error_message .= "هذا الحساب على تيليجرام مرتبط بالفعل بحساب عميل آخر.\n\n";
+                $error_message .= 'يرجى استخدام حساب تيليجرام مختلف أو الاتصال بالدعم.';
 
                 $telegram_service->sendMessage($chat_id, $error_message);
                 http_response_code(200);
@@ -120,10 +157,10 @@ if (isset($message['text']) && str_starts_with($message['text'], '/start')) {
             $customer->telegram_chat_id = $chat_id;
             $customer->save();
 
-            $confirmation_message = "✅ <b>Telegram Notifications Activated!</b>\n\n";
-            $confirmation_message .= "Hello {$customer->name},\n\n";
-            $confirmation_message .= "Your Telegram account has been successfully linked to your store account.\n";
-            $confirmation_message .= 'You will now receive notifications about your orders and important updates.';
+            $confirmation_message = "✅ <b>تم تفعيل إشعارات تيليجرام!</b>\n\n";
+            $confirmation_message .= "مرحباً {$customer->name},\n\n";
+            $confirmation_message .= "تم ربط حسابك على تيليجرام بنجاح بحساب المتجر.\n";
+            $confirmation_message .= 'ستتلقى الآن إشعارات حول طلباتك والتحديثات المهمة.';
 
             $telegram_service->sendMessage($chat_id, $confirmation_message);
 
@@ -134,8 +171,8 @@ if (isset($message['text']) && str_starts_with($message['text'], '/start')) {
                 'chat_id' => $chat_id,
             ]);
 
-            $error_message = "❌ Sorry, an error occurred while activating your Telegram notifications.\n\n";
-            $error_message .= 'Please try again later or contact support.';
+            $error_message = "❌ عذراً، حدث خطأ أثناء تفعيل إشعارات تيليجرام.\n\n";
+            $error_message .= 'يرجى المحاولة مرة أخرى لاحقاً أو الاتصال بالدعم.';
 
             $telegram_service->sendMessage($chat_id, $error_message);
         }
@@ -145,8 +182,8 @@ if (isset($message['text']) && str_starts_with($message['text'], '/start')) {
         $user_id = (int) str_replace('user-', '', $start_param);
 
         if ($user_id <= 0) {
-            $error_message = "❌ Sorry, we couldn't activate your Telegram notifications.\n\n";
-            $error_message .= "Please make sure you're using the correct activation link from your account.";
+            $error_message = "❌ عذراً، لم نتمكن من تفعيل إشعارات تيليجرام.\n\n";
+            $error_message .= 'يرجى التأكد من استخدام رابط التفعيل الصحيح من حسابك.';
 
             $telegram_service->sendMessage($chat_id, $error_message);
             http_response_code(200);
@@ -158,8 +195,45 @@ if (isset($message['text']) && str_starts_with($message['text'], '/start')) {
             $user = User::find($user_id);
 
             if (! $user) {
-                $error_message = "❌ Sorry, we couldn't activate your Telegram notifications.\n\n";
-                $error_message .= "Please make sure you're using the correct activation link from your account.";
+                $error_message = "❌ عذراً، لم نتمكن من تفعيل إشعارات تيليجرام.\n\n";
+                $error_message .= 'يرجى التأكد من استخدام رابط التفعيل الصحيح من حسابك.';
+
+                $telegram_service->sendMessage($chat_id, $error_message);
+                http_response_code(200);
+                echo json_encode(['ok' => true]);
+                exit;
+            }
+
+            // Check if user is already linked
+            if ($user->hasTelegramActivated()) {
+                if ($user->telegram_chat_id == $chat_id) {
+                    // Same chat ID, already activated
+                    $already_activated_message = "✅ <b>إشعارات تيليجرام مفعّلة بالفعل!</b>\n\n";
+                    $already_activated_message .= "مرحباً {$user->name},\n\n";
+                    $already_activated_message .= "حسابك على تيليجرام مرتبط بالفعل بحساب مالك المتجر.\n";
+                    $already_activated_message .= 'ستستمر في تلقي إشعارات حول الطلبات الجديدة وتنبيهات المخزون المنخفض والتحديثات المهمة.';
+
+                    $telegram_service->sendMessage($chat_id, $already_activated_message);
+                } else {
+                    // Different chat ID, invalid action
+                    $error_message = "❌ <b>إجراء غير صالح</b>\n\n";
+                    $error_message .= "هذا الحساب مرتبط بالفعل بحساب تيليجرام آخر.\n\n";
+                    $error_message .= 'إذا كنت تريد ربط حساب تيليجرام مختلف، يرجى الاتصال بالدعم.';
+
+                    $telegram_service->sendMessage($chat_id, $error_message);
+                }
+
+                http_response_code(200);
+                echo json_encode(['ok' => true]);
+                exit;
+            }
+
+            // Check if this chat_id is already linked to another user
+            $existing_user = User::where('telegram_chat_id', $chat_id)->where('id', '!=', $user_id)->first();
+            if ($existing_user) {
+                $error_message = "❌ <b>إجراء غير صالح</b>\n\n";
+                $error_message .= "هذا الحساب على تيليجرام مرتبط بالفعل بحساب مستخدم آخر.\n\n";
+                $error_message .= 'يرجى استخدام حساب تيليجرام مختلف أو الاتصال بالدعم.';
 
                 $telegram_service->sendMessage($chat_id, $error_message);
                 http_response_code(200);
@@ -170,10 +244,10 @@ if (isset($message['text']) && str_starts_with($message['text'], '/start')) {
             $user->telegram_chat_id = $chat_id;
             $user->save();
 
-            $confirmation_message = "✅ <b>Telegram Notifications Activated!</b>\n\n";
-            $confirmation_message .= "Hello {$user->name},\n\n";
-            $confirmation_message .= "Your Telegram account has been successfully linked to your store owner account.\n";
-            $confirmation_message .= 'You will now receive notifications about new orders, low stock alerts, and important updates.';
+            $confirmation_message = "✅ <b>تم تفعيل إشعارات تيليجرام!</b>\n\n";
+            $confirmation_message .= "مرحباً {$user->name},\n\n";
+            $confirmation_message .= "تم ربط حسابك على تيليجرام بنجاح بحساب مالك المتجر.\n";
+            $confirmation_message .= 'ستتلقى الآن إشعارات حول الطلبات الجديدة وتنبيهات المخزون المنخفض والتحديثات المهمة.';
 
             $telegram_service->sendMessage($chat_id, $confirmation_message);
 
@@ -184,15 +258,15 @@ if (isset($message['text']) && str_starts_with($message['text'], '/start')) {
                 'chat_id' => $chat_id,
             ]);
 
-            $error_message = "❌ Sorry, an error occurred while activating your Telegram notifications.\n\n";
-            $error_message .= 'Please try again later or contact support.';
+            $error_message = "❌ عذراً، حدث خطأ أثناء تفعيل إشعارات تيليجرام.\n\n";
+            $error_message .= 'يرجى المحاولة مرة أخرى لاحقاً أو الاتصال بالدعم.';
 
             $telegram_service->sendMessage($chat_id, $error_message);
         }
     } else {
         // Unknown parameter format
-        $welcome_message = "👋 Welcome!\n\n";
-        $welcome_message .= 'To activate Telegram notifications, please use the activation link from your account settings.';
+        $welcome_message = "👋 مرحباً!\n\n";
+        $welcome_message .= 'لتفعيل إشعارات تيليجرام، يرجى استخدام رابط التفعيل من إعدادات حسابك.';
 
         $telegram_service->sendMessage($chat_id, $welcome_message);
     }

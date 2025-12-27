@@ -15,6 +15,19 @@ return [
     'stats_refreshed' => 'Stats Refreshed',
     'stats_refreshed_body' => 'Your store statistics have been refreshed.',
 
+    // Telegram Activation
+    'telegram' => [
+        'activate_notifications' => 'Activate Telegram Notifications',
+        'activate_description' => 'Link your Telegram account to receive instant notifications about new orders, order status changes, and low stock alerts.',
+        'activate_button' => 'Activate on Telegram',
+        'status' => 'Status',
+        'activated' => '✅ Activated',
+        'not_activated' => '❌ Not Activated',
+        'chat_id' => 'Telegram Chat ID',
+        'no_chat_id' => 'Not linked',
+        'activation_link' => 'Activation Link',
+    ],
+
     // Widget Stats
     'widgets' => [
         'my_stores' => 'My Stores',
@@ -25,5 +38,12 @@ return [
         'total_items_sold_description' => 'Items sold across all orders',
         'total_sales' => 'Total Sales',
         'total_sales_description' => 'Revenue from completed orders',
+        'order_status' => [
+            'new_description' => 'New orders',
+            'processing_description' => 'Orders being processed',
+            'dispatched_description' => 'Orders dispatched',
+            'complete_description' => 'Completed orders',
+            'cancelled_description' => 'Cancelled orders',
+        ],
     ],
 ];

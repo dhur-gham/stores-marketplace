@@ -119,6 +119,7 @@ class Dashboard extends BaseDashboard
                 ->color('gray')
                 ->action(function () use ($user) {
                     \App\Filament\Widgets\UserStoreStats::clearCacheForUser($user->id);
+                    \App\Filament\Widgets\UserOrderStatusStats::clearCacheForUser($user->id);
 
                     Notification::make()
                         ->title(__('dashboard.stats_refreshed'))

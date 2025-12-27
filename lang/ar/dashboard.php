@@ -15,6 +15,19 @@ return [
     'stats_refreshed' => 'تم تحديث الإحصائيات',
     'stats_refreshed_body' => 'تم تحديث إحصائيات متجرك.',
 
+    // Telegram Activation
+    'telegram' => [
+        'activate_notifications' => 'تفعيل إشعارات تيليجرام',
+        'activate_description' => 'اربط حسابك على تيليجرام لتلقي إشعارات فورية حول الطلبات الجديدة وتغييرات حالة الطلبات وتنبيهات المخزون المنخفض.',
+        'activate_button' => 'تفعيل على تيليجرام',
+        'status' => 'الحالة',
+        'activated' => '✅ مفعّل',
+        'not_activated' => '❌ غير مفعّل',
+        'chat_id' => 'معرف محادثة تيليجرام',
+        'no_chat_id' => 'غير مرتبط',
+        'activation_link' => 'رابط التفعيل',
+    ],
+
     // Widget Stats
     'widgets' => [
         'my_stores' => 'متاجري',
@@ -25,5 +38,12 @@ return [
         'total_items_sold_description' => 'العناصر المباعة في جميع الطلبات',
         'total_sales' => 'إجمالي المبيعات',
         'total_sales_description' => 'الإيرادات من الطلبات المكتملة',
+        'order_status' => [
+            'new_description' => 'الطلبات الجديدة',
+            'processing_description' => 'الطلبات قيد المعالجة',
+            'dispatched_description' => 'الطلبات المشحونة',
+            'complete_description' => 'الطلبات المكتملة',
+            'cancelled_description' => 'الطلبات الملغاة',
+        ],
     ],
 ];
