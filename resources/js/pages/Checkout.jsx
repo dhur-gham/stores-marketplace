@@ -237,20 +237,23 @@ export default function Checkout() {
         if (result.success) {
             const orders = result.data.orders;
             
-            // If online payment, redirect to payment page for first order
-            if (payment_method === 'online' && orders.length > 0) {
-                // For multiple orders, redirect to payment for the first one
-                // In production, you might want to handle multiple orders differently
-                navigate(`/payment/${orders[0].id}`, { 
-                    state: { 
-                        orders: orders,
-                        payment_method: 'online'
-                    } 
-                });
-            } else {
-                // COD - go to confirmation page
-                navigate('/order-confirmation', { state: { orders: orders } });
-            }
+            // Online payment temporarily disabled - only COD available
+            // if (payment_method === 'online' && orders.length > 0) {
+            //     // For multiple orders, redirect to payment for the first one
+            //     // In production, you might want to handle multiple orders differently
+            //     navigate(`/payment/${orders[0].id}`, { 
+            //         state: { 
+            //             orders: orders,
+            //             payment_method: 'online'
+            //         } 
+            //     });
+            // } else {
+            //     // COD - go to confirmation page
+            //     navigate('/order-confirmation', { state: { orders: orders } });
+            // }
+            
+            // COD - go to confirmation page
+            navigate('/order-confirmation', { state: { orders: orders } });
         } else {
             if (result.errors) {
                 // Handle validation errors
@@ -545,7 +548,8 @@ export default function Checkout() {
                                 </div>
                             </label>
                             
-                            <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
+                            {/* Online payment temporarily disabled */}
+                            {/* <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
                                 payment_method === 'online'
                                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                                     : 'border-gray-200 dark:border-gray-700'
@@ -571,7 +575,7 @@ export default function Checkout() {
                                         {t('checkout.payment_methods.online_description')}
                                     </p>
                                 </div>
-                            </label>
+                            </label> */}
                         </div>
                     </div>
 
