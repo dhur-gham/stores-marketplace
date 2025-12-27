@@ -32,6 +32,44 @@ class EditProduct extends EditRecord
             }
         }
 
+        // Auto-generate SEO fields if they're empty
+        if (empty($data['meta_title']) && ! empty($data['name'])) {
+            $store_name = $data['store_id'] ? Store::find($data['store_id'])?->name : '';
+            $meta_title = $store_name ? "{$data['name']} - {$store_name}" : $data['name'];
+            $data['meta_title'] = \Illuminate\Support\Str::limit($meta_title, 60);
+        }
+
+        if (empty($data['meta_description'])) {
+            if (! empty($data['description'])) {
+                $data['meta_description'] = \Illuminate\Support\Str::limit(strip_tags($data['description']), 160);
+            } elseif (! empty($data['name'])) {
+                $data['meta_description'] = \Illuminate\Support\Str::limit("Buy {$data['name']} online. High quality product with best prices.", 160);
+            }
+        }
+
+        if (empty($data['meta_keywords']) && ! empty($data['name'])) {
+            $keywords = [];
+            $name_words = explode(' ', \Illuminate\Support\Str::lower($data['name']));
+            $keywords = array_merge($keywords, array_filter($name_words, fn ($word) => strlen($word) > 3));
+
+            if (! empty($data['description'])) {
+                $description_words = explode(' ', \Illuminate\Support\Str::lower(strip_tags($data['description'])));
+                $keywords = array_merge($keywords, array_filter($description_words, fn ($word) => strlen($word) > 3));
+            }
+
+            if (! empty($data['store_id'])) {
+                $store = Store::find($data['store_id']);
+                if ($store?->name) {
+                    $store_words = explode(' ', \Illuminate\Support\Str::lower($store->name));
+                    $keywords = array_merge($keywords, array_filter($store_words, fn ($word) => strlen($word) > 3));
+                }
+            }
+
+            $keywords = array_unique($keywords);
+            $keywords = array_slice($keywords, 0, 10);
+            $data['meta_keywords'] = implode(', ', $keywords);
+        }
+
         return $data;
     }
 

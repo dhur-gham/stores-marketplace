@@ -58,12 +58,20 @@ class Product extends Model
             if (empty($product->slug) && ! empty($product->name)) {
                 $product->slug = static::generate_unique_slug($product->name);
             }
+
+            // Auto-generate SEO fields if not set
+            static::generateSeoFields($product);
         });
 
         static::updating(function (Product $product): void {
             // Auto-regenerate slug when name changes
             if ($product->isDirty('name')) {
                 $product->slug = static::generate_unique_slug($product->name, $product->id);
+            }
+
+            // Auto-regenerate SEO fields when name or description changes
+            if ($product->isDirty(['name', 'description'])) {
+                static::generateSeoFields($product);
             }
         });
     }
@@ -97,6 +105,55 @@ class Product extends Model
         }
 
         return $query->exists();
+    }
+
+    /**
+     * Auto-generate SEO fields from product name and description.
+     */
+    protected static function generateSeoFields(Product $product): void
+    {
+        // Only auto-generate if fields are empty
+        if (empty($product->meta_title) && ! empty($product->name)) {
+            // Meta title: product name + store name (if available) - max 60 chars for SEO
+            $store_name = $product->store?->name ?? '';
+            $meta_title = $store_name ? "{$product->name} - {$store_name}" : $product->name;
+            $product->meta_title = Str::limit($meta_title, 60);
+        }
+
+        if (empty($product->meta_description)) {
+            // Meta description: use description if available, otherwise generate from name - max 160 chars
+            if (! empty($product->description)) {
+                $product->meta_description = Str::limit(strip_tags($product->description), 160);
+            } elseif (! empty($product->name)) {
+                $product->meta_description = Str::limit("Buy {$product->name} online. High quality product with best prices.", 160);
+            }
+        }
+
+        if (empty($product->meta_keywords) && ! empty($product->name)) {
+            // Meta keywords: extract keywords from name and description
+            $keywords = [];
+
+            // Add words from product name
+            $name_words = explode(' ', Str::lower($product->name));
+            $keywords = array_merge($keywords, array_filter($name_words, fn ($word) => strlen($word) > 3));
+
+            // Add words from description if available
+            if (! empty($product->description)) {
+                $description_words = explode(' ', Str::lower(strip_tags($product->description)));
+                $keywords = array_merge($keywords, array_filter($description_words, fn ($word) => strlen($word) > 3));
+            }
+
+            // Add store name if available
+            if ($product->store?->name) {
+                $store_words = explode(' ', Str::lower($product->store->name));
+                $keywords = array_merge($keywords, array_filter($store_words, fn ($word) => strlen($word) > 3));
+            }
+
+            // Remove duplicates, limit to 10 keywords, and join with commas
+            $keywords = array_unique($keywords);
+            $keywords = array_slice($keywords, 0, 10);
+            $product->meta_keywords = implode(', ', $keywords);
+        }
     }
 
     /**
@@ -220,10 +277,6 @@ class Product extends Model
 
     /**
      * Scope to exclude products that are already in a specific discount plan.
-     *
-     * @param  Builder  $query
-     * @param  int  $plan_id
-     * @return Builder
      */
     public function scopeWhereNotInPlan(Builder $query, int $plan_id): Builder
     {
