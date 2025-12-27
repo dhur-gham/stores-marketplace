@@ -19,7 +19,7 @@ class ProductService
      */
     public function get_products_by_store(Store $store, int $per_page = 15, ?Customer $customer = null): array
     {
-        $paginator = $store->products()->paginate($per_page);
+        $paginator = $store->products()->with('images')->paginate($per_page);
 
         // Get wishlist product IDs if customer is authenticated
         $wishlist_product_ids = [];
@@ -38,6 +38,7 @@ class ProductService
                     'name' => $product->name,
                     'slug' => $product->slug,
                     'image' => $product->image ? asset('storage/'.$product->image) : null,
+                    'images' => $this->formatProductImages($product),
                     'description' => $product->description,
                     'sku' => $product->sku,
                     'status' => $product->status->value,
@@ -71,8 +72,8 @@ class ProductService
     public function get_product_by_id_or_slug(string|int $identifier, ?Customer $customer = null): ?array
     {
         $product = is_numeric($identifier)
-            ? Product::query()->with('store')->find($identifier)
-            : Product::query()->with('store')->where('slug', $identifier)->first();
+            ? Product::query()->with(['store', 'images'])->find($identifier)
+            : Product::query()->with(['store', 'images'])->where('slug', $identifier)->first();
 
         if (! $product) {
             return null;
@@ -83,6 +84,7 @@ class ProductService
             'name' => $product->name,
             'slug' => $product->slug,
             'image' => $product->image ? asset('storage/'.$product->image) : null,
+            'images' => $this->formatProductImages($product),
             'description' => $product->description,
             'sku' => $product->sku,
             'status' => $product->status->value,
@@ -117,7 +119,7 @@ class ProductService
     public function get_latest_products(int $limit = 5, ?Customer $customer = null): array
     {
         $products = Product::query()
-            ->with('store')
+            ->with(['store', 'images'])
             ->where('status', ProductStatus::Active)
             ->latest()
             ->limit($limit)
@@ -139,6 +141,7 @@ class ProductService
                 'name' => $product->name,
                 'slug' => $product->slug,
                 'image' => $product->image ? asset('storage/'.$product->image) : null,
+                'images' => $this->formatProductImages($product),
                 'description' => $product->description,
                 'price' => $product->price,
                 'discounted_price' => $product->discounted_price,
@@ -176,7 +179,7 @@ class ProductService
         ?string $sort_order = 'desc',
         ?Customer $customer = null
     ): array {
-        $query = Product::query()->with('store');
+        $query = Product::query()->with(['store', 'images']);
 
         // Search by product name
         if ($search && trim($search) !== '') {
@@ -238,6 +241,7 @@ class ProductService
                     'name' => $product->name,
                     'slug' => $product->slug,
                     'image' => $product->image ? asset('storage/'.$product->image) : null,
+                    'images' => $this->formatProductImages($product),
                     'description' => $product->description,
                     'sku' => $product->sku,
                     'status' => $product->status->value,
@@ -267,5 +271,37 @@ class ProductService
             'paginator' => $paginator,
             'data' => $data,
         ];
+    }
+
+    /**
+     * Format product images (main + secondary) into a single array.
+     * Main image comes first, followed by secondary images sorted by sort_order.
+     *
+     * @param  Product  $product  The product
+     * @return array<int, array{url: string, is_main: bool, sort_order: int}>
+     */
+    private function formatProductImages(Product $product): array
+    {
+        $images = [];
+
+        // Add main image first if it exists
+        if ($product->image) {
+            $images[] = [
+                'url' => asset('storage/'.$product->image),
+                'is_main' => true,
+                'sort_order' => 0,
+            ];
+        }
+
+        // Add secondary images
+        foreach ($product->images as $image) {
+            $images[] = [
+                'url' => asset('storage/'.$image->image_path),
+                'is_main' => false,
+                'sort_order' => $image->sort_order,
+            ];
+        }
+
+        return $images;
     }
 }

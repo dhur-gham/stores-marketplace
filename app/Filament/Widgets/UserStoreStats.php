@@ -120,23 +120,23 @@ class UserStoreStats extends StatsOverviewWidget
         });
 
         return [
-            Stat::make('My Stores', $stats['total_stores'])
-                ->description('Stores you manage')
+            Stat::make(__('dashboard.widgets.my_stores'), $stats['total_stores'])
+                ->description(__('dashboard.widgets.my_stores_description'))
                 ->descriptionIcon('heroicon-m-building-storefront')
                 ->color('primary'),
 
-            Stat::make('Total Orders', $stats['total_orders'])
-                ->description('All orders from your stores')
+            Stat::make(__('dashboard.widgets.total_orders'), $stats['total_orders'])
+                ->description(__('dashboard.widgets.total_orders_description'))
                 ->descriptionIcon('heroicon-m-shopping-cart')
                 ->color('info'),
 
-            Stat::make('Total Items Sold', number_format($stats['total_items']))
-                ->description('Items sold across all orders')
+            Stat::make(__('dashboard.widgets.total_items_sold'), number_format($stats['total_items']))
+                ->description(__('dashboard.widgets.total_items_sold_description'))
                 ->descriptionIcon('heroicon-m-cube')
                 ->color('success'),
 
-            Stat::make('Total Sales', number_format($stats['total_sales']).' IQD')
-                ->description('Revenue from completed orders')
+            Stat::make(__('dashboard.widgets.total_sales'), number_format($stats['total_sales']).' IQD')
+                ->description(__('dashboard.widgets.total_sales_description'))
                 ->descriptionIcon('heroicon-m-currency-dollar')
                 ->color('success'),
         ];

@@ -14,4 +14,16 @@ return [
     'dashboard_refreshed_body' => 'تم تحديث جميع بيانات لوحة التحكم.',
     'stats_refreshed' => 'تم تحديث الإحصائيات',
     'stats_refreshed_body' => 'تم تحديث إحصائيات متجرك.',
+
+    // Widget Stats
+    'widgets' => [
+        'my_stores' => 'متاجري',
+        'my_stores_description' => 'المتاجر التي تديرها',
+        'total_orders' => 'إجمالي الطلبات',
+        'total_orders_description' => 'جميع الطلبات من متاجرك',
+        'total_items_sold' => 'إجمالي العناصر المباعة',
+        'total_items_sold_description' => 'العناصر المباعة في جميع الطلبات',
+        'total_sales' => 'إجمالي المبيعات',
+        'total_sales_description' => 'الإيرادات من الطلبات المكتملة',
+    ],
 ];

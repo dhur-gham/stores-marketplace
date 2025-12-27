@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Plus, Minus, Check, Heart } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Check, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import Header from '../components/Header';
 import ArrowIcon from '../components/ArrowIcon';
 import { fetchProduct } from '../services/api';
@@ -22,6 +22,7 @@ export default function ProductDetail() {
     const [adding, setAdding] = useState(false);
     const [added, setAdded] = useState(false);
     const [wishlist_toggling, setWishlistToggling] = useState(false);
+    const [selected_image_index, setSelectedImageIndex] = useState(0);
 
     useEffect(() => {
         const loadProduct = async () => {
@@ -117,6 +118,26 @@ export default function ProductDetail() {
     // Check wishlist status - prefer API data if available, otherwise check context
     const in_wishlist = authenticated ? (product?.in_wishlist ?? isInWishlist(product?.id)) : false;
 
+    // Get all product images (main + secondary)
+    const all_images = product?.images && product.images.length > 0 
+        ? product.images 
+        : product?.image 
+            ? [{ url: product.image, is_main: true, sort_order: 0 }]
+            : [];
+
+    // Reset selected image index when product changes
+    useEffect(() => {
+        setSelectedImageIndex(0);
+    }, [product?.id]);
+
+    const handlePreviousImage = () => {
+        setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : all_images.length - 1));
+    };
+
+    const handleNextImage = () => {
+        setSelectedImageIndex((prev) => (prev < all_images.length - 1 ? prev + 1 : 0));
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -153,13 +174,37 @@ export default function ProductDetail() {
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-8">
                     <div className="md:flex">
                         <div className="md:w-1/2">
-                            <div className="aspect-square w-full bg-gray-100 dark:bg-gray-700 relative overflow-hidden">
-                                {product.image ? (
-                                    <img
-                                        src={product.image}
-                                        alt={product.name}
-                                        className="w-full h-full object-cover"
-                                    />
+                            {/* Main Image Display */}
+                            <div className="aspect-square w-full bg-gray-100 dark:bg-gray-700 relative overflow-hidden mb-4">
+                                {all_images.length > 0 ? (
+                                    <>
+                                        <img
+                                            src={all_images[selected_image_index].url}
+                                            alt={`${product.name} - ${selected_image_index + 1}`}
+                                            className="w-full h-full object-cover"
+                                        />
+                                        {all_images.length > 1 && (
+                                            <>
+                                                <button
+                                                    onClick={handlePreviousImage}
+                                                    className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors shadow-lg"
+                                                    aria-label="Previous image"
+                                                >
+                                                    <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                                                </button>
+                                                <button
+                                                    onClick={handleNextImage}
+                                                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors shadow-lg"
+                                                    aria-label="Next image"
+                                                >
+                                                    <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                                                </button>
+                                                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/50 backdrop-blur-sm rounded-full text-white text-xs">
+                                                    {selected_image_index + 1} / {all_images.length}
+                                                </div>
+                                            </>
+                                        )}
+                                    </>
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
                                         <svg className="w-32 h-32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,6 +213,29 @@ export default function ProductDetail() {
                                     </div>
                                 )}
                             </div>
+
+                            {/* Thumbnail Gallery */}
+                            {all_images.length > 1 && (
+                                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                                    {all_images.map((img, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setSelectedImageIndex(index)}
+                                            className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                                                selected_image_index === index
+                                                    ? 'border-blue-500 dark:border-blue-400 ring-2 ring-blue-200 dark:ring-blue-800'
+                                                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                                            }`}
+                                        >
+                                            <img
+                                                src={img.url}
+                                                alt={`${product.name} thumbnail ${index + 1}`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                         <div className="md:w-1/2 p-6 md:p-8">
                             <div className="mb-4">

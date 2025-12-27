@@ -14,4 +14,16 @@ return [
     'dashboard_refreshed_body' => 'All dashboard data has been refreshed.',
     'stats_refreshed' => 'Stats Refreshed',
     'stats_refreshed_body' => 'Your store statistics have been refreshed.',
+
+    // Widget Stats
+    'widgets' => [
+        'my_stores' => 'My Stores',
+        'my_stores_description' => 'Stores you manage',
+        'total_orders' => 'Total Orders',
+        'total_orders_description' => 'All orders from your stores',
+        'total_items_sold' => 'Total Items Sold',
+        'total_items_sold_description' => 'Items sold across all orders',
+        'total_sales' => 'Total Sales',
+        'total_sales_description' => 'Revenue from completed orders',
+    ],
 ];
