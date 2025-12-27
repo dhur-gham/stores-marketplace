@@ -17,4 +17,3 @@ class EditRole extends EditRecord
         ];
     }
 }
-

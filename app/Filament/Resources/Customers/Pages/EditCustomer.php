@@ -17,4 +17,3 @@ class EditCustomer extends EditRecord
         ];
     }
 }
-

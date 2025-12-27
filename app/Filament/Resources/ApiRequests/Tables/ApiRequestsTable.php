@@ -181,4 +181,3 @@ class ApiRequestsTable
         return round($bytes, 2).' '.$units[$i];
     }
 }
-

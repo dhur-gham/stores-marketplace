@@ -7,7 +7,6 @@ use App\Filament\Resources\ApiRequests\Pages\ViewApiRequest;
 use App\Filament\Resources\ApiRequests\Tables\ApiRequestsTable;
 use App\Models\ApiRequest;
 use BackedEnum;
-use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;

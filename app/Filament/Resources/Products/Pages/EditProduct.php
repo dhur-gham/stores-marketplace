@@ -85,7 +85,7 @@ class EditProduct extends EditRecord
 
             // If store owner tries to set Draft, prevent it and keep current status
             if ($status === ProductStatus::Draft) {
-            unset($data['status']);
+                unset($data['status']);
             }
         }
 

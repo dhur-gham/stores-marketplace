@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\OrderStatus;
 use App\Enums\ProductStatus;
 use App\Enums\StoreType;
 use App\Models\CartItem;
@@ -321,4 +320,3 @@ test('order returns correct structure with items and totals', function () {
         ->assertJsonPath('data.delivery_price', 500)
         ->assertJsonPath('data.total', 2500); // 2000 + 500
 });
-

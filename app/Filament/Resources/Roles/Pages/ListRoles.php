@@ -17,4 +17,3 @@ class ListRoles extends ListRecords
         ];
     }
 }
-

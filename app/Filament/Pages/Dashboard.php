@@ -63,11 +63,11 @@ class Dashboard extends BaseDashboard
 
         // For super_admin users
         if ($this->canViewDashboardStats()) {
-        $last_updated = Cache::get('dashboard_cache_updated_at');
+            $last_updated = Cache::get('dashboard_cache_updated_at');
 
-        if ($last_updated) {
+            if ($last_updated) {
                 return __('dashboard.last_updated', ['time' => Carbon::parse($last_updated)->diffForHumans()]);
-        }
+            }
 
             return __('dashboard.data_loading_first_time');
         }

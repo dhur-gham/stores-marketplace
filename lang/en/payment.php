@@ -43,4 +43,3 @@ return [
         'online' => 'Online Payment',
     ],
 ];
-

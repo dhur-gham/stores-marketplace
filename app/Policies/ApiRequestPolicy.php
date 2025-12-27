@@ -106,4 +106,3 @@ class ApiRequestPolicy
         return false;
     }
 }
-

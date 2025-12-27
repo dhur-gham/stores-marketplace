@@ -44,7 +44,7 @@ class SeedPermissions extends Command
         $this->info('📋 Seeding permissions from PermissionSeeder...');
         $this->newLine();
 
-        $seeder = new PermissionSeeder();
+        $seeder = new PermissionSeeder;
         $seeder->setCommand($this);
         $seeder->run();
 

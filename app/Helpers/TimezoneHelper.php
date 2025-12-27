@@ -57,4 +57,3 @@ class TimezoneHelper
         return self::utcToBaghdad($datetime)->format($format);
     }
 }
-

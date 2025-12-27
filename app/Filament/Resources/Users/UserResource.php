@@ -58,4 +58,3 @@ class UserResource extends Resource
         return ['name', 'email'];
     }
 }
-

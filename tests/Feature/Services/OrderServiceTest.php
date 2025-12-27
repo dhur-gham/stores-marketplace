@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\OrderStatus;
 use App\Enums\ProductStatus;
 use App\Enums\StoreType;
 use App\Models\CartItem;
@@ -501,4 +500,3 @@ test('place_order validates address cannot be empty for physical stores', functi
         ],
     ]))->toThrow(\InvalidArgumentException::class, 'Address cannot be empty');
 });
-

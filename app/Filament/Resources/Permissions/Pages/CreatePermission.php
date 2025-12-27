@@ -9,4 +9,3 @@ class CreatePermission extends CreateRecord
 {
     protected static string $resource = PermissionResource::class;
 }
-

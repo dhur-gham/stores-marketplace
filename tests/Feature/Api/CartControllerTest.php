@@ -331,4 +331,3 @@ test('cart returns correct structure with totals', function () {
         ->assertJsonPath('data.total', 200)
         ->assertJsonPath('data.count', 2);
 });
-

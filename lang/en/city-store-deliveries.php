@@ -32,5 +32,3 @@ return [
         'all_cities_have_prices' => 'All cities already have delivery prices for this store',
     ],
 ];
-
-
