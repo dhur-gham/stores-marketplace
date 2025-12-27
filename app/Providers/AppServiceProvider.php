@@ -54,7 +54,7 @@ class AppServiceProvider extends ServiceProvider
 
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
             $switch
-                ->locales(['en', 'ar'])
+                ->locales(['ar', 'en'])
                 ->defaultLocale('ar');
         });
     }
