@@ -16,7 +16,8 @@ i18n
                 translation: arTranslations,
             },
         },
-        fallbackLng: 'en',
+        lng: 'ar',
+        fallbackLng: 'ar',
         supportedLngs: ['en', 'ar'],
         detection: {
             order: ['localStorage', 'navigator'],
