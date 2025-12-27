@@ -16,6 +16,52 @@ class UserStoreStats extends StatsOverviewWidget
 
     private const CACHE_TTL = 1800; // 30 minutes
 
+    /**
+     * Clear cache for all users who have access to a specific store.
+     */
+    public static function clearCacheForStore(int $store_id): void
+    {
+        $store = Store::find($store_id);
+        if (! $store) {
+            return;
+        }
+
+        $user_ids = $store->users()->pluck('users.id')->toArray();
+
+        foreach ($user_ids as $user_id) {
+            Cache::forget('widget_user_store_stats_'.$user_id);
+            Cache::forget('widget_user_store_stats_updated_at_'.$user_id);
+            // Set new timestamp for immediate display
+            Cache::put('widget_user_store_stats_updated_at_'.$user_id, now(), self::CACHE_TTL);
+        }
+    }
+
+    /**
+     * Clear cache for a specific user.
+     */
+    public static function clearCacheForUser(int $user_id): void
+    {
+        Cache::forget('widget_user_store_stats_'.$user_id);
+        Cache::forget('widget_user_store_stats_updated_at_'.$user_id);
+        // Set new timestamp for immediate display
+        Cache::put('widget_user_store_stats_updated_at_'.$user_id, now(), self::CACHE_TTL);
+    }
+
+    /**
+     * Get last update time for a specific user.
+     */
+    public static function getLastUpdateTime(int $user_id): ?\Illuminate\Support\Carbon
+    {
+        $cache_updated_key = 'widget_user_store_stats_updated_at_'.$user_id;
+        $last_updated = Cache::get($cache_updated_key);
+
+        if ($last_updated) {
+            return \Illuminate\Support\Carbon::parse($last_updated);
+        }
+
+        return null;
+    }
+
     public static function canView(): bool
     {
         $user = auth()->user();
@@ -32,8 +78,10 @@ class UserStoreStats extends StatsOverviewWidget
         }
 
         $cache_key = 'widget_user_store_stats_'.$user->id;
+        $cache_updated_key = 'widget_user_store_stats_updated_at_'.$user->id;
 
-        $stats = Cache::remember($cache_key, self::CACHE_TTL, function () use ($user) {
+        $stats = Cache::remember($cache_key, self::CACHE_TTL, function () use ($user, $cache_updated_key) {
+            Cache::put($cache_updated_key, now(), self::CACHE_TTL);
             // Get user's store IDs
             $store_ids = $user->stores()->pluck('stores.id')->toArray();
 

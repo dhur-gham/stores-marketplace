@@ -70,6 +70,27 @@ class CustomerMessageService
     }
 
     /**
+     * Send delivery price change notification to customer.
+     *
+     * @param  Order  $order  The order
+     * @param  int  $old_price  Previous delivery price
+     * @param  int  $new_price  New delivery price
+     * @return bool Success status
+     */
+    public function sendDeliveryPriceChangeNotification(Order $order, int $old_price, int $new_price): bool
+    {
+        $order_link = $this->getOrderLink($order);
+
+        $formatted_message = "📦 <b>Order <a href=\"{$order_link}\">#{$order->id}</a> Delivery Price Updated</b>\n\n";
+        $formatted_message .= __('orders.notifications.customer_delivery_price_changed', [
+            'old_price' => number_format($old_price),
+            'new_price' => number_format($new_price),
+        ]);
+
+        return $this->sendMessage($order->customer, $formatted_message);
+    }
+
+    /**
      * Get the frontend URL for an order.
      *
      * @param  Order  $order  The order

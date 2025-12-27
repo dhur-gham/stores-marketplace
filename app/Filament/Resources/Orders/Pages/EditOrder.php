@@ -167,6 +167,9 @@ class EditOrder extends EditRecord
             $customer_message_service = app(CustomerMessageService::class);
             $customer_message_service->sendOrderStatusChangeNotification($this->record, $old_status, $status);
 
+            // Clear widget cache for store owners
+            \App\Filament\Widgets\UserStoreStats::clearCacheForStore($this->record->store_id);
+
             $status_label = __('orders.status.'.$status->value);
 
             Notification::make()
@@ -211,10 +214,27 @@ class EditOrder extends EditRecord
                 // Notify customer about status change
                 $customer_message_service = app(CustomerMessageService::class);
                 $customer_message_service->sendOrderStatusChangeNotification($record, $old_status, $new_status);
+
+                // Clear widget cache for store owners
+                \App\Filament\Widgets\UserStoreStats::clearCacheForStore($record->store_id);
+            }
+        }
+
+        // Detect delivery price change and notify customer
+        if (isset($data['delivery_price'])) {
+            $new_delivery_price = (int) $data['delivery_price'];
+            $old_delivery_price = $record->delivery_price ?? 0;
+
+            if ($new_delivery_price !== $old_delivery_price) {
+                $customer_message_service = app(CustomerMessageService::class);
+                $customer_message_service->sendDeliveryPriceChangeNotification($record, $old_delivery_price, $new_delivery_price);
             }
         }
 
         $record->update($data);
+
+        // Clear widget cache when order is updated (for delivery price changes, etc.)
+        \App\Filament\Widgets\UserStoreStats::clearCacheForStore($record->store_id);
 
         // Order items are read-only, no updates needed
 

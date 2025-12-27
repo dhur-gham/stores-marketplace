@@ -41,6 +41,7 @@ return [
         'status_updated_body' => 'تم تغيير حالة الطلب إلى :status.',
         'status_updated_bulk' => 'تم تحديث حالة الطلبات المحددة.',
         'customer_status_changed' => 'تم تحديث حالة طلبك إلى: <b>:status</b>',
+        'customer_delivery_price_changed' => 'تم تحديث سعر التوصيل لطلبك من <b>:old_price دينار</b> إلى <b>:new_price دينار</b>.',
     ],
     'filters' => [
         'filters' => 'تصفية',

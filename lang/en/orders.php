@@ -41,6 +41,7 @@ return [
         'status_updated_body' => 'Order status changed to :status.',
         'status_updated_bulk' => 'Selected orders status has been updated.',
         'customer_status_changed' => 'Your order status has been updated to: <b>:status</b>',
+        'customer_delivery_price_changed' => 'The delivery price for your order has been updated from <b>:old_price IQD</b> to <b>:new_price IQD</b>.',
     ],
     'filters' => [
         'filters' => 'Filters',
