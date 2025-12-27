@@ -110,7 +110,7 @@ export default function ProductCard({ product }) {
                     <button
                         onClick={handleWishlistToggle}
                         disabled={wishlist_toggling}
-                        className="absolute top-2 end-2 p-2.5 min-w-[44px] min-h-[44px] bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm touch-manipulation"
+                        className="absolute top-2 end-2 p-2.5 min-w-[44px] min-h-[44px] bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm touch-manipulation flex items-center justify-center"
                         title={in_wishlist ? t('wishlist.remove') : t('wishlist.add')}
                     >
                         <Heart
