@@ -41,8 +41,9 @@ class OrderController extends BaseController
         try {
             $customer = $request->user();
             $address_data = $request->input('address_data', []);
+            $payment_method = $request->input('payment_method', 'cod');
 
-            $orders = $this->order_service->place_order($customer, $address_data);
+            $orders = $this->order_service->place_order($customer, $address_data, $payment_method);
 
             $orders_data = array_map(function ($order) {
                 return [
@@ -50,6 +51,8 @@ class OrderController extends BaseController
                     'store_id' => $order->store_id,
                     'total' => $order->total,
                     'status' => $order->status->value,
+                    'payment_method' => $order->payment_method,
+                    'payment_status' => $order->payment_status,
                 ];
             }, $orders);
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,6 +29,12 @@ class Order extends Model
         'status',
         'internal_notes',
         'customer_message',
+        'payment_method',
+        'payment_status',
+        'payment_transaction_id',
+        'payment_reference',
+        'paid_at',
+        'payment_metadata',
     ];
 
     /**
@@ -41,6 +48,9 @@ class Order extends Model
             'total' => 'integer',
             'delivery_price' => 'integer',
             'status' => OrderStatus::class,
+            'payment_status' => PaymentStatus::class,
+            'paid_at' => 'datetime',
+            'payment_metadata' => 'array',
         ];
     }
 

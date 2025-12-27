@@ -38,6 +38,21 @@ api.interceptors.response.use(
     }
 );
 
+// Payment API functions
+export const getPaymentClientKey = async () => {
+    const response = await api.get('/payment/client-key');
+    return response.data;
+};
+
+export const processPayment = async (order_id, payment_token, customer_data = {}) => {
+    const response = await api.post('/payment/process', {
+        order_id,
+        payment_token,
+        ...customer_data,
+    });
+    return response.data;
+};
+
 export const fetchStores = async (search = null, per_page = 15, page = 1) => {
     const params = {
         per_page,
@@ -189,9 +204,10 @@ export const clearCart = async () => {
 };
 
 // Order methods
-export const placeOrder = async (address_data = {}) => {
+export const placeOrder = async (address_data = {}, payment_method = 'cod') => {
     const response = await api.post('/orders', {
         address_data,
+        payment_method,
     });
     return response.data;
 };

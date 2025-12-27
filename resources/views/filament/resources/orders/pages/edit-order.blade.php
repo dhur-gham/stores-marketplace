@@ -147,7 +147,7 @@
                     </div>
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('orders.pages.edit.change_status') }}</label>
-                            <select 
+                        <select 
                             wire:model.live="data.status"
                             wire:change="onStatusChanged($event.target.value)"
                             class="w-full border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2">

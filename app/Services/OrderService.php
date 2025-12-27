@@ -22,9 +22,10 @@ class OrderService
      * Place order from cart, grouping items by store (one order per store).
      *
      * @param  array<string, array<string, mixed>>|null  $address_data  Array keyed by store_id with city_id and address
+     * @param  string  $payment_method  Payment method: 'cod' or 'online'
      * @return array<int, Order>
      */
-    public function place_order(Customer $customer, ?array $address_data = null): array
+    public function place_order(Customer $customer, ?array $address_data = null, string $payment_method = 'cod'): array
     {
         $cart_items = $customer->cart_items()->with('product.store')->get();
 
@@ -89,6 +90,8 @@ class OrderService
                     'total' => $total,
                     'delivery_price' => $delivery_price,
                     'status' => OrderStatus::New,
+                    'payment_method' => $payment_method,
+                    'payment_status' => $payment_method === 'cod' ? 'pending' : 'pending',
                 ]);
 
                 // Record initial status in history (system change, no user)

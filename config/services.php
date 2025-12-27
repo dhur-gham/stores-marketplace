@@ -40,4 +40,13 @@ return [
         'bot_username' => env('TELEGRAM_BOT_USERNAME', 'jzubot'),
     ],
 
+    'paytabs' => [
+        'server_key' => env('PAYTABS_SERVER_KEY'),
+        'client_key' => env('PAYTABS_CLIENT_KEY'),
+        'profile_id' => env('PAYTABS_PROFILE_ID'),
+        'base_url' => env('PAYTABS_BASE_URL', 'https://secure-iraq.paytabs.com'),
+        'currency' => env('PAYTABS_CURRENCY', 'IQD'),
+        'country' => env('PAYTABS_COUNTRY', 'IQ'),
+    ],
+
 ];

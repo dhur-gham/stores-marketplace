@@ -16,6 +16,7 @@ import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import Orders from './pages/Orders';
 import OrderDetail from './pages/OrderDetail';
+import Payment from './pages/Payment';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import About from './pages/About';
@@ -37,6 +38,7 @@ function AppContent() {
             <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
             <Route path="/wishlist/share/:token" element={<SharedWishlist />} />
             <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+            <Route path="/payment/:orderId" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
             <Route path="/order-confirmation" element={<ProtectedRoute><OrderConfirmation /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
             <Route path="/orders/:orderId" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />

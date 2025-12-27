@@ -8,6 +8,10 @@ return [
     'edit' => 'تعديل طلب',
     'delete' => 'حذف طلب',
     'delete_any' => 'حذف الطلبات',
+    'order_id' => 'رقم الطلب',
+    'order_number' => 'الطلب',
+    'order_summary' => 'ملخص الطلب',
+    'store' => 'المتجر',
     'fields' => [
         'customer' => 'العميل',
         'customer_id' => 'العميل',

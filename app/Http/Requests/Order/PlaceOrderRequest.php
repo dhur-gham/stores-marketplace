@@ -28,6 +28,7 @@ class PlaceOrderRequest extends FormRequest
             'address_data' => ['nullable', 'array'],
             'address_data.*.city_id' => ['nullable', 'integer', 'exists:cities,id'],
             'address_data.*.address' => ['nullable', 'string', 'min:5'],
+            'payment_method' => ['required', 'string', 'in:cod,online'],
         ];
     }
 

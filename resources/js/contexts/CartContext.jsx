@@ -119,9 +119,9 @@ export function CartProvider({ children }) {
         }
     };
 
-    const placeOrder = async (address_data = {}) => {
+    const placeOrder = async (address_data = {}, payment_method = 'cod') => {
         try {
-            const response = await orderApi.placeOrder(address_data);
+            const response = await orderApi.placeOrder(address_data, payment_method);
             if (response.status && response.data) {
                 // Clear cart after successful order
                 setCartItems([]);

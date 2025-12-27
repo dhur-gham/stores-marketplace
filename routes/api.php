@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\TelegramController;
@@ -24,6 +25,9 @@ Route::prefix('v1')->group(function () {
     // Public wishlist share route
     Route::get('/wishlist/share/{token}', [WishlistController::class, 'shared']);
 
+    // Public payment callback (webhook from PayTabs)
+    Route::post('/payment/callback', [PaymentController::class, 'callback']);
+
     // Auth routes (public)
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);
@@ -40,10 +44,16 @@ Route::prefix('v1')->group(function () {
         Route::delete('/cart/{cart_item}', [CartController::class, 'destroy']);
         Route::delete('/cart', [CartController::class, 'clear']);
 
-        // Order routes
-        Route::post('/orders', [OrderController::class, 'store']);
+        // Order routes (rate limited to prevent spam)
+        Route::post('/orders', [OrderController::class, 'store'])->middleware('throttle:10,1'); // 10 orders per minute
         Route::get('/orders', [OrderController::class, 'index']);
         Route::get('/orders/{order}', [OrderController::class, 'show']);
+
+        // Payment routes (rate limited for security)
+        Route::get('/payment/client-key', [PaymentController::class, 'getClientKey'])->middleware('throttle:20,1'); // 20 requests per minute
+        Route::post('/payment/process', [PaymentController::class, 'process'])->middleware('throttle:5,1'); // 5 payments per minute
+        Route::post('/payment/refund', [PaymentController::class, 'refund'])->middleware('throttle:3,1'); // 3 refunds per minute
+        Route::post('/payment/void', [PaymentController::class, 'void'])->middleware('throttle:3,1'); // 3 voids per minute
 
         // Wishlist routes
         Route::get('/wishlist', [WishlistController::class, 'index']);

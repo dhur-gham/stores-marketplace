@@ -23,6 +23,7 @@ export default function Checkout() {
     const [telegram_link, setTelegramLink] = useState(null);
     const [telegram_activated, setTelegramActivated] = useState(false);
     const [loading_telegram, setLoadingTelegram] = useState(true);
+    const [payment_method, setPaymentMethod] = useState('cod'); // 'cod' or 'online'
 
     // Group cart items by store
     const items_by_store = cart_items.reduce((acc, item) => {
@@ -231,10 +232,25 @@ export default function Checkout() {
         setError(null);
         setValidationErrors({});
 
-        const result = await placeOrder(address_data);
+        const result = await placeOrder(address_data, payment_method);
 
         if (result.success) {
-            navigate('/order-confirmation', { state: { orders: result.data.orders } });
+            const orders = result.data.orders;
+            
+            // If online payment, redirect to payment page for first order
+            if (payment_method === 'online' && orders.length > 0) {
+                // For multiple orders, redirect to payment for the first one
+                // In production, you might want to handle multiple orders differently
+                navigate(`/payment/${orders[0].id}`, { 
+                    state: { 
+                        orders: orders,
+                        payment_method: 'online'
+                    } 
+                });
+            } else {
+                // COD - go to confirmation page
+                navigate('/order-confirmation', { state: { orders: orders } });
+            }
         } else {
             if (result.errors) {
                 // Handle validation errors
@@ -495,6 +511,67 @@ export default function Checkout() {
                             <span className="text-2xl font-bold text-gray-900 dark:text-white">
                                 {formatPrice(getGrandTotal())}
                             </span>
+                        </div>
+                    </div>
+
+                    {/* Payment Method Selection */}
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                            {t('checkout.payment_method')}
+                        </h3>
+                        <div className="space-y-3">
+                            <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
+                                payment_method === 'cod'
+                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                    : 'border-gray-200 dark:border-gray-700'
+                            }`}>
+                                <input
+                                    type="radio"
+                                    name="payment_method"
+                                    value="cod"
+                                    checked={payment_method === 'cod'}
+                                    onChange={(e) => setPaymentMethod(e.target.value)}
+                                    className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                />
+                                <div className="ml-3 flex-1">
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-medium text-gray-900 dark:text-white">
+                                            {t('checkout.payment_methods.cod')}
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        {t('checkout.payment_methods.cod_description')}
+                                    </p>
+                                </div>
+                            </label>
+                            
+                            <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
+                                payment_method === 'online'
+                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                    : 'border-gray-200 dark:border-gray-700'
+                            }`}>
+                                <input
+                                    type="radio"
+                                    name="payment_method"
+                                    value="online"
+                                    checked={payment_method === 'online'}
+                                    onChange={(e) => setPaymentMethod(e.target.value)}
+                                    className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                />
+                                <div className="ml-3 flex-1">
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-medium text-gray-900 dark:text-white">
+                                            {t('checkout.payment_methods.online')}
+                                        </span>
+                                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300">
+                                            {t('checkout.payment_methods.secure')}
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        {t('checkout.payment_methods.online_description')}
+                                    </p>
+                                </div>
+                            </label>
                         </div>
                     </div>
 

@@ -22,3 +22,5 @@ yarn-error.log
 /.vscode
 /.zed
 /docs/SCRAMBLE.md
+test-paytabs-setup.sh
+app/Services/AsiaCellService.php

@@ -8,6 +8,10 @@ return [
     'edit' => 'Edit Order',
     'delete' => 'Delete Order',
     'delete_any' => 'Delete Orders',
+    'order_id' => 'Order ID',
+    'order_number' => 'Order',
+    'order_summary' => 'Order Summary',
+    'store' => 'Store',
     'fields' => [
         'customer' => 'Customer',
         'customer_id' => 'Customer',
