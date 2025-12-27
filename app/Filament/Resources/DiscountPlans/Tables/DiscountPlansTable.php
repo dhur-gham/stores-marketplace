@@ -30,22 +30,22 @@ class DiscountPlansTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Plan Name')
+                    ->label(__('discount-plans.fields.name'))
                     ->searchable()
                     ->sortable()
                     ->weight(FontWeight::Bold),
                 TextColumn::make('store.name')
-                    ->label('Store')
+                    ->label(__('discount-plans.fields.store'))
                     ->searchable()
                     ->sortable()
                     ->visible(fn () => auth()->user()?->hasRole('super_admin') ?? false),
                 TextColumn::make('discount_type')
-                    ->label('Type')
+                    ->label(__('discount-plans.fields.discount_type'))
                     ->badge()
-                    ->formatStateUsing(fn (DiscountType $state): string => $state === DiscountType::Percentage ? 'Percentage' : 'Fixed')
+                    ->formatStateUsing(fn (DiscountType $state): string => __('discount-plans.discount_type.'.$state->value))
                     ->color(fn (DiscountType $state): string => $state === DiscountType::Percentage ? 'info' : 'success'),
                 TextColumn::make('discount_value')
-                    ->label('Discount')
+                    ->label(__('discount-plans.fields.discount_value'))
                     ->formatStateUsing(function ($state, $record) {
                         if ($record->discount_type === DiscountType::Percentage) {
                             return "{$state}%";
@@ -55,9 +55,9 @@ class DiscountPlansTable
                     })
                     ->sortable(),
                 TextColumn::make('status')
-                    ->label('Status')
+                    ->label(__('discount-plans.fields.status'))
                     ->badge()
-                    ->formatStateUsing(fn (DiscountPlanStatus $state): string => ucfirst($state->value))
+                    ->formatStateUsing(fn (DiscountPlanStatus $state): string => __('discount-plans.status.'.$state->value))
                     ->color(fn (DiscountPlanStatus $state): string => match ($state) {
                         DiscountPlanStatus::Scheduled => 'warning',
                         DiscountPlanStatus::Active => 'success',
@@ -65,24 +65,35 @@ class DiscountPlansTable
                     })
                     ->sortable(),
                 TextColumn::make('start_date')
-                    ->label('Start Date')
+                    ->label(__('discount-plans.fields.start_date'))
                     ->dateTime('Y-m-d H:i')
                     ->formatStateUsing(fn ($state) => $state ? TimezoneHelper::formatBaghdad($state, 'Y-m-d H:i') : '-')
                     ->sortable(),
                 TextColumn::make('end_date')
-                    ->label('End Date')
+                    ->label(__('discount-plans.fields.end_date'))
                     ->dateTime('Y-m-d H:i')
                     ->formatStateUsing(fn ($state) => $state ? TimezoneHelper::formatBaghdad($state, 'Y-m-d H:i') : '-')
                     ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->options(DiscountPlanStatus::class)
+                    ->label(__('discount-plans.filters.status'))
+                    ->options(
+                        collect(DiscountPlanStatus::cases())
+                            ->mapWithKeys(fn ($status) => [$status->value => __('discount-plans.status.'.$status->value)])
+                            ->toArray()
+                    )
                     ->native(false),
                 SelectFilter::make('discount_type')
-                    ->options(DiscountType::class)
+                    ->label(__('discount-plans.filters.discount_type'))
+                    ->options(
+                        collect(DiscountType::cases())
+                            ->mapWithKeys(fn ($type) => [$type->value => __('discount-plans.discount_type.'.$type->value)])
+                            ->toArray()
+                    )
                     ->native(false),
                 SelectFilter::make('store_id')
+                    ->label(__('discount-plans.filters.store'))
                     ->relationship('store', 'name')
                     ->searchable()
                     ->preload()

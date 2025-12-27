@@ -42,7 +42,8 @@
     "low_stock": "Buy it before it's gone!",
     "out_of_stock": "Out of Stock",
     "add_to_cart": "Add to Cart",
-    "loading": "Loading product..."
+    "loading": "Loading product...",
+    "on_sale": "On Sale"
   },
   "stores": {
     "no_stores": "No stores available",

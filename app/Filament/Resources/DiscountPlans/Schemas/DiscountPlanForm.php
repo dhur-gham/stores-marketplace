@@ -15,15 +15,15 @@ class DiscountPlanForm
     {
         return $schema
             ->components([
-                Section::make('Plan Information')
+                Section::make(__('discount-plans.sections.plan_information'))
                     ->schema([
                         TextInput::make('name')
-                            ->label('Plan Name')
+                            ->label(__('discount-plans.fields.name'))
                             ->required()
                             ->maxLength(255)
                             ->columnSpanFull(),
                         Select::make('store_id')
-                            ->label('Store')
+                            ->label(__('discount-plans.fields.store'))
                             ->relationship('store', 'name')
                             ->required()
                             ->searchable()
@@ -33,17 +33,19 @@ class DiscountPlanForm
                             ->columnSpan(1),
                     ])
                     ->columns(2),
-                Section::make('Discount Details')
+                Section::make(__('discount-plans.sections.discount_details'))
                     ->schema([
                         Select::make('discount_type')
-                            ->label('Discount Type')
+                            ->label(__('discount-plans.fields.discount_type'))
                             ->options(DiscountType::class)
                             ->required()
                             ->native(false)
                             ->reactive()
                             ->columnSpan(1),
                         TextInput::make('discount_value')
-                            ->label(fn ($get) => $get('discount_type') === 'percentage' ? 'Discount Percentage (%)' : 'Discount Amount (IQD)')
+                            ->label(fn ($get) => $get('discount_type') === 'percentage'
+                                ? __('discount-plans.fields.discount_value').' (%)'
+                                : __('discount-plans.fields.discount_value').' (IQD)')
                             ->required()
                             ->numeric()
                             ->integer()
@@ -53,17 +55,17 @@ class DiscountPlanForm
                             ->columnSpan(1),
                     ])
                     ->columns(2),
-                Section::make('Schedule')
+                Section::make(__('discount-plans.sections.schedule'))
                     ->schema([
                         DateTimePicker::make('start_date')
-                            ->label('Start Date (Baghdad Time)')
+                            ->label(__('discount-plans.fields.start_date').' (Baghdad Time)')
                             ->required()
                             ->displayFormat('Y-m-d H:i')
                             ->native(false)
                             ->timezone('Asia/Baghdad')
                             ->columnSpan(1),
                         DateTimePicker::make('end_date')
-                            ->label('End Date (Baghdad Time)')
+                            ->label(__('discount-plans.fields.end_date').' (Baghdad Time)')
                             ->required()
                             ->after('start_date')
                             ->displayFormat('Y-m-d H:i')

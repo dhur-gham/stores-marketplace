@@ -122,6 +122,13 @@ export default function ProductCard({ product }) {
                         </span>
                     </div>
                 )}
+                {product.is_on_discount && (
+                    <div className={`absolute ${isLowStock ? 'top-10 start-2' : 'top-2 start-2'}`}>
+                        <span className="text-[10px] font-semibold bg-red-500 text-white px-2 py-1 rounded-full shadow-sm">
+                            {t('product.on_sale')}
+                        </span>
+                    </div>
+                )}
             </div>
             <div className="p-3">
                 {product.store && (
@@ -135,9 +142,22 @@ export default function ProductCard({ product }) {
                     {product.name}
                 </h3>
                 <div className="flex items-center justify-between gap-2">
-                    <span className="text-base font-bold text-gray-900 dark:text-white">
-                        {formatPrice(product.price)}
-                    </span>
+                    <div className="flex flex-col">
+                        {product.is_on_discount ? (
+                            <>
+                                <span className="text-base font-bold text-gray-900 dark:text-white">
+                                    {formatPrice(product.final_price || product.discounted_price)}
+                                </span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400 line-through">
+                                    {formatPrice(product.price)}
+                                </span>
+                            </>
+                        ) : (
+                            <span className="text-base font-bold text-gray-900 dark:text-white">
+                                {formatPrice(product.price)}
+                            </span>
+                        )}
+                    </div>
                     {authenticated && !isOutOfStock && (
                         <button
                             onClick={handleAddToCart}

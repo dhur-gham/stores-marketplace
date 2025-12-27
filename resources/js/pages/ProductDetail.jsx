@@ -188,9 +188,16 @@ export default function ProductDetail() {
                                 )}
                             </div>
                             
-                            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                                {product.name}
-                            </h1>
+                            <div className="mb-4 flex items-center gap-3">
+                                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+                                    {product.name}
+                                </h1>
+                                {product.is_on_discount && (
+                                    <span className="text-sm font-semibold bg-red-500 text-white px-3 py-1 rounded-full">
+                                        {t('product.on_sale')}
+                                    </span>
+                                )}
+                            </div>
 
                             {product.sku && (
                                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
@@ -199,9 +206,20 @@ export default function ProductDetail() {
                             )}
 
                             <div className="mb-6">
-                                <span className="text-4xl font-bold text-gray-900 dark:text-white">
-                                    {formatPrice(product.price)}
-                                </span>
+                                {product.is_on_discount ? (
+                                    <div className="flex flex-col gap-2">
+                                        <span className="text-4xl font-bold text-gray-900 dark:text-white">
+                                            {formatPrice(product.final_price || product.discounted_price)}
+                                        </span>
+                                        <span className="text-xl text-gray-500 dark:text-gray-400 line-through">
+                                            {formatPrice(product.price)}
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <span className="text-4xl font-bold text-gray-900 dark:text-white">
+                                        {formatPrice(product.price)}
+                                    </span>
+                                )}
                             </div>
 
                             {product.description && (

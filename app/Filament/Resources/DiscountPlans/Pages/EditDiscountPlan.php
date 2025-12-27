@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\DiscountPlans\Pages;
 
 use App\Filament\Resources\DiscountPlans\DiscountPlanResource;
+use App\Services\DiscountService;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -29,5 +30,12 @@ class EditDiscountPlan extends EditRecord
         // DateTimePicker with timezone('Asia/Baghdad') automatically converts back to UTC for storage
         // No manual conversion needed
         return $data;
+    }
+
+    protected function afterSave(): void
+    {
+        // Recalculate discounts for all products in the plan if discount value/type changed
+        $discount_service = app(DiscountService::class);
+        $discount_service->updatePlanProducts($this->record);
     }
 }

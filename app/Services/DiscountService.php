@@ -114,6 +114,56 @@ class DiscountService
     }
 
     /**
+     * Update products when a discount plan is modified.
+     * Recalculates discounts for all products in the plan if the plan is active.
+     */
+    public function updatePlanProducts(DiscountPlan $plan): void
+    {
+        DB::transaction(function () use ($plan) {
+            // Only update products if the plan is active
+            if ($plan->status !== DiscountPlanStatus::Active) {
+                return;
+            }
+
+            // Get all products in this plan
+            $products = $plan->products;
+
+            foreach ($products as $product) {
+                $discounted_price = $this->calculateDiscountedPrice($product, $plan);
+                $product->plan_id = $plan->id;
+                $product->discounted_price = $discounted_price;
+                $product->save();
+            }
+
+            Log::info("Discount plan {$plan->id} updated, recalculated discounts for {$products->count()} products");
+        });
+    }
+
+    /**
+     * Apply discount to products when they are added to an active plan.
+     */
+    public function applyDiscountToProducts(DiscountPlan $plan, array $product_ids): void
+    {
+        DB::transaction(function () use ($plan, $product_ids) {
+            // Only apply discount if the plan is active
+            if ($plan->status !== DiscountPlanStatus::Active) {
+                return;
+            }
+
+            $products = Product::whereIn('id', $product_ids)->get();
+
+            foreach ($products as $product) {
+                $discounted_price = $this->calculateDiscountedPrice($product, $plan);
+                $product->plan_id = $plan->id;
+                $product->discounted_price = $discounted_price;
+                $product->save();
+            }
+
+            Log::info("Applied discount from plan {$plan->id} to {$products->count()} products");
+        });
+    }
+
+    /**
      * Convert Baghdad datetime to UTC for storage.
      */
     public function convertBaghdadToUtc(string $datetime): \Carbon\Carbon
@@ -129,4 +179,3 @@ class DiscountService
         return TimezoneHelper::utcToBaghdad($datetime);
     }
 }
-

@@ -14,12 +14,32 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class DiscountPlanResource extends Resource
 {
     protected static ?string $model = DiscountPlan::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Store Management';
+
+    protected static ?int $navigationSort = 3;
+
+    public static function getModelLabel(): string
+    {
+        return __('discount-plans.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('discount-plans.plural_label');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('discount-plans.navigation_label');
+    }
 
     public static function form(Schema $schema): Schema
     {

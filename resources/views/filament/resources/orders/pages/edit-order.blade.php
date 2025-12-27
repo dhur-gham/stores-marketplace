@@ -1,7 +1,6 @@
 <x-filament-panels::page>
     @php
         $order = $this->record;
-        $products = $this->getProducts();
         $status_history = $this->getStatusHistory();
     @endphp
 
@@ -11,12 +10,12 @@
             <div class="lg:col-span-2 space-y-6">
                 <!-- Order Details Card -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Order Details</h2>
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">{{ __('orders.pages.edit.order_details') }}</h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Customer Info -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Customer</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('orders.fields.customer') }}</label>
                             <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
                                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold">
                                     {{ strtoupper(substr($order->customer->name ?? 'N', 0, 1)) }}
@@ -30,7 +29,7 @@
 
                         <!-- Store Info -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Store</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('orders.fields.store') }}</label>
                             <div class="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
                                 <p class="font-semibold text-gray-900 dark:text-white">{{ $order->store->name ?? 'N/A' }}</p>
                             </div>
@@ -38,7 +37,7 @@
 
                         <!-- Delivery Address -->
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Delivery Address</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('orders.fields.address') }}</label>
                             <div class="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
                                 <p class="text-gray-900 dark:text-white">{{ $order->address ?? 'N/A' }}</p>
                                 @if($order->city)
@@ -52,101 +51,76 @@
                 <!-- Order Items Card -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Order Items</h2>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ __('orders.pages.edit.order_items') }}</h2>
                     </div>
 
                     <!-- Existing Items -->
                     <div class="space-y-3 mb-6">
                         @foreach($this->order_items as $index => $item)
-                            <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                                <div class="flex-1">
-                                    <p class="font-semibold text-gray-900 dark:text-white">{{ $item['product_name'] }}</p>
+                            <div class="flex items-start gap-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                <!-- Product Image -->
+                                <div class="flex-shrink-0">
+                                    @if($item['product_image'])
+                                        <img 
+                                            src="{{ $item['product_image'] }}" 
+                                            alt="{{ $item['product_name'] }}"
+                                            class="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover border border-gray-200 dark:border-gray-700"
+                                        >
+                                    @else
+                                        <div class="w-16 h-16 md:w-20 md:h-20 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center border border-gray-200 dark:border-gray-700">
+                                            <svg class="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </div>
+                                    @endif
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <input 
-                                        type="number" 
-                                        wire:model.live="order_items.{{ $index }}.quantity"
-                                        wire:change="updateItemQuantity({{ $index }}, $event.target.value)"
-                                        min="1"
-                                        class="w-20 px-2 py-1 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
-                                    >
-                                    <span class="text-gray-500 dark:text-gray-400">×</span>
-                                    <input 
-                                        type="number" 
-                                        wire:model.live="order_items.{{ $index }}.price"
-                                        wire:change="updateItemPrice({{ $index }}, $event.target.value)"
-                                        min="0"
-                                        class="w-24 px-2 py-1 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm"
-                                    >
-                                    <span class="text-gray-500 dark:text-gray-400">IQD</span>
-                                    <span class="w-24 text-right font-semibold text-gray-900 dark:text-white">
+                                
+                                <!-- Product Info -->
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="font-semibold text-gray-900 dark:text-white mb-1 truncate">
+                                        {{ $item['product_name'] }}
+                                    </h3>
+                                    @if($item['product_sku'])
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                            SKU: {{ $item['product_sku'] }}
+                                        </p>
+                                    @endif
+                                    <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                        <span class="font-medium">{{ $item['quantity'] }}</span>
+                                        <span class="text-gray-400 dark:text-gray-500">×</span>
+                                        <span>{{ number_format($item['price']) }} IQD</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Subtotal -->
+                                <div class="flex-shrink-0 text-right">
+                                    <p class="text-lg font-bold text-gray-900 dark:text-white">
                                         {{ number_format($item['subtotal']) }} IQD
-                                    </span>
-                                    <button 
-                                        type="button"
-                                        wire:click="removeOrderItem({{ $index }})"
-                                        class="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                        </svg>
-                                    </button>
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        {{ __('orders.messages.subtotal') }}
+                                    </p>
                                 </div>
                             </div>
                         @endforeach
-                    </div>
-
-                    <!-- Add New Item -->
-                    <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Add New Item</h3>
-                        <div class="flex gap-2">
-                            <select 
-                                wire:model="new_item_product_id"
-                                class="flex-1 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2">
-                                <option value="">Select Product</option>
-                                @foreach($products as $product)
-                                    <option value="{{ $product->id }}">{{ $product->name }} - {{ number_format($product->price) }} IQD</option>
-                                @endforeach
-                            </select>
-                            <input 
-                                type="number" 
-                                wire:model="new_item_quantity"
-                                min="1"
-                                placeholder="Qty"
-                                class="w-20 px-2 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                            >
-                            <input 
-                                type="number" 
-                                wire:model="new_item_price"
-                                min="0"
-                                placeholder="Price"
-                                class="w-24 px-2 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                            >
-                            <button 
-                                type="button"
-                                wire:click="addOrderItem"
-                                class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all font-medium">
-                                Add
-                            </button>
-                        </div>
                     </div>
                 </div>
 
                 <!-- Order Summary Card -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Order Summary</h2>
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">{{ __('orders.pages.edit.order_summary') }}</h2>
                     
                     <div class="space-y-3">
                         <div class="flex justify-between text-gray-700 dark:text-gray-300">
-                            <span>Subtotal:</span>
+                            <span>{{ __('orders.messages.subtotal') }}:</span>
                             <span>{{ number_format(collect($this->order_items)->sum('subtotal')) }} IQD</span>
                         </div>
                         <div class="flex justify-between text-gray-700 dark:text-gray-300">
-                            <span>Delivery:</span>
+                            <span>{{ __('orders.messages.delivery') }}:</span>
                             <span>
                                 <input 
                                     type="number" 
-                                    wire:model.live="data.delivery_price"
-                                    wire:change="calculateTotal"
+                                    wire:model="data.delivery_price"
                                     min="0"
                                     class="w-32 px-2 py-1 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm text-right"
                                 >
@@ -154,9 +128,9 @@
                             </span>
                         </div>
                         <div class="pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-between">
-                            <span class="text-lg font-bold text-gray-900 dark:text-white">Total:</span>
+                            <span class="text-lg font-bold text-gray-900 dark:text-white">{{ __('orders.messages.total') }}:</span>
                             <span class="text-lg font-bold text-gray-900 dark:text-white">
-                                {{ number_format($this->getOrderTotal()) }} IQD
+                                {{ number_format(collect($this->order_items)->sum('subtotal') + ($this->data['delivery_price'] ?? 0)) }} IQD
                             </span>
                         </div>
                     </div>
@@ -167,18 +141,18 @@
             <div class="space-y-6">
                 <!-- Status Card -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Status</h2>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ __('orders.pages.edit.status') }}</h2>
                     <div class="mb-4">
                         @include('filament.resources.orders.components.status-badge', ['status' => $order->status])
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Change Status</label>
-                        <select 
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('orders.pages.edit.change_status') }}</label>
+                            <select 
                             wire:model.live="data.status"
                             wire:change="onStatusChanged($event.target.value)"
                             class="w-full border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2">
                             @foreach(\App\Enums\OrderStatus::cases() as $status)
-                                <option value="{{ $status->value }}">{{ ucfirst($status->value) }}</option>
+                                <option value="{{ $status->value }}">{{ __('orders.status.'.$status->value) }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -186,7 +160,7 @@
 
                 <!-- Status Timeline Card -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Status History</h2>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ __('orders.pages.edit.status_history') }}</h2>
                     <div class="space-y-4">
                         @foreach($status_history as $index => $history)
                             <div class="relative {{ $index < count($status_history) - 1 ? 'pb-6 border-l-2 border-gray-200 dark:border-gray-700' : '' }}">
@@ -208,7 +182,7 @@
                                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                             {{ $history['created_at']->diffForHumans() }}
                                             @if(isset($history['changed_by']) && $history['changed_by'])
-                                                · Changed by {{ $history['changed_by']->name }}
+                                                · {{ __('orders.pages.edit.changed_by') }} {{ $history['changed_by']->name }}
                                             @endif
                                         </p>
                                     </div>
@@ -220,18 +194,18 @@
 
                 <!-- Order Info Card -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Order Information</h2>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ __('orders.pages.edit.order_information') }}</h2>
                     <div class="space-y-3 text-sm">
                         <div>
-                            <span class="text-gray-500 dark:text-gray-400">Order ID:</span>
+                            <span class="text-gray-500 dark:text-gray-400">{{ __('orders.pages.edit.order_id') }}:</span>
                             <span class="font-semibold text-gray-900 dark:text-white ml-2">#{{ $order->id }}</span>
                         </div>
                         <div>
-                            <span class="text-gray-500 dark:text-gray-400">Created:</span>
+                            <span class="text-gray-500 dark:text-gray-400">{{ __('orders.pages.edit.created') }}:</span>
                             <span class="font-semibold text-gray-900 dark:text-white ml-2">{{ $order->created_at->format('M d, Y h:i A') }}</span>
                         </div>
                         <div>
-                            <span class="text-gray-500 dark:text-gray-400">Last Updated:</span>
+                            <span class="text-gray-500 dark:text-gray-400">{{ __('orders.pages.edit.last_updated') }}:</span>
                             <span class="font-semibold text-gray-900 dark:text-white ml-2">{{ $order->updated_at->format('M d, Y h:i A') }}</span>
                         </div>
                     </div>
@@ -244,12 +218,12 @@
             <a 
                 href="{{ \App\Filament\Resources\Orders\OrderResource::getUrl('index') }}"
                 class="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-medium">
-                Cancel
+                {{ __('orders.pages.edit.cancel') }}
             </a>
             <button 
                 type="submit"
                 class="px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all font-medium">
-                Save Changes
+                {{ __('orders.pages.edit.save_changes') }}
             </button>
         </div>
     </form>

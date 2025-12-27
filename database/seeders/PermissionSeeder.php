@@ -35,6 +35,7 @@ class PermissionSeeder extends Seeder
             'users',                  // UserResource
             'customers',              // CustomerResource
             'api_requests',           // ApiRequestResource
+            'discount_plans',         // DiscountPlanResource
         ];
 
         // Standard Filament permissions for each resource
