@@ -145,16 +145,19 @@ class PayTabsService
 
             // Handle PCI DSS compliance error
             if (stripos($error_message, 'PCI DSS') !== false || stripos($error_message, 'SAQ') !== false) {
+                $pci_error_message = 'Payment gateway configuration error. Your PayTabs account needs to be configured for SAQ A-EP compliance. Please contact PayTabs support to enable managed form integration.';
+
                 Log::error('PayTabs PCI DSS compliance error', [
                     'order_id' => $order->id,
                     'response' => $result,
                     'status' => $response->status(),
+                    'error_message' => $error_message,
                     'note' => 'PayTabs account/profile may need to be configured for SAQ A-EP compliance. Contact PayTabs support to enable managed form integration.',
                 ]);
 
                 return [
                     'success' => false,
-                    'error' => 'Payment gateway configuration error. Your PayTabs account needs to be configured for SAQ A-EP compliance. Please contact PayTabs support.',
+                    'error' => $pci_error_message,
                     'error_code' => $result['code'] ?? 'PCI_DSS_ERROR',
                     'pci_error' => true,
                     'response' => $result,

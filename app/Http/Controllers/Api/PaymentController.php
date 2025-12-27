@@ -79,10 +79,21 @@ class PaymentController extends BaseController
             ]);
 
             $error_message = $payment_result['error'] ?? 'Payment processing failed';
-
+            
             // Provide more helpful error for PCI DSS issues
             if (isset($payment_result['pci_error']) && $payment_result['pci_error']) {
-                $error_message = 'Payment gateway configuration error. Please contact support.';
+                // In development/debug mode, show full error details
+                if (config('app.debug')) {
+                    $error_message = $payment_result['error'] ?? 'Payment gateway configuration error. Your PayTabs account needs SAQ A-EP compliance enabled. Contact PayTabs support.';
+                    // Include full response in debug mode
+                    Log::info('PayTabs PCI DSS error details (debug mode)', [
+                        'full_error' => $payment_result['error'] ?? null,
+                        'error_code' => $payment_result['error_code'] ?? null,
+                        'response' => $payment_result['response'] ?? null,
+                    ]);
+                } else {
+                    $error_message = 'Payment gateway configuration error. Please contact support.';
+                }
             }
 
             return $this->error_response($error_message, 422);
