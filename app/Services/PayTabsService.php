@@ -86,8 +86,8 @@ class PayTabsService
                     'country' => $this->country,
                     'zip' => '',
                 ],
-                'callback' => rtrim(config('app.url'), '/').'/api/v1/payment/callback',
-                'return' => rtrim(config('app.frontend_url'), '/').'/orders/'.$order->id.'?payment=success',
+                'callback' => preg_replace('#([^:])//+#', '$1/', rtrim(config('app.url'), '/').'/api/v1/payment/callback'),
+                'return' => preg_replace('#([^:])//+#', '$1/', rtrim(config('app.frontend_url'), '/').'/orders/'.$order->id.'?payment=success'),
             ];
 
             $response = Http::withHeaders([
