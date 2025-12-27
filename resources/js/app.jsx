@@ -20,6 +20,8 @@ import Payment from './pages/Payment';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import About from './pages/About';
+import Help from './pages/Help';
+import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
 import { useLanguage } from './hooks/useLanguage';
 import '../css/app.css';
@@ -42,7 +44,9 @@ function AppContent() {
             <Route path="/order-confirmation" element={<ProtectedRoute><OrderConfirmation /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
             <Route path="/orders/:orderId" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/about" element={<About />} />
+            <Route path="/help" element={<Help />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
         </Routes>

@@ -285,3 +285,24 @@ export const toggleShare = async (is_active) => {
     return response.data;
 };
 
+// Saved Addresses API functions
+export const getSavedAddresses = async () => {
+    const response = await api.get('/saved-addresses');
+    return response.data;
+};
+
+export const createSavedAddress = async (data) => {
+    const response = await api.post('/saved-addresses', data);
+    return response.data;
+};
+
+export const updateSavedAddress = async (id, data) => {
+    const response = await api.put(`/saved-addresses/${id}`, data);
+    return response.data;
+};
+
+export const deleteSavedAddress = async (id) => {
+    const response = await api.delete(`/saved-addresses/${id}`);
+    return response.data;
+};
+

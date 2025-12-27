@@ -301,8 +301,19 @@ export default function ProductDetail() {
                                 </div>
                             )}
 
+                            {product.stock === 0 && (
+                                <div className="mb-6">
+                                    <div className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                                        <svg className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <span className="font-semibold text-red-700 dark:text-red-300">{t('cart.out_of_stock')}</span>
+                                    </div>
+                                </div>
+                            )}
+                            
                             {product.stock > 0 && product.stock < 5 && (
-                                <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                                <div className="mb-6">
                                     <div className="flex items-center gap-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-3">
                                         <svg className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -345,41 +356,57 @@ export default function ProductDetail() {
                                             )}
                                         </div>
                                     )}
-                                    <div className="flex gap-3">
-                                        <button
-                                            onClick={handleAddToCart}
-                                            disabled={product.stock === 0 || adding || added}
-                                            className={`flex-1 py-3 px-6 rounded-lg font-semibold text-white transition-colors flex items-center justify-center gap-2 ${
-                                                product.stock > 0 && !added
-                                                    ? 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                                                    : added
-                                                    ? 'bg-green-600 dark:bg-green-500'
-                                                    : 'bg-gray-400 cursor-not-allowed dark:bg-gray-600'
-                                            }`}
-                                        >
-                                            {added ? (
-                                                <>
-                                                    <Check className="w-5 h-5" />
-                                                    {t('cart.item_added')}
-                                                </>
-                                            ) : adding ? (
-                                                <>
-                                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                                    {t('cart.adding')}
-                                                </>
-                                            ) : product.stock > 0 ? (
-                                                <>
-                                                    <ShoppingCart className="w-5 h-5" />
-                                                    {t('cart.add_to_cart')}
-                                                </>
-                                            ) : (
-                                                t('cart.out_of_stock')
-                                            )}
-                                        </button>
+                                    {product.stock > 0 && (
+                                        <div className="flex gap-3">
+                                            <button
+                                                onClick={handleAddToCart}
+                                                disabled={adding || added}
+                                                className={`flex-1 py-3 px-6 rounded-lg font-semibold text-white transition-colors flex items-center justify-center gap-2 ${
+                                                    added
+                                                        ? 'bg-green-600 dark:bg-green-500'
+                                                        : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                            >
+                                                {added ? (
+                                                    <>
+                                                        <Check className="w-5 h-5" />
+                                                        {t('cart.item_added')}
+                                                    </>
+                                                ) : adding ? (
+                                                    <>
+                                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                        {t('cart.adding')}
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <ShoppingCart className="w-5 h-5" />
+                                                        {t('cart.add_to_cart')}
+                                                    </>
+                                                )}
+                                            </button>
+                                            <button
+                                                onClick={handleWishlistToggle}
+                                                disabled={wishlist_toggling}
+                                                className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 border-2 ${
+                                                    in_wishlist
+                                                        ? 'bg-red-50 dark:bg-red-900/20 border-red-500 dark:border-red-400 text-red-600 dark:text-red-400'
+                                                        : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                                title={in_wishlist ? t('wishlist.remove') : t('wishlist.add')}
+                                            >
+                                                <Heart
+                                                    className={`w-5 h-5 ${
+                                                        in_wishlist ? 'fill-red-500 text-red-500' : ''
+                                                    }`}
+                                                />
+                                            </button>
+                                        </div>
+                                    )}
+                                    {product.stock === 0 && (
                                         <button
                                             onClick={handleWishlistToggle}
                                             disabled={wishlist_toggling}
-                                            className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 border-2 ${
+                                            className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 border-2 ${
                                                 in_wishlist
                                                     ? 'bg-red-50 dark:bg-red-900/20 border-red-500 dark:border-red-400 text-red-600 dark:text-red-400'
                                                     : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
@@ -391,8 +418,9 @@ export default function ProductDetail() {
                                                     in_wishlist ? 'fill-red-500 text-red-500' : ''
                                                 }`}
                                             />
+                                            <span>{in_wishlist ? t('wishlist.remove') : t('wishlist.add')}</span>
                                         </button>
-                                    </div>
+                                    )}
                                 </div>
                             )}
                             {!authenticated && product.stock > 0 && (
@@ -404,16 +432,6 @@ export default function ProductDetail() {
                                         <ShoppingCart className="w-5 h-5" />
                                         {t('cart.login_to_add')}
                                     </Link>
-                                </div>
-                            )}
-                            {product.stock === 0 && (
-                                <div className="mt-8">
-                                    <button
-                                        disabled
-                                        className="w-full py-3 px-6 rounded-lg font-semibold text-white bg-gray-400 cursor-not-allowed dark:bg-gray-600"
-                                    >
-                                        {t('cart.out_of_stock')}
-                                    </button>
                                 </div>
                             )}
                         </div>

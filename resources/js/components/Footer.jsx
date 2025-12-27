@@ -57,6 +57,14 @@ export default function Footer() {
                                     {t('footer.about')}
                                 </Link>
                             </li>
+                            <li>
+                                <Link
+                                    to="/help"
+                                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                >
+                                    {t('footer.help')}
+                                </Link>
+                            </li>
                         </ul>
                     </div>
 

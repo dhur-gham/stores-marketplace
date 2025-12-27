@@ -86,6 +86,14 @@ class Customer extends Authenticatable
     }
 
     /**
+     * Get the saved addresses for this customer.
+     */
+    public function saved_addresses(): HasMany
+    {
+        return $this->hasMany(SavedAddress::class);
+    }
+
+    /**
      * Get the wishlist share for this customer.
      */
     public function wishlist_share(): \Illuminate\Database\Eloquent\Relations\HasOne

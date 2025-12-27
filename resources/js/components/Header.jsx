@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { User, LogOut, ChevronDown, Globe, ShoppingCart, Package, Heart } from 'lucide-react';
+import { User, LogOut, ChevronDown, Globe, ShoppingCart, Package, Heart, HelpCircle, Settings } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
@@ -20,7 +20,7 @@ export default function Header() {
 
     const languages = [
         { code: 'en', name: 'English', flag: '🇬🇧' },
-        { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+        { code: 'ar', name: 'العربية', flag: '🇮🇶' },
     ];
 
     // Close dropdowns when clicking outside
@@ -98,6 +98,14 @@ export default function Header() {
                             )}
                         </Link>
                     )}
+                    {/* Help Link - Always visible */}
+                    <Link
+                        to="/help"
+                        className="p-1.5 sm:p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                        title={t('header.help')}
+                    >
+                        <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </Link>
                     {/* Language Switcher - Always visible */}
                     <div className="relative" ref={lang_dropdown_ref}>
                         <button
@@ -175,6 +183,14 @@ export default function Header() {
                                     >
                                         <Package className="w-4 h-4" />
                                         {t('header.orders')}
+                                    </Link>
+                                    <Link
+                                        to="/settings"
+                                        onClick={() => setDropdownOpen(false)}
+                                        className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 flex items-center gap-2 transition-colors"
+                                    >
+                                        <Settings className="w-4 h-4" />
+                                        {t('header.settings')}
                                     </Link>
                                     <button
                                         onClick={() => {

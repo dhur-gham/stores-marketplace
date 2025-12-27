@@ -11,7 +11,8 @@
     "search": "Search",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "optional": "Optional"
+    "optional": "Optional",
+    "saving": "Saving..."
   },
   "header": {
     "title": "Stores Marketplace",
@@ -19,7 +20,9 @@
     "logout": "Logout",
     "register": "Register",
     "language": "Language",
-    "orders": "Orders"
+    "orders": "Orders",
+    "settings": "Settings",
+    "help": "Help"
   },
   "home": {
     "stores": "Stores",
@@ -196,7 +199,17 @@
       "address_required": "The address field is required.",
       "city_required": "The city field is required.",
       "city_invalid": "The selected city is invalid."
-    }
+    },
+    "saved_addresses": "Saved Addresses",
+    "use_new_address": "Use New Address",
+    "saved_addresses_hint": "Select a saved address to auto-fill all delivery addresses, or enter a new address below.",
+    "save_this_address": "Save this address",
+    "address_label": "Address Label",
+    "address_label_placeholder": "Home, Work, etc.",
+    "address_label_required": "Please enter a label for this address (e.g., Home, Work)",
+    "save": "Save",
+    "save_address_failed": "Failed to save address. Please try again.",
+    "using_saved_address": "Using saved address. Select \"Use New Address\" above to edit."
   },
   "wishlist": {
     "title": "Wishlist",
@@ -348,6 +361,7 @@
     "stores": "Stores",
     "products": "Products",
     "about": "About",
+    "help": "Help & Support",
     "platform": "Platform",
     "tagline": "Your one-stop marketplace for all your shopping needs.",
     "rights_reserved": "All rights reserved."
@@ -414,6 +428,81 @@
       "benefit2": "Access to a large customer base",
       "benefit3": "Real-time inventory and order tracking",
       "benefit4": "Comprehensive analytics and reporting"
+    }
+  },
+  "help": {
+    "title": "Help & Support",
+    "description": "We're here to help! If you have any questions, issues, or feedback, please don't hesitate to reach out to us.",
+    "telegram": {
+      "title": "Telegram Support",
+      "description": "Get instant help via Telegram. We usually respond within a few hours.",
+      "button": "Contact on Telegram"
+    },
+    "email": {
+      "title": "Email Support",
+      "description": "Send us an email and we'll get back to you as soon as possible.",
+      "button": "Send Email"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "how_to_order": {
+        "question": "How do I place an order?",
+        "answer": "Browse products, add them to your cart, and proceed to checkout. Fill in your delivery address and choose a payment method. Once confirmed, your order will be processed."
+      },
+      "delivery": {
+        "question": "How does delivery work?",
+        "answer": "Delivery prices vary by city and store. Select your city during checkout to see the delivery price. Delivery times depend on the store and your location."
+      },
+      "payment": {
+        "question": "What payment methods are available?",
+        "answer": "Currently, we support Cash on Delivery (COD). Online payment is temporarily disabled."
+      },
+      "returns": {
+        "question": "Can I return or cancel my order?",
+        "answer": "Please contact the store owner or our support team via Telegram or email to discuss returns or cancellations. Each store may have different return policies."
+      }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your profile and saved addresses",
+    "select_section": "Select Section",
+    "sections": {
+      "profile": "Profile Information",
+      "addresses": "Saved Addresses"
+    },
+    "profile": {
+      "title": "Profile Information",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "city": "City",
+      "address": "Address",
+      "read_only_notice": "Profile information is read-only. Contact support if you need to update your profile."
+    },
+    "addresses": {
+      "title": "Saved Addresses",
+      "add_new": "Add New Address",
+      "add_first": "Add Your First Address",
+      "add_address": "Add Address",
+      "edit_address": "Edit Address",
+      "no_addresses": "You haven't saved any addresses yet.",
+      "label": "Address Label",
+      "label_placeholder": "Home, Work, etc.",
+      "city": "City",
+      "address": "Address",
+      "address_placeholder": "Enter your delivery address",
+      "select_city": "Select a city",
+      "set_as_default": "Set as default address",
+      "default": "Default",
+      "edit": "Edit",
+      "delete": "Delete",
+      "label_required": "Please enter a label for this address",
+      "city_required": "Please select a city",
+      "address_required": "Please enter an address",
+      "save_failed": "Failed to save address. Please try again.",
+      "delete_failed": "Failed to delete address. Please try again.",
+      "confirm_delete": "Are you sure you want to delete this address?"
     }
   }
 }

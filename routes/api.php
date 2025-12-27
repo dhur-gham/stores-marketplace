@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\StoreController;
+use App\Http\Controllers\Api\SavedAddressController;
 use App\Http\Controllers\Api\TelegramController;
 use App\Http\Controllers\Api\WishlistController;
 use Illuminate\Support\Facades\Route;
@@ -69,5 +70,8 @@ Route::prefix('v1')->group(function () {
 
         // Telegram routes
         Route::get('/telegram/activation-link', [TelegramController::class, 'getActivationLink']);
+
+        // Saved Addresses routes
+        Route::apiResource('saved-addresses', SavedAddressController::class);
     });
 });

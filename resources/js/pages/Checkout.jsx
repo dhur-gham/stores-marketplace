@@ -5,7 +5,7 @@ import { ShoppingCart, ArrowLeft, Package, MapPin, MessageCircle, ExternalLink }
 import Header from '../components/Header';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
-import { fetchCities, fetchStoreDeliveryPrices, getTelegramActivationLink } from '../services/api';
+import { fetchCities, fetchStoreDeliveryPrices, getTelegramActivationLink, getSavedAddresses, createSavedAddress } from '../services/api';
 import { Link } from 'react-router-dom';
 
 export default function Checkout() {
@@ -24,6 +24,12 @@ export default function Checkout() {
     const [telegram_activated, setTelegramActivated] = useState(false);
     const [loading_telegram, setLoadingTelegram] = useState(true);
     const [payment_method, setPaymentMethod] = useState('cod'); // 'cod' or 'online'
+    const [saved_addresses, setSavedAddresses] = useState([]);
+    const [loading_addresses, setLoadingAddresses] = useState(true);
+    const [selected_address_id, setSelectedAddressId] = useState(null);
+    const [save_address_label, setSaveAddressLabel] = useState('');
+    const [show_save_address, setShowSaveAddress] = useState(false);
+    const [saving_address, setSavingAddress] = useState(false);
 
     // Group cart items by store
     const items_by_store = cart_items.reduce((acc, item) => {
@@ -76,6 +82,120 @@ export default function Checkout() {
         };
         loadTelegramLink();
     }, [customer]);
+
+    // Load saved addresses
+    useEffect(() => {
+        const loadSavedAddresses = async () => {
+            if (customer && stores.length > 0) {
+                try {
+                    setLoadingAddresses(true);
+                    const response = await getSavedAddresses();
+                    if (response.status && response.data) {
+                        setSavedAddresses(response.data);
+                        // Auto-select default address if available
+                        const default_address = response.data.find(addr => addr.is_default);
+                        if (default_address) {
+                            // Apply to all physical stores - ensure city_id is string for select inputs
+                            const new_address_data = {};
+                            stores.forEach(store_group => {
+                                if (store_group.store.type === 'physical') {
+                                    new_address_data[store_group.store.id] = {
+                                        city_id: String(default_address.city_id), // Convert to string for select input
+                                        address: default_address.address,
+                                    };
+                                }
+                            });
+                            setAddressData(new_address_data);
+                            setSelectedAddressId(default_address.id);
+                            setValidationErrors({}); // Clear any validation errors
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading saved addresses:', error);
+                } finally {
+                    setLoadingAddresses(false);
+                }
+            }
+        };
+        loadSavedAddresses();
+    }, [customer, stores.length]);
+
+    const handleSelectSavedAddress = (address) => {
+        if (!address) return;
+        
+        setSelectedAddressId(address.id);
+        setError(null); // Clear any errors
+        
+        // Apply to all physical stores - use functional update and ensure city_id is string for consistency with select inputs
+        setAddressData((prev) => {
+            const new_data = { ...prev };
+            stores.forEach(store_group => {
+                if (store_group.store.type === 'physical') {
+                    new_data[store_group.store.id] = {
+                        city_id: String(address.city_id), // Ensure string format for select inputs
+                        address: address.address,
+                    };
+                }
+            });
+            return new_data;
+        });
+        
+        setShowSaveAddress(false);
+        
+        // Clear validation errors since we're filling valid data
+        setValidationErrors({});
+    };
+
+    const handleSaveAddress = async () => {
+        // Get address from first physical store (they should all be the same when saving)
+        const physical_stores = stores.filter(sg => sg.store.type === 'physical');
+        if (physical_stores.length === 0) return;
+
+        const first_store = physical_stores[0];
+        const address_info = address_data[first_store.store.id];
+        
+        if (!address_info || !address_info.city_id || !address_info.address || address_info.address.trim() === '') {
+            setError(t('checkout.address_required'));
+            return;
+        }
+
+        if (!save_address_label || save_address_label.trim() === '') {
+            setError(t('checkout.address_label_required') || 'Please enter a label for this address (e.g., Home, Work)');
+            return;
+        }
+
+        setSavingAddress(true);
+        setError(null);
+
+        try {
+            const response = await createSavedAddress({
+                label: save_address_label.trim(),
+                city_id: address_info.city_id,
+                address: address_info.address.trim(),
+                is_default: saved_addresses.length === 0, // Set as default if it's the first address
+            });
+
+            if (response.status) {
+                // Reload saved addresses
+                const addresses_response = await getSavedAddresses();
+                if (addresses_response.status && addresses_response.data) {
+                    setSavedAddresses(addresses_response.data);
+                    // Select the newly saved address
+                    const new_address = addresses_response.data.find(a => a.id === response.data.id);
+                    if (new_address) {
+                        handleSelectSavedAddress(new_address);
+                    }
+                }
+                setSaveAddressLabel('');
+                setShowSaveAddress(false);
+            }
+        } catch (error) {
+            console.error('Error saving address:', error);
+            setError(error.response?.data?.message || t('checkout.save_address_failed') || 'Failed to save address');
+        } finally {
+            setSavingAddress(false);
+        }
+    };
 
     // Load delivery prices for physical stores
     useEffect(() => {
@@ -339,6 +459,56 @@ export default function Checkout() {
                         </div>
                     )}
 
+                    {/* Global Saved Addresses Selector - Show for all physical stores */}
+                    {!loading_addresses && saved_addresses.length > 0 && stores.some(sg => sg.store.type === 'physical') && (
+                        <div className="mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                            <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                                <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                {t('checkout.saved_addresses')}
+                            </label>
+                            <select
+                                value={selected_address_id || ''}
+                                onChange={(e) => {
+                                    const address_id = e.target.value;
+                                    if (address_id) {
+                                        const address = saved_addresses.find(a => a.id === parseInt(address_id));
+                                        if (address) {
+                                            handleSelectSavedAddress(address);
+                                        }
+                                    } else {
+                                        // User selected "Use New Address" - clear saved address and enable fields
+                                        setSelectedAddressId(null);
+                                        // Clear address data for all physical stores to allow manual entry
+                                        setAddressData((prev) => {
+                                            const new_data = { ...prev };
+                                            stores.forEach(store_group => {
+                                                if (store_group.store.type === 'physical') {
+                                                    new_data[store_group.store.id] = {
+                                                        city_id: '',
+                                                        address: '',
+                                                    };
+                                                }
+                                            });
+                                            return new_data;
+                                        });
+                                        setValidationErrors({});
+                                    }
+                                }}
+                                className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+                            >
+                                <option value="">{t('checkout.use_new_address')}</option>
+                                {saved_addresses.map((address) => (
+                                    <option key={address.id} value={address.id}>
+                                        {address.label} {address.is_default ? '(Default)' : ''} - {address.city?.name || ''} - {address.address.substring(0, 50)}...
+                                    </option>
+                                ))}
+                            </select>
+                            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                                                {t('checkout.saved_addresses_hint')}
+                            </p>
+                        </div>
+                    )}
+
                     {/* Telegram Activation Banner */}
                     {!loading_telegram && !telegram_activated && (
                         <div className="mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
@@ -419,6 +589,15 @@ export default function Checkout() {
                                                 <MapPin className="w-4 h-4" />
                                                 {t('checkout.delivery_address')}
                                             </h3>
+                                            
+                                            {selected_address_id && (
+                                                <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                                                        {t('checkout.using_saved_address') || 'Using saved address. Select "Use New Address" above to edit.'}
+                                                    </p>
+                                                </div>
+                                            )}
+                                            
                                             <div className="space-y-4">
                                                 <div>
                                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -426,11 +605,19 @@ export default function Checkout() {
                                                     </label>
                                                     <select
                                                         value={address_data[store.id]?.city_id || ''}
-                                                        onChange={(e) => handleAddressChange(store.id, 'city_id', e.target.value)}
+                                                        onChange={(e) => {
+                                                            handleAddressChange(store.id, 'city_id', e.target.value);
+                                                            setSelectedAddressId(null); // Clear selected saved address when manually changing
+                                                        }}
+                                                        disabled={!!selected_address_id}
                                                         className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                                             getValidationError(store.id, 'city_id')
                                                                 ? 'border-red-500 dark:border-red-500'
                                                                 : 'border-gray-300 dark:border-gray-600'
+                                                        } ${
+                                                            selected_address_id
+                                                                ? 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed opacity-75'
+                                                                : ''
                                                         }`}
                                                         required
                                                     >
@@ -453,12 +640,20 @@ export default function Checkout() {
                                                     </label>
                                                     <textarea
                                                         value={address_data[store.id]?.address || ''}
-                                                        onChange={(e) => handleAddressChange(store.id, 'address', e.target.value)}
+                                                        onChange={(e) => {
+                                                            handleAddressChange(store.id, 'address', e.target.value);
+                                                            setSelectedAddressId(null); // Clear selected saved address when manually changing
+                                                        }}
+                                                        disabled={!!selected_address_id}
                                                         rows={3}
                                                         className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                                             getValidationError(store.id, 'address')
                                                                 ? 'border-red-500 dark:border-red-500'
                                                                 : 'border-gray-300 dark:border-gray-600'
+                                                        } ${
+                                                            selected_address_id
+                                                                ? 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed opacity-75'
+                                                                : ''
                                                         }`}
                                                         placeholder={t('checkout.address_placeholder')}
                                                         required
@@ -469,6 +664,68 @@ export default function Checkout() {
                                                         </p>
                                                     )}
                                                 </div>
+                                                
+                                                {/* Save Address Option - Only show when NOT using a saved address */}
+                                                {!selected_address_id && address_data[store.id]?.city_id && address_data[store.id]?.address && (
+                                                    <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                                                        {!show_save_address ? (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setShowSaveAddress(true);
+                                                                    // Check if this address already exists in saved addresses
+                                                                    const current_addr = address_data[store.id];
+                                                                    const existing = saved_addresses.find(addr => 
+                                                                        addr.city_id === current_addr.city_id && 
+                                                                        addr.address === current_addr.address
+                                                                    );
+                                                                    if (existing) {
+                                                                        setSaveAddressLabel(existing.label);
+                                                                    }
+                                                                }}
+                                                                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium flex items-center gap-1"
+                                                            >
+                                                                <MapPin className="w-4 h-4" />
+                                                                {t('checkout.save_this_address')}
+                                                            </button>
+                                                        ) : (
+                                                            <div className="space-y-2">
+                                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                                    {t('checkout.address_label') || 'Address Label'} (e.g., Home, Work)
+                                                                </label>
+                                                                <div className="flex gap-2">
+                                                                    <input
+                                                                        type="text"
+                                                                        value={save_address_label}
+                                                                        onChange={(e) => setSaveAddressLabel(e.target.value)}
+                                                                        placeholder={t('checkout.address_label_placeholder') || 'Home, Work, etc.'}
+                                                                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                                        disabled={saving_address}
+                                                                    />
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={handleSaveAddress}
+                                                                        disabled={saving_address || !save_address_label.trim()}
+                                                                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                                                    >
+                                                                        {saving_address ? t('common.saving') : t('checkout.save')}
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            setShowSaveAddress(false);
+                                                                            setSaveAddressLabel('');
+                                                                        }}
+                                                                        disabled={saving_address}
+                                                                        className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                                                    >
+                                                                        {t('common.cancel')}
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     ) : (

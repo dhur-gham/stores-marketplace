@@ -32,5 +32,15 @@ return [
         'city_required' => 'City is required',
         'city_invalid' => 'Please select a valid city',
     ],
+    'saved_addresses' => 'Saved Addresses',
+    'use_new_address' => 'Use New Address',
+    'saved_addresses_hint' => 'Select a saved address to auto-fill all delivery addresses, or enter a new address below.',
+    'save_this_address' => 'Save this address',
+    'address_label' => 'Address Label',
+    'address_label_placeholder' => 'Home, Work, etc.',
+    'address_label_required' => 'Please enter a label for this address (e.g., Home, Work)',
+    'save' => 'Save',
+    'save_address_failed' => 'Failed to save address. Please try again.',
+    'using_saved_address' => 'Using saved address. Select "Use New Address" above to edit.',
 ];
 
