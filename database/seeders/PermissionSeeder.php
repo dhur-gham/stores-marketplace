@@ -80,6 +80,15 @@ class PermissionSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
 
+        // System permissions (API documentation, etc.)
+        $system_permissions = [
+            'view_api_docs',                  // Scramble API documentation access
+        ];
+
+        foreach ($system_permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+        }
+
         // Create a super-admin role and assign all permissions
         $super_admin_role = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
         $super_admin_role->givePermissionTo(Permission::all());

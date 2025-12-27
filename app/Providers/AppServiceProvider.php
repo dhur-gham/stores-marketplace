@@ -56,5 +56,14 @@ class AppServiceProvider extends ServiceProvider
             $switch
                 ->locales(['ar', 'en']);
         });
+
+        // Define Gate for Scramble API documentation access
+        Gate::define('viewApiDocs', function (?User $user) {
+            if (! $user) {
+                return false;
+            }
+
+            return $user->hasPermissionTo('view_api_docs');
+        });
     }
 }
